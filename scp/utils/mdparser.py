@@ -1,7 +1,5 @@
-from typing import Dict
 
-
-ALL_CHARS: Dict[str] = {
+ALL_CHARS = {
 	'\\',
 	'\'',
 	'*',
