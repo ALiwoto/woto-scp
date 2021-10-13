@@ -25,3 +25,11 @@ def permissionParser(perms):
     text += 'invite: ' + bool_check(perms.can_invite_users) + '\n'
     text += 'Pin: ' + bool_check(perms.can_pin_messages) + '\n'
     return text
+
+def replace_text(text):
+    return text.replace('"', "").replace("\\r", "").replace("\\n", "").replace("\\", "")
+
+def remove_prefix(text: str, prefix: str) -> str:
+    if text.startswith(prefix):
+        text = text.replace(prefix, "", 1)
+    return text
