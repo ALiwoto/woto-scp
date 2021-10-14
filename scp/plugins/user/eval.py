@@ -27,7 +27,11 @@ exec_tasks = {}
     ),
 )
 async def pyexec(client: user, message: user.types.Message):
-    code = message.text.split(None, 1)[1]
+    code = ""
+    if message.reply_to_message:
+        code = message.reply_to_message.text
+    else:
+        code = message.text.split(None, 1)[1]
     tree = ast.parse(code)
     obody = tree.body
     body = obody.copy()
@@ -117,6 +121,21 @@ async def pyexec(client: user, message: user.types.Message):
                 user.md.Section('Output:', user.md.Code(output)),
             ),
         )
+
+
+@user.on_message(
+    ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.owner
+    & user.filters.command(
+        'exit',
+        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+    ),
+)
+async def exitexec():
+    exit(0)
 
 
 @user.on_message(user.owner & user.command('listEval'))
