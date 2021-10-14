@@ -249,15 +249,14 @@ async def url_cssworker(target_url: str):
     target_url = remove_prefix(target_url, "https://")
     target_url = remove_prefix(target_url, "http://")
 
-    data = json.dumps({"html": "", "console_mode": "", "url": target_url, "css": "", "selector": "", "ms_delay": "",
-                        "render_when_ready": "false", "viewport_height": "", "viewport_width": "",
-                        "google_fonts": "", "device_scale": ""})
-    async with httpx.AsyncClient(headers=my_headers) as ses:
-            try:
-                resp = await ses.post(url, data=data)
-                return resp.json()
-            except Exception:
-                return None
+    data = json.dumps({"html": "", "console_mode": "", 
+                "url": target_url, "css": "", "selector": "", "ms_delay": "",
+                "render_when_ready": "false", "viewport_height": "", "viewport_width": "",
+                "google_fonts": "", "device_scale": ""})
+    try:
+        return await user.Request(target_url, data=data, type="post")
+    except:
+        return None
 
 
 async def html_cssworker(target_html: str):
