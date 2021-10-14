@@ -27,7 +27,7 @@ __DOC__ = str(
 
 
 @user.on_message(
-    user.sudo
+    (user.sudo | user.owner)
     & user.filters.command(
         'exec',
         prefixes=user._config.get('scp-5170', 'prefixes').split(),

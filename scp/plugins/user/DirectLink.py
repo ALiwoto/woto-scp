@@ -17,7 +17,7 @@ __DOC__ = str(
 
 
 @user.on_message(
-    user.sudo
+    (user.sudo | user.admin)
     & (user.filters.reply | ~user.filters.text)
     & user.command('uploadFile'),
 )

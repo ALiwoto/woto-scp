@@ -27,7 +27,9 @@ def replace_text(text: str):
     )
 
 
-@user.on_message(user.sudo & user.command('ud'))
+@user.on_message(
+    (user.sudo | user.owner) & 
+    user.command('ud'))
 async def _(_, message: user.types.Message):
     if len(message.text.split()) == 1:
         return await message.delete()

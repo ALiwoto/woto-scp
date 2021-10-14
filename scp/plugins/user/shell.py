@@ -10,7 +10,7 @@ from scp import user
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & ~user.filters.edited
-    & user.filters.me
+    & user.owner
     & user.filters.command(
         'shell',
         prefixes=user._config.get('scp-5170', 'prefixes').split(),

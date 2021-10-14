@@ -119,7 +119,7 @@ async def pyexec(client: user, message: user.types.Message):
         )
 
 
-@user.on_message(user.filters.me & user.command('listEval'))
+@user.on_message(user.owner & user.command('listEval'))
 async def listexec(_, message: user.types.Message):
     try:
         x = await user.get_inline_bot_results(

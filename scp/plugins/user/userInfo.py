@@ -19,7 +19,7 @@ __DOC__ = str(
 
 
 @user.on_message(
-    user.sudo &
+    (user.sudo | user.owner) &
     user.command('info'),
 )
 async def _(_, message: user.types.Message):

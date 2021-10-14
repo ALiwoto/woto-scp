@@ -15,7 +15,9 @@ __DOC__ = str(
 )
 
 
-@user.on_message(user.sudo & user.command('phoneValidate'))
+@user.on_message(
+    (user.sudo | user.owner) & 
+    user.command('phoneValidate'))
 async def _(_, message: user.types.Message):
     if len(message.text.split()) == 1:
         return await message.delete()
