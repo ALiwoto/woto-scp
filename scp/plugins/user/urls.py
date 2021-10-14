@@ -1,8 +1,17 @@
+import html
 import httpx
+import html
 import ujson as json
 from scp.plugins.user.reporting import report_error
 from scp.utils.strUtils import remove_prefix
 from scp import user
+
+RIQ_URL = 1
+RIQ_GOOGLE = 2
+RIQ_GOOGLE_IMAGE = 3
+RIQ_BING = 4
+RIQ_BING_IMAGE = 5
+RIQ_DUCKGO = 6
 
 __PLUGIN__ = 'follow'
 __DOC__ = str(
@@ -65,6 +74,30 @@ async def _(_, message: user.types.Message):
 
 @user.on_message(user.sudo & user.command('urls'))
 async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_URL)
+
+@user.on_message(user.sudo & user.command('google'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_GOOGLE)
+
+@user.on_message(user.sudo & user.command('gimage'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_GOOGLE_IMAGE)
+
+@user.on_message(user.sudo & user.command('bing'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_BING)
+
+@user.on_message(user.sudo & user.command('bimage'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_BING_IMAGE)
+
+@user.on_message(user.sudo & user.command('duck'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_DUCKGO)
+
+
+async def cssworker_base(message: user.types.Message, req: int = 0):
     msg = message.text
     the_url = msg.split(" ", 1)
     wrong = False
@@ -81,10 +114,22 @@ async def cssworker_urls(_, message: user.types.Message):
     if wrong:
         return
 
+    if req == RIQ_GOOGLE:
+        the_url = "google.com/search?q=" + html.escape(the_url)
+    elif req == RIQ_GOOGLE_IMAGE:
+        the_url = "google.com/search?tbm=isch&q=" + html.escape(the_url)
+    elif req == RIQ_BING:
+        the_url = "bing.com/search?q=" + html.escape(the_url)
+    elif req == RIQ_BING_IMAGE:
+        the_url = (f"https://www.bing.com/images/search?q={html.escape(the_url)}"+
+            "&form=HDRSC2&first=1&tsc=ImageHoverTitle")
+    elif req == RIQ_DUCKGO:
+        the_url = "duckduckgo.com/?kae=d&q=" + html.escape(the_url)
+
     try:
         res_json = await url_cssworker(target_url=the_url)
     except BaseException as e:
-        await report_error(e, "urls", message.from_user)
+        await report_error(e, f"urls with request of: {req}", message.from_user)
         return
 
     if res_json:
@@ -145,8 +190,6 @@ async def cssworker_html(_, message: user.types.Message):
                 "urls", message.from_user)
 
     return
-
-
 
 
 async def url_cssworker(target_url: str):
