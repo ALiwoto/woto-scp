@@ -1,7 +1,7 @@
-import html
 import httpx
 import html
 import ujson as json
+from urllib.parse import urlencode
 from scp.plugins.user.reporting import report_error
 from scp.utils.strUtils import remove_prefix
 from scp import user
@@ -114,17 +114,19 @@ async def cssworker_base(message: user.types.Message, req: int = 0):
     if wrong:
         return
 
+    
+
     if req == RIQ_GOOGLE:
-        the_url = "google.com/search?q=" + html.escape(the_url)
+        the_url = "google.com/search?q=" + urlencode(the_url)
     elif req == RIQ_GOOGLE_IMAGE:
-        the_url = "google.com/search?tbm=isch&q=" + html.escape(the_url)
+        the_url = "google.com/search?tbm=isch&q=" + urlencode(the_url)
     elif req == RIQ_BING:
-        the_url = "bing.com/search?q=" + html.escape(the_url)
+        the_url = "bing.com/search?q=" + urlencode(the_url)
     elif req == RIQ_BING_IMAGE:
-        the_url = (f"https://www.bing.com/images/search?q={html.escape(the_url)}"+
+        the_url = (f"https://www.bing.com/images/search?q={urlencode(the_url)}"+
             "&form=HDRSC2&first=1&tsc=ImageHoverTitle")
     elif req == RIQ_DUCKGO:
-        the_url = "duckduckgo.com/?kae=d&q=" + html.escape(the_url)
+        the_url = "duckduckgo.com/?kae=d&q=" + urlencode(the_url)
 
     try:
         res_json = await url_cssworker(target_url=the_url)
