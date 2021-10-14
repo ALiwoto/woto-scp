@@ -169,10 +169,14 @@ async def cssworker_base(message: user.types.Message, req: int = 0):
         return
 
     if res_json:
-        # {"url":"image_url","response_time":"147ms"}
         image_url = res_json["url"]
         if image_url:
-            await message.reply_photo(image_url)
+            try:
+                await message.reply_photo(image_url)
+            except BaseException as e:
+                await report_error(e, f"urls with request of: {req} and " +
+                    "url of {image_url}", message.from_user)
+                return
         else:
             await report_error("couldn't get url value, most probably API is not accessible.",
                 "urls", message.from_user)
