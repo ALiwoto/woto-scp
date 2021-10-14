@@ -18,6 +18,27 @@ from scp import user
 )
 async def shell(_, message: user.types.Message):
     command = message.text.split(None, 1)[1]
+    await shell_base(message, command)
+
+
+@user.on_message(
+    ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.filters.me
+    & user.filters.command(
+        'neo',
+        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+    ),
+)
+async def shell(_, message: user.types.Message):
+    await shell_base(message, "neofetch --stdout")
+
+
+
+
+async def shell_base(message: user.types.Message, command: str):
     reply = await message.reply_text('Executing...', quote=True)
     process = await asyncio.create_subprocess_shell(
         command,
@@ -46,3 +67,7 @@ async def shell(_, message: user.types.Message):
         )
     else:
         await reply.edit_text(doc)
+
+
+
+

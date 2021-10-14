@@ -120,3 +120,6 @@ scp/logs/*.txt
 scp/plugins/private/*.py
 test.py
 unknown_errors.txt
+
+# old and deprecated pyfiles
+*.pyold
