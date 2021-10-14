@@ -134,7 +134,9 @@ async def pyexec(client: user, message: user.types.Message):
         prefixes=user._config.get('scp-5170', 'prefixes').split(),
     ),
 )
-async def exitexec():
+async def exitexec(_, message: user.types.Message):
+    if message.reply_to_message:
+        return
     exit(0)
 
 
