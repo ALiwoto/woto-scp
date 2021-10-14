@@ -11,6 +11,11 @@ RIQ_GOOGLE_IMAGE = 3
 RIQ_BING = 4
 RIQ_BING_IMAGE = 5
 RIQ_DUCKGO = 6
+RIQ_YANDEX = 7
+RIQ_YANDEX_IMAGE = 8
+RIQ_CC_IMAGE = 9
+RIQ_SWISSCOWS = 10
+RIQ_SWISSCOWS_IMAGE = 11
 
 __PLUGIN__ = 'follow'
 __DOC__ = str(
@@ -95,6 +100,26 @@ async def cssworker_urls(_, message: user.types.Message):
 async def cssworker_urls(_, message: user.types.Message):
     await cssworker_base(message, RIQ_DUCKGO)
 
+@user.on_message(user.sudo & user.command('yandex'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_YANDEX)
+
+@user.on_message(user.sudo & user.command('yimage'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_YANDEX_IMAGE)
+
+@user.on_message(user.sudo & user.command('ccimage'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_CC_IMAGE)
+
+@user.on_message(user.sudo & user.command('swiss'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_SWISSCOWS)
+
+@user.on_message(user.sudo & user.command('simage'))
+async def cssworker_urls(_, message: user.types.Message):
+    await cssworker_base(message, RIQ_SWISSCOWS_IMAGE)
+
 
 async def cssworker_base(message: user.types.Message, req: int = 0):
     msg = message.text
@@ -126,6 +151,16 @@ async def cssworker_base(message: user.types.Message, req: int = 0):
             "&form=HDRSC2&first=1&tsc=ImageHoverTitle")
     elif req == RIQ_DUCKGO:
         the_url = "duckduckgo.com/?kae=d&q=" + quote(the_url)
+    elif req == RIQ_YANDEX:
+        the_url = "yandex.com/search/?text=" + quote(the_url)
+    elif req == RIQ_YANDEX_IMAGE:
+        the_url = "yandex.com/images/search?from=tabbar&text=" + quote(the_url)
+    elif req == RIQ_CC_IMAGE:
+        the_url = "https://search.creativecommons.org/search?q=" + quote(the_url)
+    elif req == RIQ_SWISSCOWS:
+        the_url = "https://swisscows.com/web?query=" + quote(the_url)
+    elif req == RIQ_SWISSCOWS_IMAGE:
+        the_url = "https://swisscows.com/image?query=" + quote(the_url)
 
     try:
         res_json = await url_cssworker(target_url=the_url)
