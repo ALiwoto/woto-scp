@@ -101,7 +101,14 @@ class client(Client):
     _config = ConfigParser()
     _config.read('config.ini')
     _sudo = []
+    _owners = []
     for x in _config.get('scp-5170', 'SudoList').split():
         _sudo.append(int(x))
+    try:
+        for x in _config.get('scp-5170', 'OwnerList').split():
+            _owners.append(int(x))
+    except Exception as e:
+        logging.warning(f'{e}')
     sudo = (filters.me | filters.user(_sudo))
+    owner = (filters.me | filters.user(_owners))
     log_channel = _config.getint('scp-5170', 'LogChannel')
