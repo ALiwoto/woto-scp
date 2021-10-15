@@ -40,7 +40,7 @@ def is_undefined(response) -> bool:
     user.command('ud'))
 async def _(_, message: user.types.Message):
     if len(message.text.split()) == 1:
-        return await message.delete()
+        return
     text = message.text.split(None, 1)[1]
     response = await user.Request(
         f'http://api.urbandictionary.com/v0/define?term={text}',
