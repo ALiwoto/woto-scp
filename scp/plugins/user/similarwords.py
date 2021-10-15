@@ -1,4 +1,3 @@
-
 from urllib.parse import quote_plus as quote
 
 # create an async request with requests module
