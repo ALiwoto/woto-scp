@@ -46,7 +46,6 @@ async def _(_, message: user.types.Message):
         f'http://api.urbandictionary.com/v0/define?term={text}',
         type='get',
     )
-    text = ""
     if is_undefined(response):
         similars = await get_similar_words_async(text)
         if (not similars) or (len(similars) == 0):
