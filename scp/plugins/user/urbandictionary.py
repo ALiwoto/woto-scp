@@ -1,6 +1,6 @@
 from scp import user
 from scp.plugins.user.similarwords import get_similar_words_async
-from utils.mdparser import escapeAny
+from scp.utils.mdparser import escapeAny
 
 
 __PLUGIN__ = 'UrbanDictionary'
