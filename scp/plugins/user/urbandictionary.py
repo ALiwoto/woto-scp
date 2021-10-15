@@ -39,9 +39,14 @@ def is_undefined(response) -> bool:
     (user.sudo | user.owner) & 
     user.command('ud'))
 async def _(_, message: user.types.Message):
-    if len(message.text.split()) == 1:
-        return
-    text = message.text.split(None, 1)[1]
+    text = ""
+    if len(message.text.split()) <= 1:
+        if not message.reply_to_message:
+            return
+        else:
+            text = message.reply_to_message.text
+    else:
+        text = message.text.split(None, 1)[1]
     response = await user.Request(
         f'http://api.urbandictionary.com/v0/define?term={text}',
         type='get',
