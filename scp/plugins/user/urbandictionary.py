@@ -56,7 +56,7 @@ async def _(_, message: user.types.Message):
             num = 0
             for similar in similars:
                 num += 1
-                text += escapeAny(f'\n{num}- {similar}')
+                text += escapeAny(f'\n{num}- ') + '__' + escapeAny(similar) + '__ '
         return await message.reply(text, parse_mode="markdown")
     else:    
         text = user.md.KanTeXDocument(
