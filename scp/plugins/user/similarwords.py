@@ -10,13 +10,13 @@ def get_similar_words_requests(query: str) -> list:
         return []
     
     import requests
+    query = quote(query.strip())
     the_url = ("https://www.google.com/complete/" +
         "search?q=" + query +
         "&cp=0&client=gws-wiz" +
         "&xssi=t&gs_ri=gws-wiz&hl=en-US&authuser=0&" +
         "pq=" + query +
         "&psi=qUycYJ_XLseNkwXX7oGgBg.1620855979375&nolsbt=1&dpr=1")
-    query = quote(query.lower().strip())
     resp = requests.get(the_url)
     return parse_google_data(resp.content.decode("utf-8"))
 
@@ -31,13 +31,13 @@ def get_similar_words(query: str) -> list:
         return []
     
     import httpx
+    query = quote(query.strip())
     the_url = ("https://www.google.com/complete/" +
         "search?q=" + query +
         "&cp=0&client=gws-wiz" +
         "&xssi=t&gs_ri=gws-wiz&hl=en-US&authuser=0&" +
         "pq=" + query +
         "&psi=qUycYJ_XLseNkwXX7oGgBg.1620855979375&nolsbt=1&dpr=1")
-    query = quote(query.lower().strip())
     with httpx.Client() as ses:
         resp = ses.get(the_url)
         return parse_google_data(resp.content.decode("utf-8"))
@@ -53,13 +53,13 @@ async def get_similar_words_async(query: str) -> list:
         return []
     
     import httpx
+    query = quote(query.strip())
     the_url = ("https://www.google.com/complete/" +
         "search?q=" + query +
         "&cp=0&client=gws-wiz" +
         "&xssi=t&gs_ri=gws-wiz&hl=en-US&authuser=0&" +
         "pq=" + query +
         "&psi=qUycYJ_XLseNkwXX7oGgBg.1620855979375&nolsbt=1&dpr=1")
-    query = quote(query.lower().strip())
     async with httpx.AsyncClient() as ses:
         resp = await ses.get(the_url)
         return parse_google_data(resp.content.decode("utf-8"))
@@ -67,7 +67,7 @@ async def get_similar_words_async(query: str) -> list:
 
 def parse_google_data(gStr: str) -> list:
     """
-    Parses the data returned response from the Google API.
+    Parses the data returned from the Google API.
     """
 
     if (not gStr) or (len(gStr) < 2):
