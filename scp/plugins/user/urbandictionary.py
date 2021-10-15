@@ -30,9 +30,9 @@ def replace_text(text: str):
 
 def is_undefined(response) -> bool:
     return ((not response) or (not response['list']) or (len(response['list']) == 0)
-        or (len(response['list'][0] == 0)) or 
-        (len(response['list'][0]['word'] == 0)) or 
-        (len(response['list'][0]['definition'] == 0)))
+        or (len(response['list'][0]) == 0) or 
+        (len(response['list'][0]['word']) == 0) or 
+        (len(response['list'][0]['definition']) == 0))
 
 
 @user.on_message(
@@ -52,7 +52,7 @@ async def _(_, message: user.types.Message):
             text = escapeAny(f'No definition found for "{text}"...')
         else:
             text = escapeAny(f'No definition found for "{text}"...\n'+
-                'but here are some similarities:')
+                '✧ but here are some similarities:')
             num = 0
             for similar in similars:
                 num += 1
