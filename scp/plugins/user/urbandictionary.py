@@ -1,5 +1,5 @@
 from scp import user
-from similarwords import get_similar_words_async
+from scp.plugins.user.similarwords import get_similar_words_async
 from utils.mdparser import escapeAny
 
 
