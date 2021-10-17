@@ -55,7 +55,7 @@ async def upload(_, message: user.types.Message):
     reply = await message.reply_text(text)
     file_name = os.path.basename(file)
     if os.path.isdir(file):
-        shutil.make_archive(f"{file_name}.zip", 'zip', file)
+        shutil.make_archive(f"{file_name}-archive", 'zip', file)
         file = file_name
         return
     
