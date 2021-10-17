@@ -1,6 +1,7 @@
 import os
 import html
 import time
+import shutil
 from datetime import timedelta
 from scp import user
 
@@ -52,13 +53,20 @@ async def upload(_, message: user.types.Message):
         return
     text = f'Uploading {html.escape(file)}...'
     reply = await message.reply_text(text)
+    file_name = os.path.basename(file)
+    if os.path.isdir(file):
+        shutil.make_archive(f"{file_name}.zip", 'zip', file)
+        file = file_name
+        return
+    
     try:
-		
-        await user.send_document(message.chat.id, file, progress=progress_callback, progress_args=(reply, text, True), force_document=True, reply_to_message_id=None if message.chat.type in ('private', 'bot') else message.message_id)
+        await user.send_document(message.chat.id, file, 
+            progress=progress_callback, progress_args=(reply, text, True), force_document=True, reply_to_message_id=None if message.chat.type in ('private', 'bot') else message.message_id)
     except user.exceptions.MediaInvalid:
         await message.reply_text('Upload cancelled!')
     else:
         await reply.delete()
+
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
