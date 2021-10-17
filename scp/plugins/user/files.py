@@ -57,7 +57,6 @@ async def upload(_, message: user.types.Message):
     if os.path.isdir(file):
         shutil.make_archive(f"{file_name}-archive", 'zip', file)
         file = file_name
-        return
     
     try:
         await user.send_document(message.chat.id, file, 
