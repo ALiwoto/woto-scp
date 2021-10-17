@@ -16,3 +16,4 @@ TgCrypto==1.2.2
 ujson==4.1.0
 yarl==1.6.3
 httpx==0.18.2
+psutil==5.8.0
