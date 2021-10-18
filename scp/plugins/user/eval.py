@@ -19,7 +19,7 @@ exec_tasks = {}
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & ~user.filters.edited
-    & user.filters.me
+    & user.owner
     & user.filters.command(
         'eval',
         prefixes=user._config.get('scp-5170', 'prefixes').split(),
