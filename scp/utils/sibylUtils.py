@@ -28,6 +28,7 @@ class SibylClient(PsychoPass):
     
     def ban(self, user_id: int, reason: str, message: str=None, source: str=None) -> BanResult:
         r = self.client.get(f"{self.host}addBan?token={self.token}&user-id={user_id}&reason={reason}&message={message}&source={source}")
+        j = r.json()
         if not self.is_success(j):
             raise GeneralException(r.json()["error"]["message"])
         return BanResult(**r.json()["result"])
