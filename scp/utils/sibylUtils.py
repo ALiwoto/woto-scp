@@ -276,6 +276,9 @@ class SibylClient(PsychoPass):
         the_resp = stats_from_dict(resp)
         return the_resp.result
     
+    def change_toke(self, token: str):
+        self.token = token
+    
     def change_perm(self, user_id: int, permission: int) -> str:
         resp = self.invoke_request((f"{self.host}changePerm?token={self.token}"+
             f"&user-id={user_id}&permission={permission}"))
