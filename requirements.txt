@@ -18,4 +18,3 @@ ujson==4.1.0
 yarl==1.6.3
 httpx==0.20.0
 psutil==5.8.0
-git+https://github.com/AnimeKaizoku/SibylSystem-Py
