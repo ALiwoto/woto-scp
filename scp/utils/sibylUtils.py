@@ -5,6 +5,7 @@ from sibylsystem.SibylSystem.types import (
     Ban,
     BanResult,
 )
+from sibylsystem.SibylSystem.types.stats import StatsResult
 
 class SibylClient(PsychoPass):
     def __init__(self, token: str):
@@ -36,8 +37,17 @@ class SibylClient(PsychoPass):
     def ban_user(self, user_id: int, reason: str, message: str=None, source: str=None) -> BanResult:
         return self.ban(user_id, reason, message, source)
 
+    def stats(self) -> StatsResult:
+        resp = self.invoke_request(f"{self.host}stats?token={self.token}")
+        if not self.is_success(resp):
+            raise GeneralException(resp["error"]["message"])
+        return StatsResult(**resp)
+
     def is_success(self, jsonResp) -> bool:
         return jsonResp['success']
+    
+    def invoke_request(self, url: str):
+        return self.client.get(url).json()
     
     
     
