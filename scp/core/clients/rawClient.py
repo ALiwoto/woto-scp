@@ -1,5 +1,6 @@
 from pyrogram import Client, filters, types, raw, errors, session
 from scp.core.filters.Command import command
+from scp.utils.sibylUtils import SibylClient
 from configparser import ConfigParser
 from kantex import md as Markdown
 from aiohttp import ClientSession, client_exceptions
@@ -117,4 +118,18 @@ class client(Client):
         logging.warning(f'{e}')
     sudo = (filters.me | filters.user(_sudo))
     owner = (filters.me | filters.user(_owners))
+    
     log_channel = _config.getint('scp-5170', 'LogChannel')
+    # sibyl configuration stuff:
+    sibyl_token = _config.get('sibyl-system', 'token')
+    public_listener = _config.getint('sibyl-system', 'public_listener')
+    public_logger = _config.get('sibyl-system', 'public_logger')
+    private_listener = _config.get('sibyl-system', 'private_listener')
+    private_logger = _config.get('sibyl-system', 'private_logger')
+    public_sibyl_filter = filters.chat(
+        public_listener,
+    )
+    private_sibyl_filter = filters.chat(
+        private_listener,
+    )
+    sibyl: SibylClient = SibylClient(sibyl_token)
