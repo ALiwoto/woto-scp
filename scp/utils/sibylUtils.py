@@ -36,7 +36,7 @@ class SibylClient(PsychoPass):
     def ban_user(self, user_id: int, reason: str, message: str=None, source: str=None) -> BanResult:
         return self.add_ban(user_id, reason, message, source)
 
-    def is_success(jsonResp) -> bool:
+    def is_success(self, jsonResp) -> bool:
         return jsonResp['success']
     
     
