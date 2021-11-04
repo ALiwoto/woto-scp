@@ -115,7 +115,7 @@ dmypy.json
 *.session
 bot.ini
 *.session-journal
-*.ini
+config.ini
 scp/logs/*.txt
 scp/plugins/private/*.py
 test.py
