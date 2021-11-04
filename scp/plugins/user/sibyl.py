@@ -28,6 +28,9 @@ async def _(_, message: user.types.Message):
             await message.reply_text(txt, parse_mode="HTML", disable_web_page_preview=True)
             return
         else:
+            txt = "<b>" + "This user is not currently banned in Sibyl System." + "</b>\n"
+            txt += "<b>" + "ID: " + "</b><code>" + str(the_info.user_id) + "</code>\n"
+            await message.reply_text(txt, parse_mode="HTML", disable_web_page_preview=True)
             await message.reply_text(html.escape(f"{the_info}"), parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
         await message.reply_text("<code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
