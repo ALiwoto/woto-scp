@@ -23,7 +23,8 @@ async def _(_, message: user.types.Message):
     try:
         the_info = user.sibyl.get_info(get_user)
         if the_info.banned:
-            await message.edit("This user is banned.")
+            await message.reply_text("This user is banned.", parse_mode="HTML",
+                disable_web_page_preview=True)
             return
     except Exception as e:
         await message.reply_text("<code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
