@@ -258,6 +258,12 @@ class SibylClient(PsychoPass):
     def clear_ban(self, user_id: int) -> bool:
         return self.revert(user_id)
     
+    def user_info(self, user_id: int) -> UserInfo:
+        resp = self.invoke_request(f"{self.host}getInfo?token={self.token}&user-id={user_id}")
+        if not self.is_success(resp):
+            raise GeneralException(resp["error"]["message"])
+        return UserInfo.from_dict(resp['result'])
+    
     def ban(self, user_id: int, reason: str, message: str=None, source: str=None) -> UserBannedResult:
         resp = self.invoke_request((f"{self.host}addBan?token={self.token}"+
             f"&user-id={user_id}&reason={reason}&message={message}&source={source}"))
