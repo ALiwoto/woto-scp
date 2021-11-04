@@ -33,6 +33,6 @@ async def _(_, message: user.types.Message):
             await message.reply_text(txt, parse_mode="HTML", disable_web_page_preview=True)
             await message.reply_text(html.escape(f"{the_info}"), parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
-        await message.reply_text("<code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
+        await message.reply_text("Got error: <code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
         return
     

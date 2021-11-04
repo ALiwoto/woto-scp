@@ -1,3 +1,4 @@
+from pyrogram.types.user_and_chats.user import User
 from sibylsystem.SibylSystem import PsychoPass
 from typing import List, Dict, Any, TypeVar, Callable, Type, cast
 from sibylsystem.SibylSystem.exceptions import GeneralException
@@ -231,6 +232,39 @@ class StatsResponse:
         return result
 
 
+
+
+class UserInfoResponse:
+    success: bool
+    result: UserInfo
+    error: None
+
+    def __init__(self, success: bool, result: UserInfo, error: None) -> None:
+        self.success = success
+        self.result = result
+        self.error = error
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'UserInfoResponse':
+        assert isinstance(obj, dict)
+        success = from_bool(obj.get("success"))
+        result = UserInfoResponse.from_dict(obj.get("result"))
+        error = from_none(obj.get("error"))
+        return UserInfoResponse(success, result, error)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["success"] = from_bool(self.success)
+        result["result"] = to_class(UserInfo, self.result)
+        result["error"] = from_none(self.error)
+        return result
+
+
+def UserInfoResponse_from_dict(s: Any) -> UserInfoResponse:
+    return UserInfoResponse.from_dict(s)
+
+
+
 def stats_from_dict(s: Any) -> StatsResponse:
     return StatsResponse.from_dict(s)
 
@@ -262,7 +296,8 @@ class SibylClient(PsychoPass):
         resp = self.invoke_request(f"{self.host}getInfo?token={self.token}&user-id={user_id}")
         if not self.is_success(resp):
             raise GeneralException(resp["error"]["message"])
-        return UserInfo.from_dict(resp['result'])
+        the_resp = UserInfoResponse_from_dict(resp)
+        return the_resp.result
     
     def ban(self, user_id: int, reason: str, message: str=None, source: str=None) -> UserBannedResult:
         resp = self.invoke_request((f"{self.host}addBan?token={self.token}"+
