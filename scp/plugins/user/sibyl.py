@@ -21,9 +21,11 @@ async def _(_, message: user.types.Message):
         except ValueError:
             pass
     try:
-        the_info = user.sibyl.get_info(get_user)
+        the_info = user.sibyl.user_info(get_user)
         if the_info.banned:
-            await message.reply_text(html.escape("This user is banned."), parse_mode="HTML", disable_web_page_preview=True)
+            txt = "<b>" + "This user is banned in Sibyl System." + "</b>\n"
+            txt += "<b>" + "ID: " + "</b><code>" + str(the_info.user_id) + "</code>\n"
+            await message.reply_text(txt, parse_mode="HTML", disable_web_page_preview=True)
             return
         else:
             await message.reply_text(html.escape(f"{the_info}"), parse_mode="HTML", disable_web_page_preview=True)
