@@ -248,7 +248,7 @@ class UserInfoResponse:
     def from_dict(obj: Any) -> 'UserInfoResponse':
         assert isinstance(obj, dict)
         success = from_bool(obj.get("success"))
-        result = UserInfoResponse.from_dict(obj.get("result"))
+        result = UserInfo.from_dict(obj.get("result"))
         error = from_none(obj.get("error"))
         return UserInfoResponse(success, result, error)
 
