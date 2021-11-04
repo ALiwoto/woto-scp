@@ -14,7 +14,7 @@ class SibylClient(PsychoPass):
         r = self.client.get(f"{self.host}removeBan?token={self.token}&user-id={user_id}")
         j = r.json()
         if self.is_success(j):
-            return r['result']
+            return j['result']
         raise GeneralException(j['error']['message'])
     
     def revert_ban(self, user_id: int) -> bool:
@@ -30,11 +30,11 @@ class SibylClient(PsychoPass):
         r = self.client.get(f"{self.host}addBan?token={self.token}&user-id={user_id}&reason={reason}&message={message}&source={source}")
         j = r.json()
         if not self.is_success(j):
-            raise GeneralException(r.json()["error"]["message"])
-        return BanResult(**r.json()["result"])
+            raise GeneralException(j["error"]["message"])
+        return BanResult(**j["result"])
     
     def ban_user(self, user_id: int, reason: str, message: str=None, source: str=None) -> BanResult:
-        return self.add_ban(user_id, reason, message, source)
+        return self.ban(user_id, reason, message, source)
 
     def is_success(self, jsonResp) -> bool:
         return jsonResp['success']
