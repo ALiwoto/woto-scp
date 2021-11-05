@@ -1,5 +1,8 @@
 from pyrogram.types.user_and_chats.user import User
 from sibylsystem.SibylSystem import PsychoPass
+from sibylsystem.SibylSystem.types import (
+    BanResult as SibylBanResult,
+)
 from typing import List, Dict, Any, TypeVar, Callable, Type, cast
 from sibylsystem.SibylSystem.exceptions import GeneralException
 
@@ -294,18 +297,18 @@ class SibylClient(PsychoPass):
     
     def user_info(self, user_id: int) -> UserInfo:
         resp = self.invoke_request(f"{self.host}getInfo?token={self.token}&user-id={user_id}")
+        self.get_info
         if not self.is_success(resp):
             raise GeneralException(resp["error"]["message"])
         the_resp = UserInfoResponse_from_dict(resp)
         return the_resp.result
     
-    def ban(self, user_id: int, reason: str, message: str=None, source: str=None) -> UserBannedResult:
+    def ban(self, user_id: int, reason: str, message: str=None, source: str=None) -> SibylBanResult:
         resp = self.invoke_request((f"{self.host}addBan?token={self.token}"+
             f"&user-id={user_id}&reason={reason}&message={message}&source={source}"))
         if not self.is_success(resp):
             raise GeneralException(resp["error"]["message"])
-        the_resp = BanResponse_from_dict(resp)
-        return the_resp.result
+        return SibylBanResult(**resp)
     
     def ban_user(self, user_id: int, reason: str, message: str=None, source: str=None) -> UserBannedResult:
         return self.ban(user_id, reason, message, source)
