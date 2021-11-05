@@ -1,3 +1,4 @@
+from time import sleep
 from scp import user
 import html
 
@@ -20,6 +21,12 @@ async def _(_, message: user.types.Message):
             get_user = int(cmd[1])
         except ValueError:
             pass
+    ptxt = "Sending cymatic scan request to Sibyl System."
+    my_msg = await message.reply_text(ptxt)
+    sleep(0.8)
+    await my_msg.edit_text(ptxt + ".")
+    sleep(0.8)
+    await my_msg.edit_text(ptxt + ".")
     try:
         the_info = user.sibyl.user_info(get_user)
         if not the_info:
@@ -42,8 +49,8 @@ async def _(_, message: user.types.Message):
             txt += "<b>" + "‍ • Last update: " + "</b><code>" + str(the_info.date) + "</code>\n"
         
         
-        await message.reply_text(txt, parse_mode="HTML", disable_web_page_preview=True)
+        await my_msg.edit_text(txt, parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
-        await message.reply_text("Got error: <code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
+        await my_msg.edit_text("Got error: <code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
         return
     
