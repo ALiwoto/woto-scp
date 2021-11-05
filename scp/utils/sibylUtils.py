@@ -143,7 +143,10 @@ def stats_from_dict(s: Any) -> StatsResponse:
 
 
 class SibylClient(PsychoPass):
+    original_token: str
+
     def __init__(self, token: str):
+        self.original_token = token
         super().__init__(token, show_license=False)
 
     def revert(self, user_id: int) -> bool:
@@ -175,10 +178,21 @@ class SibylClient(PsychoPass):
         return the_resp.result
     
     def change_token(self, token: str):
+        if not isinstance(token, str):
+            raise TypeError("token must be str")
+        if len(token) < 20:
+            raise ValueError("token must be more than 20 characters long")
         self.token = token
     
     def change_host(self, host: str):
+        if not host.endswith("/"):
+            host += "/"
+        if not host.startswith("http"):
+            host = "http://" + host
         self.host = host
+    
+    def change_to_original_token(self):
+        self.token = self.original_token
     
     def change_perm(self, user_id: int, permission: int) -> str:
         return self.change_permission(user_id, permission)
