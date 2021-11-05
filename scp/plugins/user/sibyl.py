@@ -1,4 +1,6 @@
 from time import sleep
+
+from gitdb.db import mem
 from scp import user
 import html
 
@@ -54,3 +56,20 @@ async def _(_, message: user.types.Message):
         await my_msg.edit_text("Got error: <code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
         return
     
+@user.on_message(
+    (user.sudo | user.owner) &
+    user.command('skickall'),
+)
+async def kickall(_, message: user.types.Message):
+    chat = message.chat
+    for i in range(10):
+        members = chat.get_members()
+        for member in members:
+            if  not member.can_send_messages:
+                chat.kick_member(member.user_id)
+
+
+
+
+    pass
+
