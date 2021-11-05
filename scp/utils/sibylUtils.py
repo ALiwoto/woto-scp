@@ -181,12 +181,12 @@ class SibylClient(PsychoPass):
         self.host = host
     
     def change_perm(self, user_id: int, permission: int) -> str:
-        self.change_permission
-        resp = self.invoke_request((f"{self.host}changePerm?token={self.token}"+
-            f"&user-id={user_id}&permission={permission}"))
-        if not self.is_success(resp):
-            raise GeneralException(resp["error"]["message"])
-        return resp['result']
+        return self.change_permission(user_id, permission)
+        #resp = self.invoke_request((f"{self.host}changePerm?token={self.token}"+
+        #    f"&user-id={user_id}&permission={permission}"))
+        #if not self.is_success(resp):
+        #    raise GeneralException(resp["error"]["message"])
+        #return resp['result']
     
     def to_inspector(self, user_id: int) -> str:
         return self.change_perm(user_id, 2)
