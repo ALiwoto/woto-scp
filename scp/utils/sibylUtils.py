@@ -304,14 +304,10 @@ class SibylClient(PsychoPass):
         return the_resp.result
     
     def ban(self, user_id: int, reason: str, message: str=None, source: str=None) -> SibylBanResult:
-        resp = self.invoke_request((f"{self.host}addBan?token={self.token}"+
-            f"&user-id={user_id}&reason={reason}&message={message}&source={source}"))
-        if not self.is_success(resp):
-            raise GeneralException(resp["error"]["message"])
-        return SibylBanResult(**resp)
+        return self.add_ban(user_id, reason, message, source)
     
     def ban_user(self, user_id: int, reason: str, message: str=None, source: str=None) -> UserBannedResult:
-        return self.ban(user_id, reason, message, source)
+        return self.add_ban(user_id, reason, message, source)
 
     def stats(self) -> StatsResult:
         resp = self.invoke_request(f"{self.host}stats?token={self.token}")
