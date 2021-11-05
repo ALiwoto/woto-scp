@@ -14,7 +14,7 @@ __DOC__ = str(
             user.md.SubSection(
                 'Execute',
                 user.md.Code(
-                    '(*prefix)exec {language} {code_or_Document}',
+                    '(*prefix)execcc {language} {code_or_Document}',
                 ),
             ),
             user.md.SubSection(
@@ -29,7 +29,7 @@ __DOC__ = str(
 @user.on_message(
     (user.sudo | user.owner)
     & user.filters.command(
-        'exec',
+        'execcc',
         prefixes=user._config.get('scp-5170', 'prefixes').split(),
     ),
 )
