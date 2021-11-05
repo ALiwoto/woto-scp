@@ -2,6 +2,7 @@ from pyrogram.types.user_and_chats.user import User
 from sibylsystem.SibylSystem import PsychoPass
 from sibylsystem.SibylSystem.types import (
     BanResult as SibylBanResult,
+    Ban as SibylBanInfo,
 )
 from typing import List, Dict, Any, TypeVar, Callable, Type, cast
 from sibylsystem.SibylSystem.exceptions import GeneralException
@@ -295,13 +296,15 @@ class SibylClient(PsychoPass):
     def clear_ban(self, user_id: int) -> bool:
         return self.revert(user_id)
     
-    def user_info(self, user_id: int) -> UserInfo:
+    def user_info_old(self, user_id: int) -> UserInfo:
         resp = self.invoke_request(f"{self.host}getInfo?token={self.token}&user-id={user_id}")
-        self.get_info
         if not self.is_success(resp):
             raise GeneralException(resp["error"]["message"])
         the_resp = UserInfoResponse_from_dict(resp)
         return the_resp.result
+    
+    def user_info(self, user_id: int) -> SibylBanInfo:
+        return self.get_info(user_id)
     
     def ban(self, user_id: int, reason: str, message: str=None, source: str=None) -> SibylBanResult:
         return self.add_ban(user_id, reason, message, source)
@@ -328,6 +331,15 @@ class SibylClient(PsychoPass):
         if not self.is_success(resp):
             raise GeneralException(resp["error"]["message"])
         return resp['result']
+    
+    def to_inspector(self, user_id: int) -> str:
+        return self.change_perm(user_id, 2)
+    
+    def to_enforcer(self, user_id: int) -> str:
+        return self.change_perm(user_id, 1)
+    
+    def to_civilian(self, user_id: int) -> str:
+        return self.change_perm(user_id, 0)
 
     def is_success(self, jsonResp) -> bool:
         return jsonResp['success']
