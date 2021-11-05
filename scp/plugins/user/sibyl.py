@@ -26,16 +26,22 @@ async def _(_, message: user.types.Message):
             await message.reply_text('failed to receive info from Sibyl System.')
             return
         txt = "<b>" + "Sibyl System scan results:" + "</b>\n"
-        txt += "<b>" + "‍ •ID: " + "</b><code>" + str(the_info.user_id) + "</code>\n"
-        txt += "<b>" + "‍ •Is banned: " + "</b><code>" + str(the_info.banned) + "</code>\n"
+        txt += "<b>" + "‍ • ID: " + "</b><code>" + str(the_info.user_id) + "</code>\n"
+        txt += "<b>" + "‍ • Is banned: " + "</b><code>" + str(the_info.banned) + "</code>\n"
         if the_info.banned:
-            txt += "<b>" + "‍ •Ban reason: " + "</b><code>" + html.escape(the_info.reason) + "</code>\n"
             if the_info.banned_by != 0:
-                txt += "<b>" + "‍ •Banned by: " + "</b><code>" + str(the_info.banned_by) + "</code>\n"
+                txt += "<b>" + "‍ • Banned by: " + "</b><code>" + str(the_info.banned_by) + "</code>\n"
             if the_info.ban_flags and len(the_info.ban_flags) > 0:
-                txt += "<b>" + "‍ •Ban flags: " + "</b><code>" + str(the_info.ban_flags) + "</code>\n"
-        txt += "<b>" + "‍ •Crime Coefficient: " + "</b><code>" + str(the_info.crime_coefficient) + "</code>\n"
-        txt += "<b>" + "‍ •Last update: " + "</b><code>" + str(the_info.date) + "</code>\n"
+                f = ', '.join(the_info.ban_flags)
+                txt += "<b>" + "‍ • Ban flags: " + "</b><code>" + html.escape(f) + "</code>\n"
+            txt += "<b>" + "‍ • Crime Coefficient: " + "</b><code>" + str(the_info.crime_coefficient) + "</code>\n"
+            txt += "<b>" + "‍ • Last update: " + "</b><code>" + str(the_info.date) + "</code>\n"
+            txt += "<b>" + "‍ • Ban reason: " + "</b><code>" + html.escape(the_info.reason) + "</code>\n"
+        else:
+            txt += "<b>" + "‍ • Crime Coefficient: " + "</b><code>" + str(the_info.crime_coefficient) + "</code>\n"
+            txt += "<b>" + "‍ • Last update: " + "</b><code>" + str(the_info.date) + "</code>\n"
+        
+        
         await message.reply_text(txt, parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
         await message.reply_text("Got error: <code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
