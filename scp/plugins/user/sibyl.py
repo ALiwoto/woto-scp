@@ -1,6 +1,4 @@
 from time import sleep
-
-from gitdb.db import mem
 from scp import user
 import html
 
