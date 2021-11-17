@@ -133,3 +133,4 @@ class client(Client):
         private_listener,
     )
     sibyl: SibylClient = SibylClient(sibyl_token)
+    auto_read_enabled = True
