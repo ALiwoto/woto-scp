@@ -36,7 +36,7 @@ async def admins_handler(_, message: user.types.Message):
     try:
         m = await user.get_chat_members(the_chat)
     except Exception as ex:
-        top_msg.edit_text(text=f"<code>{ex}</code>")
+        await top_msg.edit_text(text=f"<code>{ex}</code>")
         return
     creator = None
     admins = []
