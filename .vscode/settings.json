@@ -4,6 +4,7 @@
         "aiohttp",
         "execv",
         "gautoread",
+        "hiddenls",
         "Kantek",
         "pyrogram"
     ]
