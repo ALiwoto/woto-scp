@@ -1,17 +1,7 @@
 import asyncio
-import os
 import html
-import sys
-import time
 from io import BytesIO
-import shutil
-from datetime import timedelta
-
-from git import exc
 from scp import user
-
-
-
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
