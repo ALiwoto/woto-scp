@@ -2,6 +2,7 @@
     "cSpell.words": [
         "aioclient",
         "aiohttp",
+        "execv",
         "gautoread",
         "Kantek",
         "pyrogram"

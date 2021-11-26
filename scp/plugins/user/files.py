@@ -1,5 +1,7 @@
+import asyncio
 import os
 import html
+import sys
 import time
 import shutil
 from datetime import timedelta
@@ -51,6 +53,38 @@ async def ls(_, message: user.types.Message):
 async def pwd(_, message: user.types.Message):
     dir = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or '.'))
     await message.reply_text(dir or 'Empty', disable_web_page_preview=True)
+
+
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command('gitpull',
+        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+    ))
+async def gitpull(_, message: user.types.Message):
+    command = "git pull"
+    r = await message.reply("Trying to pull changes")
+    process = await asyncio.create_subprocess_shell(command, 
+                stdin=asyncio.subprocess.PIPE if sys.stdin else None,
+                stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+                
+    res = await process.communicate()
+    output = res[0].decode()
+    await r.edit("<code>" + html.escape(str(output)[:4000]) + "</code>", parse_mode='html')
+
+    try:
+        r = await user.send_message(chat_id=message.chat.id, text="Restarting")
+        await user.stop(block=False)
+
+        os.execv("start.sh", sys.argv)
+
+    except user.errors.RPCError as rpc_error:
+        await r.edit("<code>" + html.escape(str(rpc_error)[:4000]) + "</code>", parse_mode='html')
+
 
 
 @user.on_message(~user.filters.scheduled & 
