@@ -32,10 +32,14 @@ async def admins_handler(_, message: user.types.Message):
     m = await user.get_chat_members(the_chat)
     creator = None
     admins = []
+    bots = []
     for i in m:
         if i.status == 'creator':
             creator = i
         elif i.status == 'administrator':
+            if i.user.is_bot:
+                bots.append(i)
+                continue
             admins.append(i)
 
     if not creator and len(admins) == 0:
@@ -52,6 +56,12 @@ async def admins_handler(_, message: user.types.Message):
         txt += "<bold>" + html.escape("Admins:\n") + "</bold>"
         for admin in admins:
             txt += starter + f"<a href=tg://user?id={admin.user.id}>{html.escape(admin.user.first_name)}</a>"
+            txt += "\n"
+    
+    if len(bots) > 0:
+        txt += "<bold>" + html.escape("Bots:\n") + "</bold>"
+        for bot in bots:
+            txt += starter + f"<a href=tg://user?id={bot.user.id}>{html.escape(bot.user.first_name)}</a>"
             txt += "\n"
     
     await top_msg.edit_text(text=txt, parse_mode="html")
