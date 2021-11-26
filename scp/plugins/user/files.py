@@ -82,8 +82,8 @@ async def gitpull(_, message: user.types.Message):
 
         os.execv("run.sh", sys.argv)
 
-    except user.errors.RPCError as rpc_error:
-        await r.edit("<code>" + html.escape(str(rpc_error)[:4000]) + "</code>", parse_mode='html')
+    except Exception as e:
+        await r.edit("<code>" + html.escape(str(e)[:4000]) + "</code>", parse_mode='html')
 
 
 
