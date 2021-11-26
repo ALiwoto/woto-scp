@@ -1,5 +1,9 @@
+import os
+import sys
+import signal
+import psutil
 from pyrogram.types import InlineKeyboardButton
-
+from pyrogram import Client
 
 class _KB(InlineKeyboardButton):
     def __eq__(self, other):
@@ -50,3 +54,19 @@ def paginate_modules(_page_n, module_dict, prefix, chat=None):
     if calc in [1, 2]:
         pairs.append((modules[-1],))
     return pairs
+
+
+async def restart_scp(user: Client, update_req: bool = False, hard: bool = False) -> None:
+        """ Restart the woto-scp """
+        await user.stop()
+        if update_req:
+            os.system(  # nosec
+                "pip install -U pip && pip install -r requirements.txt --quiet")
+        if hard:
+            os.kill(os.getpid(), signal.SIGUSR1)
+        else:
+            c_p = psutil.Process(os.getpid())
+            for handler in c_p.open_files() + c_p.connections():
+                os.close(handler.fd)
+            os.execl(sys.executable, sys.executable, '-m', 'scp')  # nosec
+            sys.exit()

@@ -2,11 +2,15 @@
     "cSpell.words": [
         "aioclient",
         "aiohttp",
+        "execl",
         "execv",
         "gautoread",
+        "getpid",
         "hiddenls",
         "Kantek",
         "popen",
-        "pyrogram"
+        "psutil",
+        "pyrogram",
+        "SIGUSR"
     ]
 }
