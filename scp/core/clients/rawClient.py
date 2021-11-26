@@ -75,7 +75,7 @@ class client(Client):
     
     async def restart_scp(self, update_req: bool = False, hard: bool = False):
         await self.stop(block=False)
-        restart_woto_scp(self, update_req, hard)
+        restart_woto_scp(update_req, hard)
     
 
     async def Request(self, url: str, type: str, *args, **kwargs):
