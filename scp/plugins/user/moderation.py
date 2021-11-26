@@ -39,7 +39,7 @@ async def admins_handler(_, message: user.types.Message):
             admins.append(i)
 
     if not creator and len(admins) == 0:
-        top_msg.edit_text(text="Seems like all admins are anon...")
+        await top_msg.edit_text(text="Seems like all admins are anon...")
         return
 
     starter = "<code>" + " • " + "</code>"
@@ -54,4 +54,4 @@ async def admins_handler(_, message: user.types.Message):
             txt += starter + f"<a href=tg://user?id={admin.user.id}>{html.escape(admin.user.first_name)}</a>"
             txt += "\n"
     
-    top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(text=txt, parse_mode="html")
