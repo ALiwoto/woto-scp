@@ -60,7 +60,6 @@ def restart_scp(update_req: bool = False, hard: bool = False) -> None:
         if update_req:
             os.system(  # nosec
                 "pip install -U pip && pip install -r requirements.txt --quiet")
-        
         if hard:
             os.kill(os.getpid(), signal.SIGUSR1)
         else:
