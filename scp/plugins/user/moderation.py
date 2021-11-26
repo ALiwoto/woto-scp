@@ -44,7 +44,7 @@ async def admins_handler(_, message: user.types.Message):
 
     starter = "<code>" + " • " + "</code>"
     if creator:
-        txt += "<bold>" + html.escape("The creator:\n") + "</bold>"
+        txt += "<bold>" + html.escape("The creator:") + "</bold>\n"
         txt += starter + f"<a href=tg://user?id={creator.user.id}>{html.escape(creator.user.first_name)}</a>"
         txt += "\n\n"
 
