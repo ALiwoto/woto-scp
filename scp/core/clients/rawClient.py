@@ -1,6 +1,7 @@
 from pyrogram import Client, filters, types, raw, errors, session
 from scp.core.filters.Command import command
 from scp.utils.sibylUtils import SibylClient
+from scp.utils.misc import restart_scp as restart_woto_scp
 from configparser import ConfigParser
 from kantex import md as Markdown
 from aiohttp import ClientSession, client_exceptions
@@ -71,6 +72,9 @@ class client(Client):
         ) as response:
             e = await response.text()
         return e if e != 'false' and e[:-1] != url else None
+    
+    async def restart_scp(self, update_req: bool = False, hard: bool = False):
+        await restart_woto_scp(self, update_req, hard)
 
     async def Request(self, url: str, type: str, *args, **kwargs):
         if type == 'get':

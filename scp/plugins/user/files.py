@@ -79,10 +79,8 @@ async def gitpull(_, message: user.types.Message):
         return
     
     try:
-        r = await user.send_message(chat_id=message.chat.id, text="Restarting")
-        await user.stop(block=False)
-
-        os.popen('./run.sh')
+        r = await user.send_message(chat_id=message.chat.id, text="Restarting...")
+        await user.restart_scp()
     
     except Exception as e:
         await r.edit("<code>" + html.escape(str(e)[:4000]) + "</code>", parse_mode='html')
