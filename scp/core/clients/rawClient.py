@@ -124,6 +124,7 @@ class client(Client):
         logging.warning(f'{e}')
     sudo = (filters.me | filters.user(_sudo))
     owner = (filters.me | filters.user(_owners))
+    cmd_prefixes = _config.get('scp-5170', 'prefixes').split() or ['!', '.']
     
     log_channel = _config.getint('scp-5170', 'LogChannel')
     # sibyl configuration stuff:
