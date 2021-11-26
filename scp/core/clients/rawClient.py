@@ -74,7 +74,8 @@ class client(Client):
         return e if e != 'false' and e[:-1] != url else None
     
     async def restart_scp(self, update_req: bool = False, hard: bool = False):
-        await restart_woto_scp(self, update_req, hard)
+        await self.stop()
+        restart_woto_scp(self, update_req, hard)
 
     async def Request(self, url: str, type: str, *args, **kwargs):
         if type == 'get':
