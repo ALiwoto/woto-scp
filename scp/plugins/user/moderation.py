@@ -56,12 +56,14 @@ async def admins_handler(_, message: user.types.Message):
         txt += "<bold>" + html.escape("Admins:\n") + "</bold>"
         for admin in admins:
             txt += starter + f"<a href=tg://user?id={admin.user.id}>{html.escape(admin.user.first_name)}</a>"
-            txt += "\n\n"
+            txt += "\n"
+        txt += "\n"
     
     if len(bots) > 0:
         txt += "<bold>" + html.escape("Bots:\n") + "</bold>"
         for bot in bots:
             txt += starter + f"<a href=tg://user?id={bot.user.id}>{html.escape(bot.user.first_name)}</a>"
-            txt += "\n\n"
+            txt += "\n"
+        txt += "\n"
     
     await top_msg.edit_text(text=txt, parse_mode="html")
