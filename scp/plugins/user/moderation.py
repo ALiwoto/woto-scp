@@ -24,6 +24,8 @@ async def admins_handler(_, message: user.types.Message):
             index = len(all_strs) - 1
             if all_strs[index].isdigit():
                 index -= 1
+            if all_strs[index].isdigit():
+                all_strs[index] = '-100' + all_strs[index]
             the_chat = all_strs[index]
         
     top_msg = await message.reply_text(f"<code>{html.escape('fetching group admins...')}</code>")
