@@ -84,7 +84,6 @@ async def gitpull(_, message: user.types.Message):
 
         os.popen('./run.sh')
     
-
     except Exception as e:
         await r.edit("<code>" + html.escape(str(e)[:4000]) + "</code>", parse_mode='html')
 
