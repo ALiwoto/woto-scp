@@ -82,7 +82,7 @@ async def gitpull(_, message: user.types.Message):
         r = await user.send_message(chat_id=message.chat.id, text="Restarting")
         await user.stop(block=False)
 
-        os.execv("./run.sh", sys.argv)
+        os.popen('./run.sh')
     
 
     except Exception as e:

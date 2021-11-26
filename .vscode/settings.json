@@ -6,6 +6,7 @@
         "gautoread",
         "hiddenls",
         "Kantek",
+        "popen",
         "pyrogram"
     ]
 }
