@@ -22,7 +22,7 @@ exec_tasks = {}
     & user.owner
     & user.filters.command(
         'eval',
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ),
 )
 async def pyexec(client: user, message: user.types.Message):
@@ -130,7 +130,7 @@ async def pyexec(client: user, message: user.types.Message):
     & user.owner
     & user.filters.command(
         'exit',
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ),
 )
 async def exitexec(_, message: user.types.Message):

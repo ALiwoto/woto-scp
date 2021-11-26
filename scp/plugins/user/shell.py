@@ -12,8 +12,8 @@ from scp import user
     & ~user.filters.edited
     & user.owner
     & user.filters.command(
-        'shell',
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        ['shell', 'sh'],
+        prefixes=user.cmd_prefixes,
     ),
 )
 async def shell(_, message: user.types.Message):
@@ -29,7 +29,7 @@ async def shell(_, message: user.types.Message):
     & user.filters.me
     & user.filters.command(
         'neo',
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ),
 )
 async def shell(_, message: user.types.Message):

@@ -30,7 +30,7 @@ __DOC__ = str(
     (user.sudo | user.owner)
     & user.filters.command(
         'execcc',
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ),
 )
 async def _(_, message: user.types.Message):

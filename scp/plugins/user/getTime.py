@@ -26,7 +26,7 @@ __DOC__ = str(
 	user.owner & 
 	user.filters.command(
         ['time', 'now'],
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ))
 async def _(_, message: user.types.Message):
     if len(message.command) == 1:

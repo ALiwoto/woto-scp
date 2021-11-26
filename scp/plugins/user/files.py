@@ -15,7 +15,7 @@ from scp import user
 	user.owner & 
 	user.filters.command(
         ['ls', 'hls', 'hiddenls'],
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ))
 async def ls(_, message: user.types.Message):
     dir = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or '.'))
@@ -48,7 +48,7 @@ async def ls(_, message: user.types.Message):
 	user.owner & 
 	user.filters.command(
         ['pwd', 'dir'],
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ))
 async def pwd(_, message: user.types.Message):
     dir = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or '.'))
@@ -63,7 +63,7 @@ async def pwd(_, message: user.types.Message):
 	~user.filters.edited & 
 	user.owner & 
 	user.filters.command('gitpull',
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ))
 async def gitpull(_, message: user.types.Message):
     command = "git pull"
@@ -95,7 +95,7 @@ async def gitpull(_, message: user.types.Message):
 	user.owner & 
 	user.filters.command(
         ['ul', 'upload'],
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ))
 async def upload(_, message: user.types.Message):
     file = os.path.expanduser(' '.join(message.command[1:]))
@@ -125,7 +125,7 @@ async def upload(_, message: user.types.Message):
 	user.owner & 
 	user.filters.command(
         ['dl', 'download'],
-        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+        prefixes=user.cmd_prefixes,
     ))
 async def download(_, message: user.types.Message):
     file = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or './'))
