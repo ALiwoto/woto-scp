@@ -80,7 +80,7 @@ async def gitpull(_, message: user.types.Message):
         r = await user.send_message(chat_id=message.chat.id, text="Restarting")
         await user.stop(block=False)
 
-        os.execv("start.sh", sys.argv)
+        os.execv("run.sh", sys.argv)
 
     except user.errors.RPCError as rpc_error:
         await r.edit("<code>" + html.escape(str(rpc_error)[:4000]) + "</code>", parse_mode='html')
