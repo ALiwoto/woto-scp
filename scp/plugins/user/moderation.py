@@ -19,7 +19,7 @@ async def admins_handler(_, message: user.types.Message):
         the_chat = message.chat.id
     else:
         the_chat = message.text.split(' ')[1]
-        if the_chat.find('/'):
+        if the_chat.find('/') > 0:
             all_strs = the_chat.split('/')
             index = len(all_strs) - 1
             if all_strs[index].isdigit:
