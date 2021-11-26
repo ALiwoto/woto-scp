@@ -77,7 +77,6 @@ async def gitpull(_, message: user.types.Message):
     await r.edit("<code>" + html.escape(str(output)[:4000]) + "</code>", parse_mode='html')
     if output.count('Already up to date') > 0:
         return
-    else: print(output)
     
     try:
         r = await user.send_message(chat_id=message.chat.id, text="Restarting")
