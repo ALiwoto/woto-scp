@@ -1,4 +1,4 @@
-# XWSLLPX5RMIZ
+
 from scp import user
 from typing import List
 import datetime
@@ -18,7 +18,16 @@ __DOC__ = str(
 )
 
 
-@user.on_message(user.sudo & user.command('time'))
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['time', 'now'],
+        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+    ))
 async def _(_, message: user.types.Message):
     if len(message.command) == 1:
         return None
