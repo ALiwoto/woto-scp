@@ -3,6 +3,7 @@ import os
 import html
 import sys
 import time
+from io import BytesIO
 import shutil
 from datetime import timedelta
 from scp import user
@@ -50,12 +51,14 @@ async def admins_handler(_, message: user.types.Message):
     if creator:
         txt += "<bold>" + html.escape("The creator:") + "</bold>\n"
         txt += starter + f"<a href=tg://user?id={creator.user.id}>{html.escape(creator.user.first_name)}</a>"
+        txt += f": <code>{creator.user.id}</code>"
         txt += "\n\n"
 
     if len(admins) > 0:
         txt += "<bold>" + html.escape("Admins:\n") + "</bold>"
         for admin in admins:
             txt += starter + f"<a href=tg://user?id={admin.user.id}>{html.escape(admin.user.first_name)}</a>"
+            txt += f": <code>{admin.user.id}</code>"
             txt += "\n"
         txt += "\n"
     
@@ -63,7 +66,15 @@ async def admins_handler(_, message: user.types.Message):
         txt += "<bold>" + html.escape("Bots:\n") + "</bold>"
         for bot in bots:
             txt += starter + f"<a href=tg://user?id={bot.user.id}>{html.escape(bot.user.first_name)}</a>"
+            txt += f": <code>{bot.user.id}</code>"
             txt += "\n"
         txt += "\n"
     
+    if len(txt) > 4096:
+        f = BytesIO(txt.strip().encode('utf-8'))
+        f.name = 'output.txt'
+        await asyncio.gather(top_msg.delete(), message.reply_document(f))
+        return
+
     await top_msg.edit_text(text=txt, parse_mode="html")
+    
