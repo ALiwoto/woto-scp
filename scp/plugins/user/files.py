@@ -37,6 +37,22 @@ async def ls(_, message: user.types.Message):
     await message.reply_text(text or 'Empty', disable_web_page_preview=True)
 
 
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['pwd', 'dir'],
+        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+    ))
+async def pwd(_, message: user.types.Message):
+    dir = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or '.'))
+    await message.reply_text(dir or 'Empty', disable_web_page_preview=True)
+
+
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
