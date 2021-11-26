@@ -27,11 +27,11 @@ class client(Client):
             f'logged in as {(await super().get_me()).first_name}.',
         )
 
-    async def stop(self, *args):
+    async def stop(self, block: bool = True):
         logging.warning(
             f'logged out from {(await super().get_me()).first_name}.',
         )
-        await super().stop()
+        await super().stop(block)
 
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
