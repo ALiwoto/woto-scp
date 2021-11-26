@@ -13,14 +13,14 @@ class client(Client):
     def __init__(
         self,
         name: str,
-        aioclient=ClientSession,
+        _=ClientSession,
     ):
         self.name = name
         super().__init__(
             name,
             workers=8,
         )
-        self.aioclient = aioclient()
+        self.aioclient:ClientSession = ClientSession()
 
     async def start(self):
         await super().start()
@@ -74,7 +74,7 @@ class client(Client):
         return e if e != 'false' and e[:-1] != url else None
     
     async def restart_scp(self, update_req: bool = False, hard: bool = False):
-        await self.stop()
+        await self.stop(block=False)
         restart_woto_scp(self, update_req, hard)
 
     async def Request(self, url: str, type: str, *args, **kwargs):
