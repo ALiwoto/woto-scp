@@ -69,4 +69,3 @@ async def restart_scp(user: Client, update_req: bool = False, hard: bool = False
             for handler in c_p.open_files() + c_p.connections():
                 os.close(handler.fd)
             os.execl(sys.executable, sys.executable, '-m', 'scp')  # nosec
-            sys.exit()
