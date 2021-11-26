@@ -57,14 +57,14 @@ async def admins_handler(_, message: user.types.Message):
     starter = "<code>" + " • " + "</code>"
     if creator:
         txt += "<bold>" + html.escape("The creator:") + "</bold>\n"
-        txt += starter + f"<a href=tg://user?id={creator.user.id}>{html.escape(creator.user.first_name)}</a>"
+        txt += starter + f"<a href=tg://user?id={creator.user.id}>{html.escape(creator.user.first_name[:16])}</a>"
         txt += f": <code>{creator.user.id}</code>"
         txt += "\n\n"
 
     if len(admins) > 0:
         txt += "<bold>" + html.escape("Admins:\n") + "</bold>"
         for admin in admins:
-            txt += starter + f"<a href=tg://user?id={admin.user.id}>{html.escape(admin.user.first_name)}</a>"
+            txt += starter + f"<a href=tg://user?id={admin.user.id}>{html.escape(admin.user.first_name[:16])}</a>"
             txt += f": <code>{admin.user.id}</code>"
             txt += "\n"
         txt += "\n"
@@ -72,7 +72,7 @@ async def admins_handler(_, message: user.types.Message):
     if len(bots) > 0:
         txt += "<bold>" + html.escape("Bots:\n") + "</bold>"
         for bot in bots:
-            txt += starter + f"<a href=tg://user?id={bot.user.id}>{html.escape(bot.user.first_name)}</a>"
+            txt += starter + f"<a href=tg://user?id={bot.user.id}>{html.escape(bot.user.first_name[:16])}</a>"
             txt += f": <code>{bot.user.id}</code>"
             txt += "\n"
         txt += "\n"
