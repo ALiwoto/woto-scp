@@ -6,6 +6,8 @@ import time
 from io import BytesIO
 import shutil
 from datetime import timedelta
+
+from git import exc
 from scp import user
 
 
@@ -30,7 +32,12 @@ async def admins_handler(_, message: user.types.Message):
         
     top_msg = await message.reply_text(f"<code>{html.escape('fetching group admins...')}</code>")
     txt = ''
-    m = await user.get_chat_members(the_chat)
+    m = None
+    try:
+        m = await user.get_chat_members(the_chat)
+    except Exception as ex:
+        top_msg.edit_text(text=f"<code>{ex}</code>")
+        return
     creator = None
     admins = []
     bots = []
