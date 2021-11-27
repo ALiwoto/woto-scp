@@ -61,16 +61,16 @@ def can_user_match(user: types.User, query: str) -> bool:
     if not user or len(query) < 2:
         return False
 
-    if len(user.first_name) > 0 and can_str_param_match(user.first_name, query):
+    if user.first_name and len(user.first_name) > 0 and can_str_param_match(user.first_name, query):
         return True
     
-    if len(user.last_name) > 0 and can_str_param_match(user.last_name, query):
+    if user.last_name and len(user.last_name) > 0 and can_str_param_match(user.last_name, query):
         return True
     
-    if len(user.username) > 0 and can_str_param_match(user.username, query):
+    if user.username and len(user.username) > 0 and can_str_param_match(user.username, query):
         return True
     
-    if len(user.status) > 0 and can_str_param_match(user.username, query):
+    if user.status and len(user.status) > 0 and can_str_param_match(user.status, query):
         return True
 
     return False
@@ -82,19 +82,19 @@ def can_member_match(m: types.ChatMember, query: str) -> bool:
     if not user or len(query) < 2:
         return False
 
-    if len(user.first_name) > 0 and can_str_param_match(user.first_name, query):
+    if user.first_name and len(user.first_name) > 0 and can_str_param_match(user.first_name, query):
         return True
     
-    if len(user.last_name) > 0 and can_str_param_match(user.last_name, query):
+    if user.last_name and len(user.last_name) > 0 and can_str_param_match(user.last_name, query):
         return True
     
-    if len(user.username) > 0 and can_str_param_match(user.username, query):
+    if user.username and len(user.username) > 0 and can_str_param_match(user.username, query):
         return True
     
-    if len(user.status) > 0 and can_str_param_match(user.username, query):
+    if user.status and len(user.status) > 0 and can_str_param_match(user.username, query):
         return True
     
-    if len(m.title) > 0 and can_str_param_match(user.username, query):
+    if m.title and len(m.title) > 0 and can_str_param_match(user.username, query):
         return True
 
     return False
