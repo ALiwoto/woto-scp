@@ -65,7 +65,7 @@ def fix_encoding(value: str) -> str:
 
 
 def split_all(value: str, *delimiters) -> list[str]:
-    regP = '|'.join(map(re.escape, delimiters))
+    regP = '|'.join(map(re.escape, *delimiters))
     return remove_empty_strs(re.split(regP, value))
 
 def remove_empty_strs(values: list[str]) -> list[str]:
