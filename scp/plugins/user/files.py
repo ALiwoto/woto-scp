@@ -109,8 +109,14 @@ async def upload(_, message: user.types.Message):
         file = os.path.expanduser(f"{file_name}-archive.zip")
     
     try:
-        await user.send_document(message.chat.id, file, 
-            progress=progress_callback, progress_args=(reply, text, True), force_document=True, reply_to_message_id=None if message.chat.type in ('private', 'bot') else message.message_id)
+        await user.send_document(
+            message.chat.id, 
+            file, 
+            progress=progress_callback, 
+            progress_args=(reply, text, True), 
+            force_document=True, 
+            reply_to_message_id=None if message.chat.type in ('private', 'bot') else message.message_id,
+        )
     except user.exceptions.MediaInvalid:
         await message.reply_text('Upload cancelled!')
     else:
@@ -159,7 +165,7 @@ async def download(_, message: user.types.Message):
 
 
 progress_callback_data = dict()
-async def progress_callback(current, total, reply, text, upload):
+async def progress_callback(current: int, total: int, reply: user.types.Message, text: str, upload: bool):
     message_identifier = (reply.chat.id, reply.message_id)
     last_edit_time, prevtext, start_time = progress_callback_data.get(message_identifier, (0, None, time.time()))
     if current == total:
@@ -173,13 +179,11 @@ async def progress_callback(current, total, reply, text, upload):
             speed = format_bytes((total - current) / (time.time() - start_time))
         else:
             speed = '0 B'
-        text = f'''{text}
-<code>{return_progress_string(current, total)}</code>
-
-<b>Total Size:</b> {format_bytes(total)}
-<b>{handle}ed Size:</b> {format_bytes(current)}
-<b>{handle} Speed:</b> {speed}/s
-<b>ETA:</b> {calculate_eta(current, total, start_time)}'''
+        text = (f"{text}\n<code>{return_progress_string(current, total)}</code>"+
+        f"\n<b>Total Size:</b> {format_bytes(total)}" +
+        f"\n<b>{handle}ed Size:</b> {format_bytes(current)}" +
+        f"\n<b>{handle} Speed:</b> {speed}/s" +
+        f"\n<b>ETA:</b> {calculate_eta(current, total, start_time)}")
         if prevtext != text:
             await reply.edit_text(text)
             prevtext = text
@@ -188,7 +192,7 @@ async def progress_callback(current, total, reply, text, upload):
 
 
 # https://stackoverflow.com/a/34325723
-def return_progress_string(current, total):
+def return_progress_string(current: int, total: int) -> str:
     filled_length = int(30 * current // total)
     return '[' + '=' * filled_length + ' ' * (30 - filled_length) + ']'
 
