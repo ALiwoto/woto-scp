@@ -64,6 +64,21 @@ def fix_encoding(value: str) -> str:
     except: return ""
 
 
+def split_all(value: str, *delimiters) -> list[str]:
+    regP = '|'.join(map(re.escape, delimiters))
+    return remove_empty_strs(re.split(regP, value))
+
+def remove_empty_strs(values: list[str]) -> list[str]:
+    myStrs: list[str] = []
+    for s in values:
+        if not is_invalid_str(s):
+            myStrs.append(s)
+
+    return myStrs
+
+def is_invalid_str(value: str) -> bool:
+    return not value or len(value.strip()) == 0 or value.isspace()
+
 def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
     f = BytesIO(fix_encoding(value))
     f.name = file_name
