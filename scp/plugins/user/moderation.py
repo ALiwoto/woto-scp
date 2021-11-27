@@ -64,7 +64,7 @@ async def admins_handler(_, message: user.types.Message):
     if creator:
         txt += html_bold("The creator:", "\n")
         u = creator.user
-        txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id, "\n")
+        txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id)
         txt += "\n\n"
 
     if len(admins) > 0:
