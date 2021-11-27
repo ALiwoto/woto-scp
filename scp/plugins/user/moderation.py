@@ -141,17 +141,17 @@ async def members_handler(_, message: user.types.Message):
 
     starter = "<code>" + " • " + "</code>"
     if len(members) > 0:
-        txt += html_bold("Members:\n")
+        txt += html_bold("Members:", "\n")
         for member in members:
             u = member.user
-            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id) + "\n"
+            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
         txt += "\n"
     
     if len(bots) > 0:
-        txt += html_bold("Bots:\n")
+        txt += html_bold("Bots:", "\n")
         for bot in bots:
             u = bot.user
-            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id) + "\n"
+            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
         txt += "\n"
     
     if len(txt) > 4096:

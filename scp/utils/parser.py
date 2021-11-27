@@ -70,11 +70,11 @@ def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
     return f
 
 
-def html_mono(value) -> str:
-    return f"<code>{html.escape(str(value))}</code>"
+def html_mono(value, *argv) -> str:
+    return f"<code>{html.escape(str(value))}</code>" + ''.join(argv)
 
-def html_bold(value) -> str:
-    return f"<b>{html.escape(str(value))}</b>"
+def html_bold(value, *argv) -> str:
+    return f"<b>{html.escape(str(value))}</b>" + ''.join(argv)
 
 def get_name(user: types.User, name_limit: int = -1) -> str:
     if not user:
