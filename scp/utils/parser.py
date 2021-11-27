@@ -76,7 +76,7 @@ def html_mono(value, *argv) -> str:
 def html_in_parantesis(value) -> str:
     if not value:
         return ": "
-    return f"({value}): "
+    return f" ({value}): "
 
 def html_bold(value, *argv) -> str:
     return f"<b>{html.escape(str(value))}</b>" + ''.join(argv)
