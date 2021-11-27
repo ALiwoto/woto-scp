@@ -4,6 +4,8 @@ from io import BytesIO
 from scp import user
 from scp.utils.parser import (
     html_bold,
+    html_in_common,
+    html_in_parantesis,
     html_mono, 
     mention_user_html, 
     to_output_file,
@@ -62,16 +64,14 @@ async def admins_handler(_, message: user.types.Message):
     if creator:
         txt += "<b>" + html.escape("The creator:") + "</b>\n"
         u = creator.user
-        txt += starter + mention_user_html(u, 16)
-        txt += f": <code>{u.id}</code>"
+        txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id, "\n")
         txt += "\n\n"
 
     if len(admins) > 0:
         txt += "<b>" + html.escape("Admins:") + "</b>\n"
         for admin in admins:
             u = admin.user
-            txt += starter + mention_user_html(u, 16)
-            txt += f": <code>{u.id}</code>"
+            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id, "\n")
             txt += "\n"
         txt += "\n"
     
@@ -79,8 +79,7 @@ async def admins_handler(_, message: user.types.Message):
         txt += "<b>" + html.escape("Bots:") + "</b>\n"
         for bot in bots:
             u = bot.user
-            txt += starter + mention_user_html(u, 16)
-            txt += f": <code>{u.id}</code>"
+            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id, "\n")
             txt += "\n"
         txt += "\n"
     
