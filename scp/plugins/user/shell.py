@@ -48,7 +48,7 @@ async def shell(_, message: user.types.Message):
     ),
 )
 async def shell(_, message: user.types.Message):
-    await shell_base(message, message.text)
+    await shell_base(message, message.text[1:])
 
 
 
