@@ -104,8 +104,6 @@ def can_member_match(m: types.ChatMember, ch: types.Chat, query: str) -> bool:
     return False
 
 
-
-
 def can_str_param_match(param: str, query: str) -> bool:
     return remove_special_chars(param).find(query) != -1
 
