@@ -91,10 +91,10 @@ def can_member_match(m: types.ChatMember, query: str) -> bool:
     if user.username and len(user.username) > 0 and can_str_param_match(user.username, query):
         return True
     
-    if user.status and len(user.status) > 0 and can_str_param_match(user.username, query):
+    if user.status and len(user.status) > 0 and can_str_param_match(user.status, query):
         return True
     
-    if m.title and len(m.title) > 0 and can_str_param_match(user.username, query):
+    if m.title and len(m.title) > 0 and can_str_param_match(m.title, query):
         return True
 
     return False
