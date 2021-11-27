@@ -1,4 +1,6 @@
+from io import BytesIO
 from pyrogram import types
+import html
 import re
 
 
@@ -46,3 +48,37 @@ def checkToken(token: str) -> bool:
         return False, False
     else:
         return True, token[0]
+
+
+def mention_user_html(user: types.User, name_limit: int = -1) -> str:
+    if not user:
+        return ""
+    return f"<a href=tg://user?id={user.id}>{html.escape(get_name(user, name_limit))}</a>"
+    
+
+def fix_encoding(value: str) -> str:
+    if not isinstance(value, str):
+        return ""
+    try:
+        return value.strip().encode('utf-8')
+    except: return ""
+
+
+def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
+    f = BytesIO(fix_encoding(value))
+    f.name = file_name
+    return f
+
+
+def get_name(user: types.User, name_limit: int = -1) -> str:
+    if not user:
+        return ""
+    
+    if len(user.first_name) > 0:
+        return user.first_name if name_limit == -1 else user.first_name[:name_limit]
+    
+    if len(user.last_name) > 0:
+        return user.last_name if name_limit == -1 else user.last_name[:name_limit]
+    
+    if len(user.username) > 0:
+        return user.username if name_limit == -1 else user.username[:name_limit]
