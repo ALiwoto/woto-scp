@@ -110,7 +110,7 @@ def remove_special_chars(value: str) -> str:
     last_space = False
     result = ''
     for current in value:
-        o = ord(value)
+        o = ord(current)
         if current == " ":
             if last_space:
                 continue
