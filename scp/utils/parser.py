@@ -68,7 +68,7 @@ def split_all(value: str, *delimiters) -> list:
     regP = '|'.join(map(re.escape, delimiters))
     return remove_empty_strs(re.split(regP, value))
 
-def remove_empty_strs(values: list[str]) -> list:
+def remove_empty_strs(values: list) -> list:
     myStrs: list[str] = []
     for s in values:
         if not is_invalid_str(s):
