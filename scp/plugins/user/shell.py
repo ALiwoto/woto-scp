@@ -36,6 +36,20 @@ async def shell(_, message: user.types.Message):
     await shell_base(message, "neofetch --stdout")
 
 
+@user.on_message(
+    ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.filters.me
+    & user.filters.command(
+        'git',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def shell(_, message: user.types.Message):
+    await shell_base(message, message.text)
+
 
 
 async def shell_base(message: user.types.Message, command: str):
