@@ -3,6 +3,7 @@ import html
 from io import BytesIO
 from scp import user
 from scp.utils.parser import (
+    html_bold,
     html_mono, 
     mention_user_html, 
     to_output_file,
@@ -59,14 +60,14 @@ async def admins_handler(_, message: user.types.Message):
 
     starter = "<code>" + " • " + "</code>"
     if creator:
-        txt += "<bold>" + html.escape("The creator:") + "</bold>\n"
+        txt += "<b>" + html.escape("The creator:") + "</b>\n"
         u = creator.user
         txt += starter + mention_user_html(u, 16)
         txt += f": <code>{u.id}</code>"
         txt += "\n\n"
 
     if len(admins) > 0:
-        txt += "<bold>" + html.escape("Admins:\n") + "</bold>"
+        txt += "<b>" + html.escape("Admins:") + "</b>\n"
         for admin in admins:
             u = admin.user
             txt += starter + mention_user_html(u, 16)
@@ -75,7 +76,7 @@ async def admins_handler(_, message: user.types.Message):
         txt += "\n"
     
     if len(bots) > 0:
-        txt += "<bold>" + html.escape("Bots:\n") + "</bold>"
+        txt += "<b>" + html.escape("Bots:") + "</b>\n"
         for bot in bots:
             u = bot.user
             txt += starter + mention_user_html(u, 16)
@@ -122,7 +123,7 @@ async def members_handler(_, message: user.types.Message):
     try:
         m = await user.get_chat_members(the_chat)
     except Exception as ex:
-        await top_msg.edit_text(text=f"<code>{ex}</code>")
+        await top_msg.edit_text(text=html_mono(ex))
         return
     
     members: list[user.types.ChatMember] = []
@@ -140,14 +141,14 @@ async def members_handler(_, message: user.types.Message):
 
     starter = "<code>" + " • " + "</code>"
     if len(members) > 0:
-        txt += "<bold>" + html.escape("Members:\n") + "</bold>"
+        txt += html_bold("Members:\n")
         for member in members:
             u = member.user
             txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id) + "\n"
         txt += "\n"
     
     if len(bots) > 0:
-        txt += "<bold>" + html.escape("Bots:\n") + "</bold>"
+        txt += html_bold("Bots:\n")
         for bot in bots:
             u = bot.user
             txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id) + "\n"
