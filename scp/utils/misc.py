@@ -114,6 +114,7 @@ def remove_special_chars(value: str) -> str:
         if current == " ":
             if last_space:
                 continue
+            last_space = True
             result += " "
             continue
         elif last_space:
