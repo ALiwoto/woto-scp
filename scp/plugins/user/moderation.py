@@ -2,7 +2,11 @@ import asyncio
 import html
 from io import BytesIO
 from scp import user
-from scp.utils.parser import fix_encoding, mention_user_html, to_output_file
+from scp.utils.parser import (
+    html_mono, 
+    mention_user_html, 
+    to_output_file,
+)
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -38,8 +42,8 @@ async def admins_handler(_, message: user.types.Message):
         await top_msg.edit_text(text=f"<code>{ex}</code>")
         return
     creator = None
-    admins = []
-    bots = []
+    admins: list[user.types.ChatMember] = []
+    bots: list[user.types.ChatMember] = []
     for i in m:
         if i.status == 'creator':
             creator = i
@@ -73,15 +77,14 @@ async def admins_handler(_, message: user.types.Message):
     if len(bots) > 0:
         txt += "<bold>" + html.escape("Bots:\n") + "</bold>"
         for bot in bots:
-            txt += starter + f"<a href=tg://user?id={bot.user.id}>{html.escape(bot.user.first_name[:16])}</a>"
-            txt += f": <code>{bot.user.id}</code>"
+            u = bot.user
+            txt += starter + mention_user_html(u, 16)
+            txt += f": <code>{u.id}</code>"
             txt += "\n"
         txt += "\n"
     
     if len(txt) > 4096:
-        f = BytesIO(txt.strip().encode('utf-8'))
-        f.name = 'output.txt'
-        await asyncio.gather(top_msg.delete(), message.reply_document(f))
+        await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
     await top_msg.edit_text(text=txt, parse_mode="html")
@@ -113,7 +116,7 @@ async def members_handler(_, message: user.types.Message):
                 all_strs[index] = '-100' + all_strs[index]
             the_chat = all_strs[index]
         
-    top_msg = await message.reply_text(f"<code>{html.escape('fetching group members...')}</code>")
+    top_msg = await message.reply_text(html_mono('fetching group members...'))
     txt: str = ''
     m = None
     try:
@@ -137,21 +140,17 @@ async def members_handler(_, message: user.types.Message):
 
     starter = "<code>" + " • " + "</code>"
     if len(members) > 0:
-        txt += "<bold>" + html.escape("Admins:\n") + "</bold>"
+        txt += "<bold>" + html.escape("Members:\n") + "</bold>"
         for member in members:
             u = member.user
-            txt += starter + mention_user_html(u, 16)
-            txt += f": <code>{u.id}</code>"
-            txt += "\n"
+            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id) + "\n"
         txt += "\n"
     
     if len(bots) > 0:
         txt += "<bold>" + html.escape("Bots:\n") + "</bold>"
         for bot in bots:
             u = bot.user
-            txt += starter + mention_user_html(u, 16)
-            txt += f": <code>{u.id}</code>"
-            txt += "\n"
+            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id) + "\n"
         txt += "\n"
     
     if len(txt) > 4096:
