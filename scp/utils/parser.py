@@ -73,8 +73,22 @@ def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
 def html_mono(value, *argv) -> str:
     return f"<code>{html.escape(str(value))}</code>" + ''.join(argv)
 
+def html_in_parantesis(value) -> str:
+    if not value:
+        return ": "
+    return f"({value}): "
+
 def html_bold(value, *argv) -> str:
     return f"<b>{html.escape(str(value))}</b>" + ''.join(argv)
+
+
+async def in_common_length(user: types.User) -> int:
+    if not user:
+        return 0
+    return len(await user.get_common_chats())
+
+async def html_in_common(user: types.User):
+    return html_in_parantesis(await in_common_length())
 
 def get_name(user: types.User, name_limit: int = -1) -> str:
     if not user:
