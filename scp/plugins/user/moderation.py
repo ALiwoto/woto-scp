@@ -169,7 +169,7 @@ async def members_handler(_, message: user.types.Message):
         prefixes=user.cmd_prefixes,
     ))
 async def members_handler(_, message: user.types.Message):
-    all_strs = split_all(message.text, [' ', '\n', '\t'])
+    all_strs = split_all(message.text, ' ', '\n', '\t')
     is_here = False
     query = ""
     if len(all_strs) < 2:

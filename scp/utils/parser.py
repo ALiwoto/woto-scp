@@ -64,11 +64,11 @@ def fix_encoding(value: str) -> str:
     except: return ""
 
 
-def split_all(value: str, delimiters: list[str]) -> list[str]:
+def split_all(value: str, *delimiters) -> list:
     regP = '|'.join(map(re.escape, delimiters))
     return remove_empty_strs(re.split(regP, value))
 
-def remove_empty_strs(values: list[str]) -> list[str]:
+def remove_empty_strs(values: list[str]) -> list:
     myStrs: list[str] = []
     for s in values:
         if not is_invalid_str(s):
