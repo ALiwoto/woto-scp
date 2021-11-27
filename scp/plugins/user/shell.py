@@ -32,7 +32,7 @@ async def shell(_, message: user.types.Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def shell(_, message: user.types.Message):
+async def neo_handler(_, message: user.types.Message):
     await shell_base(message, "neofetch --stdout")
 
 
@@ -47,10 +47,23 @@ async def shell(_, message: user.types.Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def shell(_, message: user.types.Message):
+async def git_handler(_, message: user.types.Message):
     await shell_base(message, message.text[1:])
 
 
+@user.on_message(
+    ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.filters.me
+    & user.filters.command(
+        'screen',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def screen_handler(_, message: user.types.Message):
+    await shell_base(message, "screen -ls" if message.text == "screen" else message.text[1:])
 
 async def shell_base(message: user.types.Message, command: str):
     reply = await message.reply_text('Executing...', quote=True)
