@@ -271,7 +271,7 @@ async def fadmins_handler(_, message: user.types.Message):
             the_chat = all_strs[index]
     
     if len(all_strs) >= 3:
-        query = ''.join(all_strs[2:])
+        query = ' '.join(all_strs[2:])
     elif is_here and len(all_strs) == 2:
         query = all_strs[1]
     else: return
