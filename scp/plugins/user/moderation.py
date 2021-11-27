@@ -303,10 +303,9 @@ async def fadmins_handler(_, message: user.types.Message):
             admins.append(i)
 
     if not creator and len(admins) == 0 and len(bots) == 0:
-        await top_msg.edit_text(text="No results found...")
+        await top_msg.edit_text(text=f"No results found for query '{html_mono(query)}'...")
         return
 
-    starter = "<code>" + " • " + "</code>"
     starter = "<code>" + " • " + "</code>"
     if creator:
         txt += html_bold("The creator:", "\n")
