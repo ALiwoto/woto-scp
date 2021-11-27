@@ -119,11 +119,12 @@ def remove_special_chars(value: str) -> str:
             continue
         elif last_space:
             last_space = False
+        
         if current.isspace() or o < 65:
             continue
         if o > 122 and o < 250:
             continue
-        result += value
+        result += current
     
     return result
 
