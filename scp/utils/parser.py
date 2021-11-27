@@ -70,6 +70,10 @@ def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
     return f
 
 
+def html_mono(value) -> str:
+    return f"<code>{html.escape(str(value))}</code>"
+
+
 def get_name(user: types.User, name_limit: int = -1) -> str:
     if not user:
         return ""
