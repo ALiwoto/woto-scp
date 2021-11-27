@@ -87,8 +87,10 @@ async def in_common_length(user: types.User) -> int:
         return 0
     return len(await user.get_common_chats())
 
-async def html_in_common(user: types.User):
-    return html_in_parantesis(await in_common_length())
+async def html_in_common(user: types.User) -> str:
+    if user.is_self:
+        return html_in_parantesis(None)
+    return html_in_parantesis(await in_common_length(user))
 
 def get_name(user: types.User, name_limit: int = -1) -> str:
     if not user:
