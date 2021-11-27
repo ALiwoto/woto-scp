@@ -36,13 +36,13 @@ async def admins_handler(_, message: user.types.Message):
                 all_strs[index] = '-100' + all_strs[index]
             the_chat = all_strs[index]
         
-    top_msg = await message.reply_text(f"<code>{html.escape('fetching group admins...')}</code>")
+    top_msg = await message.reply_text(html_mono("fetching group admins..."))
     txt = ''
     m = None
     try:
         m = await user.get_chat_members(the_chat)
     except Exception as ex:
-        await top_msg.edit_text(text=f"<code>{ex}</code>")
+        await top_msg.edit_text(text=html_mono(ex))
         return
     creator = None
     admins: list[user.types.ChatMember] = []
@@ -62,24 +62,24 @@ async def admins_handler(_, message: user.types.Message):
 
     starter = "<code>" + " • " + "</code>"
     if creator:
-        txt += "<b>" + html.escape("The creator:") + "</b>\n"
+        txt += html_bold("The creator:", "\n")
         u = creator.user
         txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id, "\n")
         txt += "\n\n"
 
     if len(admins) > 0:
-        txt += "<b>" + html.escape("Admins:") + "</b>\n"
+        txt += html_bold("Admins", "\n")
         for admin in admins:
             u = admin.user
-            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id, "\n")
+            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id)
             txt += "\n"
         txt += "\n"
     
     if len(bots) > 0:
-        txt += "<b>" + html.escape("Bots:") + "</b>\n"
+        txt += html_bold("Bots:", "\n")
         for bot in bots:
             u = bot.user
-            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id, "\n")
+            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id)
             txt += "\n"
         txt += "\n"
     
