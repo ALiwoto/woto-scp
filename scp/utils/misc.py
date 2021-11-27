@@ -76,7 +76,7 @@ def can_user_match(user: types.User, query: str) -> bool:
     return False
 
 
-def can_member_match(m: types.ChatMember, query: str) -> bool:
+def can_member_match(m: types.ChatMember, ch: types.Chat, query: str) -> bool:
     user = m.user
     query = remove_special_chars(query)
     if not user or len(query) < 2:
@@ -96,6 +96,10 @@ def can_member_match(m: types.ChatMember, query: str) -> bool:
     
     if m.title and len(m.title) > 0 and can_str_param_match(m.title, query):
         return True
+    
+    if ch:
+        if ch.bio and len(ch.bio) > 0 and can_str_param_match(ch.bio, query):
+            return True
 
     return False
 
