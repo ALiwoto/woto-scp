@@ -2,7 +2,7 @@ import asyncio
 
 from pyrogram.methods.chats.get_chat_members import Filters
 from scp import user
-from scp.utils.misc import can_member_match
+from scp.utils.misc import can_member_match, remove_special_chars
 from scp.utils.parser import (
     html_bold,
     html_in_common,
@@ -332,4 +332,22 @@ async def fadmins_handler(_, message: user.types.Message):
     await top_msg.edit_text(text=txt, parse_mode="html")
 
 
-
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['remspec'],
+        prefixes=user.cmd_prefixes,
+    ))
+async def remspec_handler(_, message: user.types.Message):
+    all_strs = split_all(message.text, ' ', '\n', '\t')
+    if len(all_strs) < 2: return
+    query = all_strs[1:]
+    result = remove_special_chars(query)
+    await message.reply_text(
+        f"Result for query '{html_mono(query)}':\n{html_bold(result)}",
+        parse_mode="html",
+    )
