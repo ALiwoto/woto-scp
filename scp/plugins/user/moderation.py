@@ -345,7 +345,7 @@ async def fadmins_handler(_, message: user.types.Message):
 async def remspec_handler(_, message: user.types.Message):
     all_strs = split_all(message.text, ' ', '\n', '\t')
     if len(all_strs) < 2: return
-    query = all_strs[1:]
+    query = ' '.join(all_strs[1:])
     result = remove_special_chars(query)
     await message.reply_text(
         f"Result for query '{html_mono(query)}':\n{html_bold(result)}",
