@@ -346,7 +346,11 @@ async def remspec_handler(_, message: user.types.Message):
     all_strs = split_all(message.text, ' ', '\n', '\t')
     if len(all_strs) < 2: return
     query = ' '.join(all_strs[1:])
-    result = remove_special_chars(query)
+    result = ''
+    try:
+        result = remove_special_chars(query)
+    except Exception as e:
+        result = f'{e}'
     await message.reply_text(
         f"Result for query '{html_mono(query)}':\n{html_bold(result)}",
         parse_mode="html",
