@@ -132,6 +132,10 @@ def remove_special_chars(value: str) -> str:
             continue
         if o > 122 and o < 250:
             continue
+        if o > 90 and o < 97:
+            result += " "
+            continue
+        
         result += current
     
     return result
