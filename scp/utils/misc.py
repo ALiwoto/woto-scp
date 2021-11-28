@@ -3,6 +3,7 @@ import sys
 import signal
 import psutil
 from pyrogram import types
+import pyrogram
 
 from scp.utils.strUtils import remove_invisible
 
@@ -17,7 +18,7 @@ class _KB(types.InlineKeyboardButton):
         return self.text > other.text
 
 
-def paginate_modules(_page_n, module_dict, prefix, chat=None):
+def paginate_modules(_, module_dict, prefix, chat=None):
     if not chat:
         modules = sorted(
             [
@@ -76,7 +77,7 @@ def can_user_match(user: types.User, query: str) -> bool:
     return False
 
 
-def can_member_match(m: types.ChatMember, ch: types.Chat, query: str) -> bool:
+async def can_member_match(m: types.ChatMember, client: pyrogram.Client, query: str) -> bool:
     user = m.user
     query = remove_special_chars(query)
     if not user or len(query) < 2:
@@ -96,6 +97,9 @@ def can_member_match(m: types.ChatMember, ch: types.Chat, query: str) -> bool:
     
     if m.title and len(m.title) > 0 and can_str_param_match(m.title, query):
         return True
+    
+    if not client: return False
+    ch = await client.get_chat(user.id)
     
     if ch:
         if ch.bio and len(ch.bio) > 0 and can_str_param_match(ch.bio, query):
