@@ -315,14 +315,14 @@ async def fadmins_handler(_, message: user.types.Message):
         txt += html_bold("Admins:", "\n")
         for member in admins:
             u = member.user
-            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
+            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id, "\n")
         txt += "\n"
     
     if len(bots) > 0:
         txt += html_bold("Bots:", "\n")
         for bot in bots:
             u = bot.user
-            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
+            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id, "\n")
         txt += "\n"
     
     if len(txt) > 4096:
