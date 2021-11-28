@@ -207,8 +207,7 @@ async def fmembers_handler(_, message: user.types.Message):
     bots: list[user.types.ChatMember] = []
     for i in m:
         if i.status == 'member' and i.status != 'left' and i.status != 'kicked':
-            ch = user.get_chat(i.user.id)
-            if not can_member_match(i, ch, query):
+            if not await can_member_match(i, user, query):
                 continue
             if i.user.is_bot:
                 bots.append(i)
@@ -289,14 +288,12 @@ async def fadmins_handler(_, message: user.types.Message):
     bots: list[user.types.ChatMember] = []
     for i in m:
         if i.status == 'creator':
-            ch = user.get_chat(i.user.id)
-            if not can_member_match(i, ch,query):
+            if not await can_member_match(i, user, query):
                 continue
             creator = i
             continue
         elif i.status == 'administrator':
-            ch = user.get_chat(i.user.id)
-            if not can_member_match(i, ch, query):
+            if not await can_member_match(i, user, query):
                 continue
             if i.user.is_bot:
                 bots.append(i)
