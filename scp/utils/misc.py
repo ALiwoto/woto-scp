@@ -100,7 +100,7 @@ async def can_member_match(m: types.ChatMember, client: pyrogram.Client, query: 
     
     if not client: return False
     ch = await client.get_chat(user.id)
-    
+
     if ch:
         if ch.bio and len(ch.bio) > 0 and can_str_param_match(ch.bio, query):
             return True
@@ -112,6 +112,8 @@ def can_str_param_match(param: str, query: str) -> bool:
     return remove_special_chars(param).find(query) != -1
 
 def remove_special_chars(value: str) -> str:
+    if isinstance(value, list):
+        value = ' '.join(value)
     value = remove_invisible(value.lower().strip())
     last_space = False
     result = ''
