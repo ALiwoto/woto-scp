@@ -3,7 +3,7 @@ from scp import user
 __PLUGIN__ = 'autoread'
 
 @user.on_message(
-    ~(user.owner | user.sudo | user.filters.private | user.filters.contact),
+    ~(user.owner | user.sudo | user.my_contacts | user.filters.private),
     group=100,
 )
 async def auto_read_handler(_, message: user.types.Message):
