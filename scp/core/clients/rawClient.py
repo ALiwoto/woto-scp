@@ -122,6 +122,14 @@ class client(Client):
             _owners.append(int(x))
     except Exception as e:
         logging.warning(f'{e}')
+
+
+    async def my_contacts_filter(_, __, m: types.Message) -> bool:
+        return bool(m.from_user.is_contact)
+
+    my_contacts = filters.create(my_contacts_filter)
+    """Filter messages sent by contact users."""
+
     sudo = (filters.me | filters.user(_sudo))
     owner = (filters.me | filters.user(_owners))
     cmd_prefixes = _config.get('scp-5170', 'prefixes').split() or ['!', '.']
