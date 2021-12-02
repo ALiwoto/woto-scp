@@ -1,5 +1,6 @@
 from pyrogram import Client, filters, types, raw, errors, session
 from scp.core.filters.Command import command
+from scp.utils import wfilters
 from scp.utils.sibylUtils import SibylClient
 from scp.utils.misc import restart_scp as restart_woto_scp
 from configparser import ConfigParser
@@ -107,6 +108,7 @@ class client(Client):
         return data
 
     filters = filters
+    wfilters = wfilters
     raw = raw
     types = types
     md = Markdown
@@ -124,11 +126,7 @@ class client(Client):
         logging.warning(f'{e}')
 
 
-    async def my_contacts_filter(_, __, m: types.Message) -> bool:
-        return bool(m.from_user.is_contact)
-
-    my_contacts = filters.create(my_contacts_filter)
-    """Filter messages sent by contact users."""
+    
 
     sudo = (filters.me | filters.user(_sudo))
     owner = (filters.me | filters.user(_owners))
