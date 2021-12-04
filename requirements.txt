@@ -1,6 +1,6 @@
-aiofiles==0.7.0
-aiohttp==3.7.4.post0
-aiopyston==1.1.1
+aiofiles==0.8.0
+aiohttp==3.8.1
+aiopyston==1.2.1
 attrify==3.0
 Faker==8.11.0
 GitPython==3.1.18
@@ -8,13 +8,13 @@ gpytranslate==1.3.0
 humanize==3.11.0
 kantex==0.2.0
 psutil==5.8.0
-Pyrogram==1.2.9
+Pyrogram==1.2.11
 pyromod==1.5
 pyzxing==1.0.1
 rich==10.7.0
 shortuuid==1.0.1
 TgCrypto==1.2.2
-ujson==4.1.0
+ujson==4.3.0
 yarl==1.6.3
 httpx==0.20.0
 psutil==5.8.0
