@@ -11,7 +11,7 @@ psutil==5.8.0
 Pyrogram==1.2.11
 pyromod==1.5
 pyzxing==1.0.1
-rich==10.7.0
+rich==10.15.2
 shortuuid==1.0.1
 TgCrypto==1.2.2
 ujson==4.3.0
