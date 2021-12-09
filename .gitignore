@@ -119,6 +119,7 @@ config.ini
 scp/logs/*.txt
 scp/plugins/private/*.py
 test.py
+woto_files
 unknown_errors.txt
 
 # old and deprecated pyfiles

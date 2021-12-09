@@ -17,6 +17,7 @@
         "popen",
         "psutil",
         "pyrogram",
-        "SIGUSR"
+        "SIGUSR",
+        "wfilters"
     ]
 }
