@@ -11,11 +11,12 @@ import logging
 
 session.Session.notice_displayed = True
 
-class client(Client):
+class ScpClient(Client):
     def __init__(
         self,
         name: str,
-        _=ClientSession,
+        is_scp_bot: bool = True,
+        the_scp_bot: Client = None
     ):
         self.name = name
         super().__init__(
@@ -23,6 +24,13 @@ class client(Client):
             workers=8,
         )
         self.aioclient:ClientSession = ClientSession()
+        self.is_scp_bot = is_scp_bot
+        if is_scp_bot:
+            self.the_bot = self
+        else:
+            if isinstance(the_scp_bot, ScpClient):
+                the_scp_bot.the_user = self
+            self.the_bot = the_scp_bot
 
     async def start(self):
         await super().start()
@@ -80,14 +88,26 @@ class client(Client):
         return e if e != 'false' and e[:-1] != url else None
     
     async def restart_scp(self, update_req: bool = False, hard: bool = False) -> bool:
-        try:
-            await self.stop(block=False)
-        except ConnectionError:
-            # connection is already closed, ignore it.
-            return restart_woto_scp(update_req, hard)
-        
+        await self.stop_scp()
         return restart_woto_scp(update_req, hard)
     
+    async def exit_scp(self):
+        await self.stop_scp()
+        exit()
+    
+    async def stop_scp(self, only_me: bool = False):
+        try:
+            if only_me:
+                await self.stop(block=False)
+                return
+            print('\n')
+            if isinstance(self.the_bot, ScpClient):
+                await self.the_bot.stop_scp(True)
+            
+            if isinstance(self.the_user, ScpClient):
+                await self.the_bot.stop_scp(True)
+        except ConnectionError:
+            pass
 
     async def Request(self, url: str, type: str, *args, **kwargs):
         if type == 'get':
@@ -117,6 +137,9 @@ class client(Client):
         await writer.wait_closed()
         return data
 
+    is_scp_bot: bool = False
+    the_bot: Client
+    the_user: Client
     filters = filters
     wfilters = wfilters
     raw = raw
