@@ -9,7 +9,7 @@ from pyrogram.types import (
 )
 from scp.utils import progress_callback
 from scp import user
-from scp.utils.parser import html_mono
+from scp.utils.parser import html_mono, split_some
 
 @user.on_message(
     ~user.filters.forwarded
@@ -23,8 +23,11 @@ from scp.utils.parser import html_mono
     ),
 )
 async def shell(_, message: Message):
-    command = message.text.split(None, 1)[1]
-    await shell_base(message, command)
+    all_strs = split_some(message.text, 2, ' ', '\n')
+    if len(all_strs) < 2:
+        return
+    
+    await shell_base(message, all_strs[1])
 
 
 @user.on_message(
@@ -40,6 +43,7 @@ async def shell(_, message: Message):
 )
 async def neo_handler(_, message: Message):
     await shell_base(message, "neofetch --stdout")
+
 
 
 @user.on_message(
@@ -73,6 +77,20 @@ async def screen_handler(_, message: Message):
         message, 
         "screen -ls" if message.text[1:].lower() == "screen" else message.text[1:],
     )
+
+@user.on_message(
+    ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.filters.me
+    & user.filters.command(
+        'curl',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def curl_handler(_, message: Message):
+    await shell_base(message, message.text[1:])
 
 async def shell_base(message: Message, command: str):
     reply = await message.reply_text('Executing...', quote=True)
