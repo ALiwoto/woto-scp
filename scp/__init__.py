@@ -22,7 +22,7 @@ LOG_FORMAT = (
 )
 
 logging.basicConfig(
-    level=logging.ERROR,
+    level=logging.WARNING,
     format=LOG_FORMAT,
     datefmt='%m-%d %H:%M',
     handlers=[RichHandler()],

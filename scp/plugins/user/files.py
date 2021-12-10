@@ -100,7 +100,6 @@ async def gitpull(_, message: Message):
         await r.edit(html_mono(str(e)[:4000]), parse_mode='html')
 
 
-
 @user.on_message(
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
