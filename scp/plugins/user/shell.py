@@ -1,7 +1,11 @@
 # https://greentreesnakes.readthedocs.io/
 # https://gitlab.com/blankX/sukuinote/-/blob/master/sukuinote/plugins/pyexec.py
 import asyncio
+import os
+import html
+import tempfile
 from io import BytesIO
+from . import progress_callback
 from scp import user
 
 @user.on_message(
@@ -33,6 +37,9 @@ async def shell(_, message: user.types.Message):
     ),
 )
 async def neo_handler(_, message: user.types.Message):
+    if not isinstance(message, user.types.Message):
+        return
+    
     await shell_base(message, "neofetch --stdout")
 
 
@@ -48,6 +55,9 @@ async def neo_handler(_, message: user.types.Message):
     ),
 )
 async def git_handler(_, message: user.types.Message):
+    if not isinstance(message, user.types.Message):
+        return
+    
     await shell_base(message, message.text[1:])
 
 
@@ -104,16 +114,22 @@ async def shell_base(message: user.types.Message, command: str):
         await reply.edit_text(doc)
 
 
-import os
-import html
-import tempfile
-from pyrogram import Client, filters
-from .. import config, help_dict, log_errors, session, progress_callback, public_log_errors
-
-@Client.on_message(~filters.scheduled & ~filters.forwarded & ~filters.sticker & ~filters.via_bot & ~filters.edited & filters.me & filters.command('cat', prefixes=config['config']['prefixes']))
-@log_errors
-@public_log_errors
-async def cat(client, message):
+@user.on_message(
+    ~user.filters.scheduled
+    & ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.filters.me
+    & user.filters.command(
+        'git',
+        prefixes=user.cmd_prefixes,
+    ),
+    )
+async def cat(_, message: user.types.Message):
+    if not isinstance(message, user.types.Message):
+        return
+    
     media = (message.text or message.caption).markdown.split(' ', 1)[1:]
     if media:
         media = os.path.expanduser(media[0])
@@ -130,7 +146,12 @@ async def cat(client, message):
         if not isinstance(media, str):
             rfile = tempfile.NamedTemporaryFile()
             reply = await message.reply_text('Downloading...')
-            await client.download_media(media, file_name=rfile.name, progress=progress_callback, progress_args=(reply, 'Downloading...', False))
+            await user.download_media(
+                media, 
+                file_name=rfile.name,
+                progress=progress_callback, 
+                progress_args=(reply, 'Downloading...', False),
+            )
             media = rfile.name
         with open(media, 'r') as file:
             while True:
@@ -149,6 +170,4 @@ async def cat(client, message):
         if rfile:
             rfile.close()
 
-help_dict['cat'] = ('cat', '''{prefix}cat <i>(as caption of text file or reply)</i> - Outputs file's text to Telegram
-{prefix}cat <i>&lt;path to local file&gt;</i> - Outputs file's text to Telegram''')
 
