@@ -2,7 +2,7 @@ import logging
 import asyncio
 import sys
 import time
-from .core.clients import client
+from .core.clients import ScpClient
 from rich.logging import RichHandler
 from pyromod import listen  # noqa
 from scp.utils.gitTools import getVersion
@@ -36,5 +36,5 @@ logging.getLogger('').addHandler(console)
 log = logging.getLogger()
 loop = asyncio.get_event_loop()
 
-bot = client('scp-bot')
-user = client('scp-user')
+bot = ScpClient('scp-bot', True)
+user = ScpClient('scp-user', False)

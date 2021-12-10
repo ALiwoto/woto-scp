@@ -1,1 +1,1 @@
-from .rawClient import client  # noqa
+from .rawClient import ScpClient  # noqa
