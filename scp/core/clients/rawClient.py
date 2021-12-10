@@ -9,6 +9,7 @@ from aiohttp import ClientSession, client_exceptions
 import asyncio
 import logging
 
+session.Session.notice_displayed = True
 
 class client(Client):
     def __init__(
@@ -55,6 +56,10 @@ class client(Client):
         except (
             errors.SlowmodeWait,
             errors.FloodWait,
+            errors.exceptions.flood_420.FloodWait,
+            errors.exceptions.flood_420.Flood,
+            errors.exceptions.Flood,
+            errors.exceptions.ApiIdPublishedFlood,
         ) as e:
             await asyncio.sleep(e.x)
             return await super().send(
@@ -74,9 +79,14 @@ class client(Client):
             e = await response.text()
         return e if e != 'false' and e[:-1] != url else None
     
-    async def restart_scp(self, update_req: bool = False, hard: bool = False):
-        await self.stop(block=False)
-        restart_woto_scp(update_req, hard)
+    async def restart_scp(self, update_req: bool = False, hard: bool = False) -> bool:
+        try:
+            await self.stop(block=False)
+        except ConnectionError:
+            # connection is already closed, ignore it.
+            return restart_woto_scp(update_req, hard)
+        
+        return restart_woto_scp(update_req, hard)
     
 
     async def Request(self, url: str, type: str, *args, **kwargs):
