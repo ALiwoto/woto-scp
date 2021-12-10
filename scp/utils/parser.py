@@ -68,6 +68,21 @@ def split_all(value: str, *delimiters) -> list:
     regP = '|'.join(map(re.escape, delimiters))
     return remove_empty_strs(re.split(regP, value))
 
+def contains_str(value: str, *substrs) -> bool:
+    if substrs is None:
+        return False
+    try:    
+        for current in substrs:
+            if isinstance(current, str):
+                if value.count(current) > 0:
+                    return True
+            else:
+                if value.count(str(current)) > 0:
+                    return True
+        
+        return False
+    except Exception: return False
+
 def remove_empty_strs(values: list) -> list:
     myStrs: list[str] = []
     for s in values:
