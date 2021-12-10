@@ -1,5 +1,8 @@
 import asyncio
-
+from pyrogram.types import (
+    Message,
+    ChatMember,
+)
 from pyrogram.methods.chats.get_chat_members import Filters
 from scp import user
 from scp.utils.misc import can_member_match, remove_special_chars
@@ -12,6 +15,7 @@ from scp.utils.parser import (
     to_output_file,
 )
 
+
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
@@ -22,7 +26,7 @@ from scp.utils.parser import (
         ['admins'],
         prefixes=user.cmd_prefixes,
     ))
-async def admins_handler(_, message: user.types.Message):
+async def admins_handler(_, message: Message):
     all_strs = message.text.split(' ')
     if len(all_strs) < 2:
         the_chat = message.chat.id
@@ -101,7 +105,7 @@ async def admins_handler(_, message: user.types.Message):
         ['members'],
         prefixes=user.cmd_prefixes,
     ))
-async def members_handler(_, message: user.types.Message):
+async def members_handler(_, message: Message):
     all_strs = message.text.split(' ')
     if len(all_strs) < 2:
         the_chat = message.chat.id
@@ -169,8 +173,9 @@ async def members_handler(_, message: user.types.Message):
 	user.filters.command(
         ['fmembers'],
         prefixes=user.cmd_prefixes,
-    ))
-async def fmembers_handler(_, message: user.types.Message):
+    ),
+)
+async def fmembers_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n', '\t')
     is_here = False
     query = ""
@@ -193,7 +198,7 @@ async def fmembers_handler(_, message: user.types.Message):
     elif is_here and len(all_strs) == 2:
         query = all_strs[1]
     else: return
-        
+    
     top_msg = await message.reply_text(html_mono('fetching group members...'))
     txt: str = ''
     m = None
@@ -203,8 +208,8 @@ async def fmembers_handler(_, message: user.types.Message):
         await top_msg.edit_text(text=html_mono(ex))
         return
     
-    members: list[user.types.ChatMember] = []
-    bots: list[user.types.ChatMember] = []
+    members: list[ChatMember] = []
+    bots: list[ChatMember] = []
     for i in m:
         if i.status == 'member' and i.status != 'left' and i.status != 'kicked':
             if not await can_member_match(i, user, query):
@@ -247,10 +252,11 @@ async def fmembers_handler(_, message: user.types.Message):
 	~user.filters.edited & 
 	user.owner & 
 	user.filters.command(
-        ['fadmins'],
+        ['fadmins', 'fadmins!'],
         prefixes=user.cmd_prefixes,
-    ))
-async def fadmins_handler(_, message: user.types.Message):
+    ),
+)
+async def fadmins_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n', '\t')
     is_here = False
     query = ""
@@ -276,6 +282,7 @@ async def fadmins_handler(_, message: user.types.Message):
         
     top_msg = await message.reply_text(html_mono('fetching group admins...'))
     txt: str = ''
+    common = all_strs[0][-1] == '!'
     m = None
     try:
         m = await user.get_chat_members(the_chat, filter=Filters.ADMINISTRATORS)
@@ -283,9 +290,9 @@ async def fadmins_handler(_, message: user.types.Message):
         await top_msg.edit_text(text=html_mono(ex))
         return
     
-    creator: user.types.ChatMember = None
-    admins: list[user.types.ChatMember] = []
-    bots: list[user.types.ChatMember] = []
+    creator: ChatMember = None
+    admins: list[ChatMember] = []
+    bots: list[ChatMember] = []
     for i in m:
         if i.status == 'creator':
             if not await can_member_match(i, user, query):
@@ -301,14 +308,18 @@ async def fadmins_handler(_, message: user.types.Message):
             admins.append(i)
 
     if not creator and len(admins) == 0 and len(bots) == 0:
-        await top_msg.edit_text(text=f"No results found for query '{html_mono(query)}'...")
+        try:
+            await top_msg.edit_text(
+                text=f"No results found for query '{html_mono(query)}'...",
+            )
+        except _: return
         return
 
     starter = "<code>" + " • " + "</code>"
     if creator:
         txt += html_bold("The creator:", "\n")
         u = creator.user
-        txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id)
+        txt += starter + mention_user_html(u, 16) + await html_in_common(u, common) + html_mono(u.id)
         txt += "\n\n"
     
     if len(admins) > 0:
@@ -341,8 +352,9 @@ async def fadmins_handler(_, message: user.types.Message):
 	user.filters.command(
         ['remspec'],
         prefixes=user.cmd_prefixes,
-    ))
-async def remspec_handler(_, message: user.types.Message):
+    ),
+)
+async def remspec_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n', '\t')
     if len(all_strs) < 2: return
     query = ' '.join(all_strs[1:])
@@ -355,3 +367,39 @@ async def remspec_handler(_, message: user.types.Message):
         f"Result for query '{html_mono(query)}':\n{html_bold(result)}",
         parse_mode="html",
     )
+
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['ban'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def ban_handler(_, message: Message):
+    if not isinstance(message, user.types.Message):
+        return
+    
+    pass
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['unban'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def unban_handler(_, message: user.types.Message):
+    if not isinstance(message, user.types.Message):
+        return
+    
+    pass
+

@@ -140,16 +140,23 @@ def remove_special_chars(value: str) -> str:
     
     return result
 
-def restart_scp(update_req: bool = False, hard: bool = False) -> None:
-        """ Restart the woto-scp """
-        if update_req:
-            os.system(  # nosec
-                "pip install -U pip && pip install -r requirements.txt --quiet")
+def restart_scp(update_req: bool = False, hard: bool = False) -> bool:
+    """ Restart the woto-scp """
+    if update_req:
+        os.system(  # nosec
+            "pip install -U pip && pip install -r requirements.txt --quiet",
+        )
         
-        if hard:
-            os.kill(os.getpid(), signal.SIGUSR1)
-        else:
-            c_p = psutil.Process(os.getpid())
-            for handler in c_p.open_files() + c_p.connections():
+    if hard:
+        os.kill(os.getpid(), signal.SIGUSR1)
+    else:
+        c_p = psutil.Process(os.getpid())
+        for handler in c_p.open_files() + c_p.connections():
+            try:
                 os.close(handler.fd)
-            os.execl(sys.executable, sys.executable, '-m', 'scp')  # nosec
+            except Exception:
+                continue
+        os.execl(sys.executable, sys.executable, '-m', 'scp')  # nosec
+    
+    return True
+    
