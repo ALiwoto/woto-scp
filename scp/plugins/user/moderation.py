@@ -312,7 +312,7 @@ async def fadmins_handler(_, message: Message):
             await top_msg.edit_text(
                 text=f"No results found for query '{html_mono(query)}'...",
             )
-        except _: return
+        except Exception: return
         return
 
     starter = "<code>" + " • " + "</code>"
@@ -531,11 +531,11 @@ async def ban_handler(_, message: Message):
     
     try:
         await message.delete()
-    except _: pass
+    except Exception: pass
 
     try:
         await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
-    except _: pass
+    except Exception: pass
 
 
 @user.on_message(~user.filters.scheduled & 
@@ -568,12 +568,12 @@ async def kick_handler(_, message: Message):
     
     try:
         await message.delete()
-    except _: pass
+    except Exception: pass
     
     try:
         await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
         await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
-    except _: pass
+    except Exception: pass
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -605,11 +605,11 @@ async def unban_handler(_, message: Message):
     
     try:
         await message.delete()
-    except _: pass
+    except Exception: pass
 
     try:
         await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
-    except _: pass
+    except Exception: pass
 
 
 
