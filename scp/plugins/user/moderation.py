@@ -386,7 +386,7 @@ async def ban_handler(_, message: Message):
     target_chat = 0
 
     if len(all_strs) == 1:
-        if message.reply_to_message in None:
+        if message.reply_to_message is None:
             return
         
         target_user = message.reply_to_message.from_user
@@ -405,7 +405,7 @@ async def ban_handler(_, message: Message):
         output = html_mono(str(e)[:4095])
 
     try:
-        message.reply_text(
+        await message.reply_text(
             text=output,
             disable_notification=True, 
             disable_web_page_preview=True,
@@ -429,7 +429,7 @@ async def kick_handler(_, message: Message):
     target_chat = 0
 
     if len(all_strs) == 1:
-        if message.reply_to_message in None:
+        if message.reply_to_message is None:
             return
         
         target_user = message.reply_to_message.from_user
@@ -449,13 +449,12 @@ async def kick_handler(_, message: Message):
         output = html_mono(str(e)[:4095])
 
     try:
-        message.reply_text(
+        await message.reply_text(
             text=output,
             disable_notification=True, 
             disable_web_page_preview=True,
         )
     except: return
-
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -474,7 +473,7 @@ async def unban_handler(_, message: Message):
     target_chat = 0
 
     if len(all_strs) == 1:
-        if message.reply_to_message in None:
+        if message.reply_to_message is None:
             return
         
         target_user = message.reply_to_message.from_user
@@ -493,11 +492,124 @@ async def unban_handler(_, message: Message):
         output = html_mono(str(e)[:4095])
 
     try:
-        message.reply_text(
+        await message.reply_text(
             text=output,
             disable_notification=True, 
             disable_web_page_preview=True,
         )
     except: return
+
+
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['sban'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def ban_handler(_, message: Message):
+    all_strs = split_all(message.text, ' ', '\n')
+    target_user = 0
+    target_chat = 0
+
+    if len(all_strs) == 1:
+        if message.reply_to_message is None:
+            return
+        
+        target_user = message.reply_to_message.from_user
+        target_chat = message.chat.id
+    elif len(all_strs) == 2:
+        target_user = all_strs[1]
+    elif len(all_strs) == 3:
+        target_chat = all_strs[1]
+        target_user = all_strs[2]
+    
+    try:
+        await message.delete()
+    except _: pass
+
+    try:
+        await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+    except _: pass
+
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['skick'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def kick_handler(_, message: Message):
+    all_strs = split_all(message.text, ' ', '\n')
+    target_user = 0
+    target_chat = 0
+
+    if len(all_strs) == 1:
+        if message.reply_to_message is None:
+            return
+        
+        target_user = message.reply_to_message.from_user
+        target_chat = message.chat.id
+    elif len(all_strs) == 2:
+        target_user = all_strs[1]
+    elif len(all_strs) == 3:
+        target_chat = all_strs[1]
+        target_user = all_strs[2]
+    
+    try:
+        await message.delete()
+    except _: pass
+    
+    try:
+        await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
+    except _: pass
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['sunban'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def unban_handler(_, message: Message):
+    all_strs = split_all(message.text, ' ', '\n')
+    target_user = 0
+    target_chat = 0
+
+    if len(all_strs) == 1:
+        if message.reply_to_message is None:
+            return
+        
+        target_user = message.reply_to_message.from_user
+        target_chat = message.chat.id
+    elif len(all_strs) == 2:
+        target_user = all_strs[1]
+    elif len(all_strs) == 3:
+        target_chat = all_strs[1]
+        target_user = all_strs[2]
+    
+    try:
+        await message.delete()
+    except _: pass
+
+    try:
+        await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
+    except _: pass
+
 
 
