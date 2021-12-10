@@ -383,8 +383,36 @@ async def remspec_handler(_, message: Message):
 async def ban_handler(_, message: Message):
     if not isinstance(message, user.types.Message):
         return
+    all_strs = split_all(message.text, ' ', '\n')
+    target_user = 0
+    target_chat = 0
+
+    if len(all_strs) == 1:
+        if message.reply_to_message in None:
+            return
+        
+        target_user = message.reply_to_message.from_user
+        target_chat = message.chat.id
+    elif len(all_strs) == 2:
+        target_user = all_strs[1]
+    elif len(all_strs) == 3:
+        target_chat = all_strs[1]
+        target_user = all_strs[2]
     
-    pass
+    output = ''
+    try:
+        done = await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
+        output = html_mono('done.' if done else f'impossible to unban {target_user}.')
+    except Exception as e:
+        output = html_mono(str(e)[:4095])
+
+    try:
+        message.reply_text(
+            text=output,
+            disable_notification=True, 
+            disable_web_page_preview=True,
+        )
+    except: return
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -397,9 +425,7 @@ async def ban_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def unban_handler(_, message: user.types.Message):
-    if not isinstance(message, user.types.Message):
-        return
+async def unban_handler(_, message: Message):
     
     pass
 
