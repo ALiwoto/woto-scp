@@ -5,7 +5,7 @@ import os
 import html
 import tempfile
 from io import BytesIO
-from . import progress_callback
+from scp.utils import progress_callback
 from scp import user
 
 @user.on_message(
