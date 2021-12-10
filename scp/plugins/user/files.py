@@ -64,15 +64,18 @@ async def pwd(_, message: Message):
 
 
 
-@user.on_message(~user.filters.scheduled & 
+@user.on_message(
+    ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command('gitpull',
+	user.filters.command(
+        ['gitpull', 'restart'],
         prefixes=user.cmd_prefixes,
-    ))
+    ),
+)
 async def gitpull(_, message: Message):
     command = "git pull"
     r = await message.reply_text("Trying to pull changes")
