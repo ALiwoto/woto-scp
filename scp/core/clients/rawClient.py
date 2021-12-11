@@ -95,7 +95,7 @@ class ScpClient(Client):
         r = await self.send(
             raw.functions.channels.DeleteParticipantHistory(
                 channel=await self.resolve_peer(chat_id),
-                participant=await self.resolve_peer(user_id)
+                participant=await self.resolve_peer(user_id),
             )
         )
 
