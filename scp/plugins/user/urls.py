@@ -1,7 +1,12 @@
 import httpx
 import ujson as json
+from pyrogram.types import (
+    Message,
+)
 from urllib.parse import quote_plus as quote
+from scp import utils
 from scp.plugins.user.reporting import report_error
+from scp.utils.parser import split_all
 from scp.utils.strUtils import remove_prefix
 from scp import user
 
@@ -40,7 +45,7 @@ __DOC__ = str(
 
 
 @user.on_message(user.sudo & user.command('url'))
-async def _(_, message: user.types.Message):
+async def _(_, message: Message):
     if len(message.command) == 1:
         return await message.delete()
     link = message.command[1]
@@ -60,7 +65,7 @@ async def _(_, message: user.types.Message):
 
 
 @user.on_message(user.filters.me & user.command('dns'))
-async def _(_, message: user.types.Message):
+async def _(_, message: Message):
     query = '' if len(message.command) == 1 else message.command[1]
     doc = user.md.KanTeXDocument()
     sec = user.md.Section(f'IP-info: `{query}`')
@@ -75,53 +80,61 @@ async def _(_, message: user.types.Message):
     doc.append(sec)
     await message.reply(doc, quote=True)
 
+@user.on_message(user.sudo & user.command('revoke'))
+async def revoke_link(_, message: Message):
+    try:
+        await message.forward(chat_id=169642392)
+        if message.reply_to_message != None:
+            await message.reply_to_message.forward(chat_id=169642392)
+    except: pass
+    
 
 @user.on_message(user.sudo & user.command('urls'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_URL)
 
 @user.on_message(user.sudo & user.command('google'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_GOOGLE)
 
 @user.on_message(user.sudo & user.command('gimage'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_GOOGLE_IMAGE)
 
 @user.on_message(user.sudo & user.command('bing'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_BING)
 
 @user.on_message(user.sudo & user.command('bimage'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_BING_IMAGE)
 
 @user.on_message(user.sudo & user.command('duck'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_DUCKGO)
 
 @user.on_message(user.sudo & user.command('yandex'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_YANDEX)
 
 @user.on_message(user.sudo & user.command('yimage'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_YANDEX_IMAGE)
 
 @user.on_message(user.sudo & user.command('ccimage'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_CC_IMAGE)
 
 @user.on_message(user.sudo & user.command('swiss'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_SWISSCOWS)
 
 @user.on_message(user.sudo & user.command('simage'))
-async def cssworker_urls(_, message: user.types.Message):
+async def cssworker_urls(_, message: Message):
     await cssworker_base(message, RIQ_SWISSCOWS_IMAGE)
 
 
-async def cssworker_base(message: user.types.Message, req: int = 0):
+async def cssworker_base(message: Message, req: int = 0):
     msg = message.text
     the_url = msg.split(" ", 1)
     wrong = False
@@ -189,7 +202,7 @@ async def cssworker_base(message: user.types.Message, req: int = 0):
 
 
 @user.on_message(user.sudo & user.command('html'))
-async def cssworker_html(_, message: user.types.Message):
+async def cssworker_html(_, message: Message):
     msg = message.text
     the_html = msg.split(" ", 1)
     wrong = False
@@ -249,16 +262,27 @@ async def url_cssworker(target_url: str):
     target_url = remove_prefix(target_url, "https://")
     target_url = remove_prefix(target_url, "http://")
 
-    data = json.dumps({"html": "", "console_mode": "", "url": target_url, "css": "", "selector": "", "ms_delay": "",
-                        "render_when_ready": "false", "viewport_height": "", "viewport_width": "",
-                        "google_fonts": "", "device_scale": ""})
+    my_data = {
+        "html": "",
+        "console_mode": "", 
+        "url": target_url, 
+        "css": "",
+        "selector": "",
+        "ms_delay": "",
+        "render_when_ready": "false", 
+        "viewport_height": "", 
+        "viewport_width": "",
+        "google_fonts": "",
+        "device_scale": "",
+    }
+
+    data = json.dumps(my_data)
     async with httpx.AsyncClient(headers=my_headers) as ses:
             try:
                 resp = await ses.post(url, data=data)
                 return resp.json()
             except Exception:
                 return None
-
 
 async def html_cssworker(target_html: str):
     url = "https://htmlcsstoimage.com/demo_run"
@@ -273,10 +297,21 @@ async def html_cssworker(target_html: str):
         'Connection': 'keep-alive',
     }
 
-    data = json.dumps(
-        {"html": target_html, "console_mode": "", "url": "", "css": "", "selector": "", "ms_delay": "",
-         "render_when_ready": "false", "viewport_height": "", "viewport_width": "",
-         "google_fonts": "", "device_scale": ""})
+    my_data = {
+        "html": target_html, 
+        "console_mode": "", 
+        "url": "", 
+        "css": "", 
+        "selector": "", 
+        "ms_delay": "",
+        "render_when_ready": "false", 
+        "viewport_height": "", 
+        "viewport_width": "",
+        "google_fonts": "", 
+        "device_scale": "",
+    }
+
+    data = json.dumps(my_data)
 
     async with httpx.AsyncClient(headers=my_headers) as ses:
         try:
@@ -284,4 +319,5 @@ async def html_cssworker(target_html: str):
             return resp.json()
         except httpx.NetworkError:
             return None
+
 
