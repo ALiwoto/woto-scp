@@ -448,6 +448,7 @@ async def aban_handler(_, message: Message):
 
     try:
         await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        await message.delete()
     except Exception: pass
 
 
