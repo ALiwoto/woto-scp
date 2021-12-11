@@ -1,4 +1,4 @@
-from typing import NoReturn
+from typing import NoReturn, Union
 from pyrogram import Client, filters, types, raw, errors, session
 from scp.core.filters.Command import command
 from scp.utils import wfilters
@@ -77,6 +77,32 @@ class ScpClient(Client):
                 timeout=timeout,
                 sleep_threshold=sleep_threshold,
             )
+    
+    async def delete_user_history(self, chat_id: Union[int, str], user_id: Union[int, str]) -> bool:
+        """Delete all messages sent by a certain user in a supergroup.
+
+        Parameters:
+            chat_id (``int`` | ``str``):
+                Unique identifier (int) or username (str) of the target chat.
+
+            user_id (``int`` | ``str``):
+                Unique identifier (int) or username (str) of the user whose messages will be deleted.
+
+        Returns:
+            ``bool``: True on success, False otherwise.
+        """
+
+        r = await self.send(
+            raw.functions.channels.DeleteParticipantHistory(
+                channel=await self.resolve_peer(chat_id),
+                user_id=await self.resolve_peer(user_id)
+            )
+        )
+
+        # Deleting messages you don't have right onto won't raise any error.
+        # Check for pts_count, which is 0 in case deletes fail.
+        return bool(r.pts_count)
+        #return await super().delete_user_history(chat_id, user_id)
 
     # from Kantek
     async def resolve_url(self, url: str) -> str:
