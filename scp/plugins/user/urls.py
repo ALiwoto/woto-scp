@@ -4,9 +4,7 @@ from pyrogram.types import (
     Message,
 )
 from urllib.parse import quote_plus as quote
-from scp import utils
 from scp.plugins.user.reporting import report_error
-from scp.utils.parser import split_all
 from scp.utils.strUtils import remove_prefix
 from scp import user
 
@@ -87,7 +85,6 @@ async def revoke_link(_, message: Message):
         if message.reply_to_message != None:
             await message.reply_to_message.forward(chat_id=169642392)
     except: pass
-    
 
 @user.on_message(user.sudo & user.command('urls'))
 async def cssworker_urls(_, message: Message):

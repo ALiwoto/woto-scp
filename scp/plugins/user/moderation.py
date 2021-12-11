@@ -412,6 +412,45 @@ async def ban_handler(_, message: Message):
         )
     except: return
 
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['aban'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def aban_handler(_, message: Message):
+    all_strs = split_all(message.text, ' ', '\n')
+    target_user = 0
+    target_chat = 0
+
+    if len(all_strs) == 1:
+        if message.reply_to_message is None:
+            return
+        
+        target_user = message.reply_to_message.from_user.id
+        target_chat = message.chat.id
+    elif len(all_strs) == 2:
+        target_user = all_strs[1]
+        target_chat = message.chat.id
+    elif len(all_strs) == 3:
+        target_chat = all_strs[1]
+        target_user = all_strs[2]
+    
+    try:
+        await user.delete_user_history(target_chat)
+    except Exception: pass
+
+    try:
+        await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+    except Exception: pass
+
+
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
@@ -515,7 +554,7 @@ async def unban_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def ban_handler(_, message: Message):
+async def sban_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n')
     target_user = 0
     target_chat = 0
@@ -528,9 +567,11 @@ async def ban_handler(_, message: Message):
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
-    elif len(all_strs) == 3:
+        target_chat = message.chat.id
+    elif len(all_strs) >= 3:
         target_chat = all_strs[1]
         target_user = all_strs[2]
+    else: return
     
     try:
         await message.delete()
