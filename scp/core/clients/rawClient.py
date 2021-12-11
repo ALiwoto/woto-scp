@@ -30,6 +30,7 @@ class ScpClient(Client):
             self.the_bot = self
         else:
             the_scp_bot.the_user = self
+            self.the_user = self
             self.the_bot = the_scp_bot
 
     async def start(self):
@@ -136,8 +137,8 @@ class ScpClient(Client):
         return data
 
     is_scp_bot: bool = False
-    the_bot: None
-    the_user = None
+    the_bot: 'ScpClient'
+    the_user: 'ScpClient'
     filters = filters
     wfilters = wfilters
     raw = raw
