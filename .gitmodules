@@ -1,6 +1,3 @@
 [submodule "session"]
 	path = session
 	url = https://github.com/pokurt/qr-Pyrogram-session.git
-[submodule "sibylsystem"]
-	path = sibylsystem
-	url = https://github.com/AnimeKaizoku/SibylSystem-Py.git

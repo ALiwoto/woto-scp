@@ -1,10 +1,10 @@
-from sibylsystem.SibylSystem import PsychoPass
-from sibylsystem.SibylSystem.types import (
+from ..sibyl import PsychoPass
+from ..sibyl.types import (
     Ban,
 )
 from typing import List, Dict, Any, TypeVar, Callable, Type, cast
-from sibylsystem.SibylSystem.exceptions import GeneralException
-from sibylsystem.SibylSystem.types.bans import BanRes
+from ..sibyl.exceptions import GeneralException
+from ..sibyl.types.bans import BanRes
 
 class StatsResult:
     banned_count: int
