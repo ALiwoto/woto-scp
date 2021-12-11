@@ -37,4 +37,4 @@ log = logging.getLogger()
 loop = asyncio.get_event_loop()
 
 bot = ScpClient('scp-bot', True)
-user = ScpClient('scp-user', False)
+user = ScpClient('scp-user', False, bot)
