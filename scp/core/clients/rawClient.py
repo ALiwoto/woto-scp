@@ -1,3 +1,4 @@
+from typing import NoReturn
 from pyrogram import Client, filters, types, raw, errors, session
 from scp.core.filters.Command import command
 from scp.utils import wfilters
@@ -90,9 +91,9 @@ class ScpClient(Client):
         await self.stop_scp()
         return restart_woto_scp(update_req, hard)
     
-    async def exit_scp(self):
+    async def exit_scp(self) -> 'NoReturn':
         await self.stop_scp()
-        exit()
+        return exit()
     
     async def stop_scp(self, only_me: bool = False):
         try:
