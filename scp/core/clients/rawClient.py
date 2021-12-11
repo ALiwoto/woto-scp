@@ -99,12 +99,10 @@ class ScpClient(Client):
             if only_me:
                 await self.stop(block=False)
                 return
-            print('\n')
-            if isinstance(self.the_bot, ScpClient):
-                await self.the_bot.stop_scp(True)
-            
-            if isinstance(self.the_user, ScpClient):
-                await self.the_bot.stop_scp(True)
+            print(' ')
+            await self.the_bot.stop_scp(True)
+            await self.the_user.stop_scp(True)
+
         except ConnectionError:
             pass
 
