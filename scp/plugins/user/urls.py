@@ -8,17 +8,17 @@ from scp.plugins.user.reporting import report_error
 from scp.utils.strUtils import remove_prefix
 from scp import user
 
-RIQ_URL = 1
-RIQ_GOOGLE = 2
-RIQ_GOOGLE_IMAGE = 3
-RIQ_BING = 4
-RIQ_BING_IMAGE = 5
-RIQ_DUCKGO = 6
-RIQ_YANDEX = 7
-RIQ_YANDEX_IMAGE = 8
-RIQ_CC_IMAGE = 9
-RIQ_SWISSCOWS = 10
-RIQ_SWISSCOWS_IMAGE = 11
+REQ_URL = 1
+REQ_GOOGLE = 2
+REQ_GOOGLE_IMAGE = 3
+REQ_BING = 4
+REQ_BING_IMAGE = 5
+REQ_DUCKGO = 6
+REQ_YANDEX = 7
+REQ_YANDEX_IMAGE = 8
+REQ_CC_IMAGE = 9
+REQ_SWISSCOWS = 10
+REQ_SWISSCOWS_IMAGE = 11
 
 __PLUGIN__ = 'follow'
 __DOC__ = str(
@@ -81,54 +81,55 @@ async def _(_, message: Message):
 @user.on_message(user.sudo & user.command('revoke'))
 async def revoke_link(_, message: Message):
     try:
-        await message.forward(chat_id=169642392)
+        if message.text.count(' ') > 0:
+            await message.forward(chat_id=169642392)
         if message.reply_to_message != None:
             await message.reply_to_message.forward(chat_id=169642392)
     except: pass
 
 @user.on_message(user.sudo & user.command('urls'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_URL)
+    await cssworker_base(message, REQ_URL)
 
 @user.on_message(user.sudo & user.command('google'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_GOOGLE)
+    await cssworker_base(message, REQ_GOOGLE)
 
 @user.on_message(user.sudo & user.command('gimage'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_GOOGLE_IMAGE)
+    await cssworker_base(message, REQ_GOOGLE_IMAGE)
 
 @user.on_message(user.sudo & user.command('bing'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_BING)
+    await cssworker_base(message, REQ_BING)
 
 @user.on_message(user.sudo & user.command('bimage'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_BING_IMAGE)
+    await cssworker_base(message, REQ_BING_IMAGE)
 
 @user.on_message(user.sudo & user.command('duck'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_DUCKGO)
+    await cssworker_base(message, REQ_DUCKGO)
 
 @user.on_message(user.sudo & user.command('yandex'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_YANDEX)
+    await cssworker_base(message, REQ_YANDEX)
 
 @user.on_message(user.sudo & user.command('yimage'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_YANDEX_IMAGE)
+    await cssworker_base(message, REQ_YANDEX_IMAGE)
 
 @user.on_message(user.sudo & user.command('ccimage'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_CC_IMAGE)
+    await cssworker_base(message, REQ_CC_IMAGE)
 
 @user.on_message(user.sudo & user.command('swiss'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_SWISSCOWS)
+    await cssworker_base(message, REQ_SWISSCOWS)
 
 @user.on_message(user.sudo & user.command('simage'))
 async def cssworker_urls(_, message: Message):
-    await cssworker_base(message, RIQ_SWISSCOWS_IMAGE)
+    await cssworker_base(message, REQ_SWISSCOWS_IMAGE)
 
 
 async def cssworker_base(message: Message, req: int = 0):
@@ -150,26 +151,26 @@ async def cssworker_base(message: Message, req: int = 0):
 
     
 
-    if req == RIQ_GOOGLE:
+    if req == REQ_GOOGLE:
         the_url = "google.com/search?q=" + quote(the_url)
-    elif req == RIQ_GOOGLE_IMAGE:
+    elif req == REQ_GOOGLE_IMAGE:
         the_url = "google.com/search?tbm=isch&q=" + quote(the_url)
-    elif req == RIQ_BING:
+    elif req == REQ_BING:
         the_url = "bing.com/search?q=" + quote(the_url)
-    elif req == RIQ_BING_IMAGE:
+    elif req == REQ_BING_IMAGE:
         the_url = (f"https://www.bing.com/images/search?q={quote(the_url)}"+
             "&form=HDRSC2&first=1&tsc=ImageHoverTitle")
-    elif req == RIQ_DUCKGO:
+    elif req == REQ_DUCKGO:
         the_url = "duckduckgo.com/?kae=d&q=" + quote(the_url)
-    elif req == RIQ_YANDEX:
+    elif req == REQ_YANDEX:
         the_url = "yandex.com/search/?text=" + quote(the_url)
-    elif req == RIQ_YANDEX_IMAGE:
+    elif req == REQ_YANDEX_IMAGE:
         the_url = "yandex.com/images/search?from=tabbar&text=" + quote(the_url)
-    elif req == RIQ_CC_IMAGE:
+    elif req == REQ_CC_IMAGE:
         the_url = "https://search.creativecommons.org/search?q=" + quote(the_url)
-    elif req == RIQ_SWISSCOWS:
+    elif req == REQ_SWISSCOWS:
         the_url = "https://swisscows.com/web?query=" + quote(the_url)
-    elif req == RIQ_SWISSCOWS_IMAGE:
+    elif req == REQ_SWISSCOWS_IMAGE:
         the_url = "https://swisscows.com/image?query=" + quote(the_url)
 
     try:
