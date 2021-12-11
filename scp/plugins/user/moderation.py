@@ -400,7 +400,7 @@ async def ban_handler(_, message: Message):
     output = ''
     try:
         done = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
-        output = html_mono('done.' if done else f'impossible to unban {target_user}.')
+        output = html_mono('done.' if done else f'impossible to ban {target_user}.')
     except Exception as e:
         output = html_mono(str(e)[:4095])
 
@@ -436,10 +436,12 @@ async def kick_handler(_, message: Message):
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
+        target_chat = message.chat.id
     elif len(all_strs) == 3:
         target_chat = all_strs[1]
         target_user = all_strs[2]
-    
+    else: return
+
     output = ''
     try:
         done = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
@@ -480,9 +482,11 @@ async def unban_handler(_, message: Message):
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
+        target_chat = message.chat.id
     elif len(all_strs) == 3:
         target_chat = all_strs[1]
         target_user = all_strs[2]
+    else: return
     
     output = ''
     try:
@@ -498,7 +502,6 @@ async def unban_handler(_, message: Message):
             disable_web_page_preview=True,
         )
     except: return
-
 
 
 @user.on_message(~user.filters.scheduled & 
@@ -540,7 +543,6 @@ async def ban_handler(_, message: Message):
         await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
     except Exception: pass
 
-
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
@@ -565,10 +567,12 @@ async def kick_handler(_, message: Message):
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
+        target_chat = message.chat.id
     elif len(all_strs) == 3:
         target_chat = all_strs[1]
         target_user = all_strs[2]
-    
+    else: return
+
     try:
         await message.delete()
     except Exception: pass
@@ -602,10 +606,12 @@ async def unban_handler(_, message: Message):
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
+        target_chat = message.chat.id
     elif len(all_strs) == 3:
         target_chat = all_strs[1]
         target_user = all_strs[2]
-    
+    else: return
+
     try:
         await message.delete()
     except Exception: pass
