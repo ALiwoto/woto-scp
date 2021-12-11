@@ -136,8 +136,8 @@ class ScpClient(Client):
         return data
 
     is_scp_bot: bool = False
-    the_bot: 'ScpClient'
-    the_user: 'ScpClient'
+    the_bot: None
+    the_user = None
     filters = filters
     wfilters = wfilters
     raw = raw
