@@ -443,7 +443,7 @@ async def aban_handler(_, message: Message):
         target_user = all_strs[2]
     
     try:
-        await user.delete_user_history(target_chat)
+        await user.delete_user_history(chat_id=target_chat, user_id=target_user)
     except Exception: pass
 
     try:
