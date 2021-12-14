@@ -1,13 +1,19 @@
 from time import sleep
+from pyrogram.types import (
+    Message,
+)
 from scp import user
 import html
 
 @user.on_message(
     (user.sudo | user.owner) &
-    user.command('sinfo'),
+    user.command(
+        ['sinfo', 'sinfo!'],
+    ),
 )
-async def sinfo_handler(_, message: user.types.Message):
+async def sinfo_handler(_, message: Message):
     cmd = message.command
+    is_silent = cmd[0].endswith('!')
     if not message.reply_to_message and len(cmd) == 1:
         get_user = message.from_user.id
     elif len(cmd) == 1:
@@ -23,12 +29,14 @@ async def sinfo_handler(_, message: user.types.Message):
             pass
     ptxt = "Sending cymatic scan request to Sibyl System."
     my_msg = await message.reply_text(ptxt)
-    sleep(1.2)
-    ptxt += "."
-    my_msg = await my_msg.edit_text(ptxt)
-    sleep(1.2)
-    ptxt += "."
-    my_msg = await my_msg.edit_text(ptxt)
+    if not is_silent:
+        sleep(1.2)
+        ptxt += "."
+        my_msg = await my_msg.edit_text(ptxt)
+        sleep(1.2)
+        ptxt += "."
+        my_msg = await my_msg.edit_text(ptxt)
+    
     try:
         the_info = user.sibyl.user_info(get_user)
         if not the_info:
