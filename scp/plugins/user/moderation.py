@@ -4,6 +4,7 @@ from pyrogram.types import (
     ChatMember,
 )
 from pyrogram.methods.chats.get_chat_members import Filters
+from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
 from scp import user
 from scp.utils.misc import can_member_match, remove_special_chars
 from scp.utils.parser import (
@@ -407,6 +408,139 @@ async def ban_handler(_, message: Message):
     try:
         done = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
         output = html_mono('done.' if done else f'impossible to ban {target_user}.')
+    except Exception as e:
+        output = html_mono(str(e)[:4095])
+
+    try:
+        await message.reply_text(
+            text=output,
+            disable_notification=True, 
+            disable_web_page_preview=True,
+        )
+    except: return
+
+
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['mute'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def mute_handler(_, message: Message):
+    all_strs = split_all(message.text, ' ', '\n')
+    target_user = 0
+    target_chat = 0
+
+    if len(all_strs) == 1:
+        if message.reply_to_message is None:
+            return
+        
+        replied = message.reply_to_message
+        target_user = (
+            replied.sender_chat.id 
+            if replied.sender_chat != None 
+            else replied.from_user.id
+        )
+        target_chat = message.chat.id
+    elif len(all_strs) == 2:
+        target_user = all_strs[1]
+        target_chat = message.chat.id
+    elif len(all_strs) == 3:
+        target_chat = all_strs[1]
+        target_user = all_strs[2]
+    
+    output = ''
+    try:
+        done = await user.restrict_chat_member(
+            chat_id=target_chat, 
+            user_id=target_user,
+            permissions=ChatPermissions(
+                can_add_web_page_previews=False,
+                can_change_info=False,
+                can_invite_users=False,
+                can_pin_messages=False,
+                can_send_animations=False,
+                can_send_games=False,
+                can_send_media_messages=False,
+                can_send_messages=False,
+                can_send_polls=False,
+                can_send_stickers=False,
+                can_use_inline_bots=False,
+            )
+        )
+        output = html_mono('done.' if done else f'impossible to mute {target_user}.')
+    except Exception as e:
+        output = html_mono(str(e)[:4095])
+
+    try:
+        await message.reply_text(
+            text=output,
+            disable_notification=True, 
+            disable_web_page_preview=True,
+        )
+    except: return
+
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['unmute'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def mute_handler(_, message: Message):
+    all_strs = split_all(message.text, ' ', '\n')
+    target_user = 0
+    target_chat = 0
+
+    if len(all_strs) == 1:
+        if message.reply_to_message is None:
+            return
+        
+        replied = message.reply_to_message
+        target_user = (
+            replied.sender_chat.id 
+            if replied.sender_chat != None 
+            else replied.from_user.id
+        )
+        target_chat = message.chat.id
+    elif len(all_strs) == 2:
+        target_user = all_strs[1]
+        target_chat = message.chat.id
+    elif len(all_strs) == 3:
+        target_chat = all_strs[1]
+        target_user = all_strs[2]
+    
+    output = ''
+    try:
+        done = await user.restrict_chat_member(
+            chat_id=target_chat, 
+            user_id=target_user,
+            permissions=ChatPermissions(
+                can_add_web_page_previews=True,
+                can_change_info=True,
+                can_invite_users=True,
+                can_pin_messages=True,
+                can_send_animations=True,
+                can_send_games=True,
+                can_send_media_messages=True,
+                can_send_messages=True,
+                can_send_polls=True,
+                can_send_stickers=True,
+                can_use_inline_bots=True,
+            )
+        )
+        output = html_mono('done.' if done else f'impossible to mute {target_user}.')
     except Exception as e:
         output = html_mono(str(e)[:4095])
 
