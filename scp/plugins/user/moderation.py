@@ -389,7 +389,12 @@ async def ban_handler(_, message: Message):
         if message.reply_to_message is None:
             return
         
-        target_user = message.reply_to_message.from_user.id
+        replied = message.reply_to_message
+        target_user = (
+            replied.sender_chat.id 
+            if replied.sender_chat != None 
+            else replied.from_user.id
+        )
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
@@ -433,7 +438,12 @@ async def aban_handler(_, message: Message):
         if message.reply_to_message is None:
             return
         
-        target_user = message.reply_to_message.from_user.id
+        replied = message.reply_to_message
+        target_user = (
+            replied.sender_chat.id 
+            if replied.sender_chat != None 
+            else replied.from_user.id
+        )
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
@@ -444,7 +454,7 @@ async def aban_handler(_, message: Message):
     
     try:
         await user.delete_user_history(chat_id=target_chat, user_id=target_user)
-    except Exception as e: print(e)
+    except Exception: pass
 
     try:
         await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
@@ -472,7 +482,12 @@ async def kick_handler(_, message: Message):
         if message.reply_to_message is None:
             return
         
-        target_user = message.reply_to_message.from_user.id
+        replied = message.reply_to_message
+        target_user = (
+            replied.sender_chat.id 
+            if replied.sender_chat != None 
+            else replied.from_user.id
+        )
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
@@ -518,7 +533,12 @@ async def unban_handler(_, message: Message):
         if message.reply_to_message is None:
             return
         
-        target_user = message.reply_to_message.from_user.id
+        replied = message.reply_to_message
+        target_user = (
+            replied.sender_chat.id 
+            if replied.sender_chat != None 
+            else replied.from_user.id
+        )
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
@@ -564,7 +584,12 @@ async def sban_handler(_, message: Message):
         if message.reply_to_message is None:
             return
         
-        target_user = message.reply_to_message.from_user.id
+        replied = message.reply_to_message
+        target_user = (
+            replied.sender_chat.id 
+            if replied.sender_chat != None 
+            else replied.from_user.id
+        )
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
@@ -578,9 +603,6 @@ async def sban_handler(_, message: Message):
         await message.delete()
     except Exception: pass
 
-    print('before ban')
-    print(target_chat)
-    print(target_user)
     try:
         await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
     except Exception: pass
@@ -605,7 +627,12 @@ async def kick_handler(_, message: Message):
         if message.reply_to_message is None:
             return
         
-        target_user = message.reply_to_message.from_user.id
+        replied = message.reply_to_message
+        target_user = (
+            replied.sender_chat.id 
+            if replied.sender_chat != None 
+            else replied.from_user.id
+        )
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
@@ -644,7 +671,12 @@ async def unban_handler(_, message: Message):
         if message.reply_to_message is None:
             return
         
-        target_user = message.reply_to_message.from_user.id
+        replied = message.reply_to_message
+        target_user = (
+            replied.sender_chat.id 
+            if replied.sender_chat != None 
+            else replied.from_user.id
+        )
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
