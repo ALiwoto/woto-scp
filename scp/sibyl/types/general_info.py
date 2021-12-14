@@ -25,6 +25,7 @@ class GeneralInfo:
         return None
     
     def get_div(self) -> str:
+        print(self)
         if self.result and self.result.division != None:
             if self.result.division < 1:
                 return None
