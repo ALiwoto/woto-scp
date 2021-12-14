@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 from .error import Error
-from permission import Permissions
+from .permission import Permissions
 
 @dataclass
 class Result:
