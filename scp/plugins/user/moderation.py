@@ -378,7 +378,6 @@ async def remspec_handler(_, message: Message):
 	user.owner & 
 	user.filters.command(
         ['ban'],
-        prefixes=user.cmd_prefixes,
     ),
 )
 async def ban_handler(_, message: Message):
@@ -418,7 +417,6 @@ async def ban_handler(_, message: Message):
             disable_web_page_preview=True,
         )
     except: return
-
 
 
 @user.on_message(~user.filters.scheduled & 
