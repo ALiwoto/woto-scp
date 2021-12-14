@@ -1,7 +1,11 @@
 from io import BytesIO
+from typing import Union
 from pyrogram import types
 import html
 import re
+from pyrogram.client import Client
+
+from pyrogram.types.user_and_chats.user import User
 
 
 def HumanizeTime(seconds: int) -> str:
@@ -114,6 +118,29 @@ def html_in_parantesis(value) -> str:
 
 def html_bold(value, *argv) -> str:
     return f"<b>{html.escape(str(value))}</b>" + html.escape(''.join(argv))
+
+def html_mention(value: Union[User, int], name: str = None, client: Client = None, *argv):
+    if isinstance(value, int):
+        if not name and client:
+            try:
+                the_user: User
+                the_user = client.get_users(value)
+                name = the_user.first_name
+            except Exception:
+                return html_mono(value, *argv)
+        if not name:
+            name = str(value)
+        return f"<a href=tg://user?id={value}>{html.escape(name)}</a>"
+    elif isinstance(value, User):
+        return f"<a href=tg://user?id={value.id}>{html.escape(value.first_name)}</a>"
+
+def html_mention_by_user(value: User,*argv):
+    if not isinstance(value, User):
+        return html_mono(value, *argv)
+    return (
+        f"<a href=tg://user?id={value.id}>{html.escape(value.first_name)}</a>" 
+        + html.escape(''.join(argv))
+    )
 
 
 def html_normal(value, *argv) -> str:

@@ -2,11 +2,19 @@ from time import sleep
 from pyrogram.types import (
     Message,
 )
+from pyrogram.types.user_and_chats.user import User
+
 from scp import user
 import html
-from scp.sibyl.types.general_info import GeneralInfo
+from SibylSystem.types import GeneralInfo
 
-from scp.utils.parser import html_bold, html_mono, html_normal
+from scp.utils.parser import( 
+    html_bold,
+    html_mention,
+    html_mention_by_user, 
+    html_mono, 
+    html_normal,
+)
 
 @user.on_message(
     (user.sudo | user.owner) &
@@ -50,26 +58,34 @@ async def sinfo_handler(_, message: Message):
         if not the_info:
             await my_msg.edit_text('failed to receive info from Sibyl System.')
             return
-        txt = "<b>" + "Sibyl System scan results:" + "</b>\n"
-        txt += "<b>" + "‍ • ID: " + "</b><code>" + str(the_info.user_id) + "</code>\n"
-        txt += "<b>" + "‍ • Is banned: " + "</b><code>" + str(the_info.banned) + "</code>\n"
+        txt = html_bold("Sibyl System scan results:")
+        txt += html_bold("‍ • ID: ") + html_mono(the_info.user_id, "\n")
+        txt += html_bold("‍ • Is banned: ") + html_mono(the_info.banned, "\n")
         if the_info.banned:
             if the_info.banned_by != 0:
-                txt += "<b>" + "‍ • Banned by: " + "</b><code>" + str(the_info.banned_by) + "</code>\n"
+                the_banner: User
+                try:
+                    the_banner = user.get_users(the_info.banned_by)
+                except Exception: pass
+                txt += html_bold("‍ • Banned by: ") + (
+                    html_mono(the_info.banned_by, "\n") 
+                    if not the_banner 
+                    else html_mention_by_user(the_banner, "\n")
+                )
             if the_info.ban_flags and len(the_info.ban_flags) > 0:
                 f = ', '.join(the_info.ban_flags)
-                txt += "<b>" + "‍ • Ban flags: " + "</b><code>" + html.escape(f) + "</code>\n"
-            txt += "<b>" + "‍ • Crime Coefficient: " + "</b><code>" + str(the_info.crime_coefficient) + "</code>\n"
-            txt += "<b>" + "‍ • Last update: " + "</b><code>" + str(the_info.date) + "</code>\n"
-            txt += "<b>" + "‍ • Ban reason: " + "</b><code>" + html.escape(the_info.reason) + "</code>\n"
+                txt += html_bold("‍ • Ban flags: ") + html_mono(f, "\n")
+            txt += html_bold("‍ • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
+            txt += html_bold("‍ • Last update: ") + html_mono(the_info.date, "\n")
+            txt += html_bold("‍ • Ban reason: ")+ + html_mono(the_info.reason, "\n")
         else:
-            txt += "<b>" + "‍ • Crime Coefficient: " + "</b><code>" + str(the_info.crime_coefficient) + "</code>\n"
-            txt += html_bold("‍ • Last update: ") + html_mono(str(the_info.date), "\n")
+            txt += html_bold("‍ • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
+            txt += html_bold("‍ • Last update: ") + html_mono(the_info.date, "\n")
             if general_info:
-                div = general_info.get_div()
+                div = user.sibyl.get_div(general_info)
                 txt += html_normal(
                     "\nThe user is a valid " ,
-                    general_info.to_general_perm(),
+                    user.sibyl.get_general_str(general_info),
                     " registered at PSB " + (f"division {div}." if div else "."),
                 )
         
