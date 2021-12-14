@@ -398,6 +398,7 @@ async def ban_handler(_, message: Message):
         target_chat = message.chat.id
     elif len(all_strs) == 2:
         target_user = all_strs[1]
+        target_chat = message.chat.id
     elif len(all_strs) == 3:
         target_chat = all_strs[1]
         target_user = all_strs[2]
