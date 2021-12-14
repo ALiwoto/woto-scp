@@ -4,6 +4,9 @@ from pyrogram.types import (
 )
 from scp import user
 import html
+from scp.sibyl.types.general_info import GeneralInfo
+
+from scp.utils.parser import html_bold, html_mono, html_normal
 
 @user.on_message(
     (user.sudo | user.owner) &
@@ -14,17 +17,18 @@ import html
 async def sinfo_handler(_, message: Message):
     cmd = message.command
     is_silent = cmd[0].endswith('!')
+    the_user = 0
     if not message.reply_to_message and len(cmd) == 1:
-        get_user = message.from_user.id
+        the_user = message.from_user.id
     elif len(cmd) == 1:
         if message.reply_to_message.forward_from:
-            get_user = message.reply_to_message.forward_from.id
+            the_user = message.reply_to_message.forward_from.id
         else:
-            get_user = message.reply_to_message.from_user.id
+            the_user = message.reply_to_message.from_user.id
     elif len(cmd) > 1:
-        get_user = cmd[1]
+        the_user = cmd[1]
         try:
-            get_user = int(cmd[1])
+            the_user = int(cmd[1])
         except ValueError:
             pass
     ptxt = "Sending cymatic scan request to Sibyl System."
@@ -38,7 +42,11 @@ async def sinfo_handler(_, message: Message):
         my_msg = await my_msg.edit_text(ptxt)
     
     try:
-        the_info = user.sibyl.user_info(get_user)
+        the_info = user.sibyl.user_info(the_user)
+        general_info: GeneralInfo
+        try:
+            general_info = user.sibyl.get_general_info(the_user)
+        except Exception: pass
         if not the_info:
             await my_msg.edit_text('failed to receive info from Sibyl System.')
             return
@@ -56,13 +64,21 @@ async def sinfo_handler(_, message: Message):
             txt += "<b>" + "‍ • Ban reason: " + "</b><code>" + html.escape(the_info.reason) + "</code>\n"
         else:
             txt += "<b>" + "‍ • Crime Coefficient: " + "</b><code>" + str(the_info.crime_coefficient) + "</code>\n"
-            txt += "<b>" + "‍ • Last update: " + "</b><code>" + str(the_info.date) + "</code>\n"
-        
+            txt += html_bold("‍ • Last update: ") + html_mono(str(the_info.date), "\n")
+            if general_info:
+                div = general_info.get_div()
+                txt += html_normal(
+                    "\nThe user is a valid " ,
+                    general_info.to_general_perm(),
+                    " registered at PSB " + (f"division {div}." if div else "."),
+                )
         
         await my_msg.edit_text(txt, parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
         await my_msg.edit_text("Got error: <code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
         return
+
+
 
 @user.on_message(
     (user.sudo | user.owner) &
@@ -71,16 +87,16 @@ async def sinfo_handler(_, message: Message):
 async def sban_handler(_, message: user.types.Message):
     cmd = message.command
     if not message.reply_to_message and len(cmd) == 1:
-        get_user = message.from_user.id
+        the_user = message.from_user.id
     elif len(cmd) == 1:
         if message.reply_to_message.forward_from:
-            get_user = message.reply_to_message.forward_from.id
+            the_user = message.reply_to_message.forward_from.id
         else:
-            get_user = message.reply_to_message.from_user.id
+            the_user = message.reply_to_message.from_user.id
     elif len(cmd) > 1:
-        get_user = cmd[1]
+        the_user = cmd[1]
         try:
-            get_user = int(cmd[1])
+            the_user = int(cmd[1])
         except ValueError:
             pass
     ptxt = "Sending cymatic scan request to Sibyl System."
@@ -92,7 +108,7 @@ async def sban_handler(_, message: user.types.Message):
     ptxt += "."
     my_msg = await my_msg.edit_text(ptxt)
     try:
-        the_info = user.sibyl.user_info(get_user)
+        the_info = user.sibyl.user_info(the_user)
         if not the_info:
             await my_msg.edit_text('failed to receive info from Sibyl System.')
             return

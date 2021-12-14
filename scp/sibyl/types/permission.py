@@ -32,3 +32,23 @@ class Permissions(Enum):
     USER = 0
     ENFORCER = 1
     INSPECTOR = 2
+    OWNER = 3
+
+    def to_string(self) -> str:
+        if self == self.USER:
+            return "user"
+        elif self == self.ENFORCER:
+            return "enforcer"
+        elif self == self.INSPECTOR:
+            return "inspector"
+        elif self == self.OWNER:
+            return "owner"
+    
+    def to_general(self) -> str:
+        if self == self.ENFORCER:
+            return "enforcer"
+        elif self == self.INSPECTOR or self == self.OWNER:
+            return "inspector"
+        
+        return None
+        
