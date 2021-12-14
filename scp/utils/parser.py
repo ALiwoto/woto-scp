@@ -105,16 +105,19 @@ def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
 
 
 def html_mono(value, *argv) -> str:
-    return f"<code>{html.escape(str(value))}</code>" + ''.join(argv)
+    return f"<code>{html.escape(str(value))}</code>" +  html.escape(''.join(argv))
 
 def html_in_parantesis(value) -> str:
     if not value:
         return ": "
-    return f" ({value}): "
+    return f" ({ html.escape(value)}): "
 
 def html_bold(value, *argv) -> str:
-    return f"<b>{html.escape(str(value))}</b>" + ''.join(argv)
+    return f"<b>{html.escape(str(value))}</b>" + html.escape(''.join(argv))
 
+
+def html_normal(value, *argv) -> str:
+    return html.escape(str(value)) + html.escape(''.join(argv))
 
 async def in_common_length(user: types.User) -> int:
     if not user:
