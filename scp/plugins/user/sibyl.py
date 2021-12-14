@@ -75,7 +75,7 @@ async def sinfo_handler(_, message: Message):
         
         await my_msg.edit_text(txt, parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
-        print(e.__traceback__)
+        print(e)
         await my_msg.edit_text("Got error: " +html_mono(str(e)), parse_mode="HTML")
         return
 
