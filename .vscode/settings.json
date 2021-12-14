@@ -23,6 +23,7 @@
         "onlines",
         "popen",
         "psutil",
+        "pydantic",
         "pyrogram",
         "Referer",
         "SIGUSR",

@@ -1,10 +1,23 @@
-from ..sibyl import PsychoPass
-from ..sibyl.types import (
+from SibylSystem import PsychoPass
+from SibylSystem.types import (
     Ban,
 )
-from typing import List, Dict, Any, TypeVar, Callable, Type, cast
-from ..sibyl.exceptions import GeneralException
-from ..sibyl.types.bans import BanRes
+
+from typing import(
+    Any,
+    Dict,
+    Type,
+    Union,
+    cast,
+    List,
+    TypeVar, 
+    Callable, 
+)
+
+from SibylSystem.exceptions import GeneralException
+from SibylSystem.types.bans import BanRes
+from SibylSystem.types.general_info import GeneralInfo
+from SibylSystem.types.permission import Permissions
 
 class StatsResult:
     banned_count: int
@@ -149,7 +162,7 @@ class SibylClient(PsychoPass):
         super().__init__(token, show_license=False)
 
     def revert(self, user_id: int) -> bool:
-        raise self.delete_ban(user_id)
+        return self.delete_ban(user_id)
     
     def revert_ban(self, user_id: int) -> bool:
         return self.delete_ban(user_id)
@@ -176,12 +189,13 @@ class SibylClient(PsychoPass):
         the_resp = stats_from_dict(resp)
         return the_resp.result
     
-    def change_token(self, token: str):
+    def change_token(self, token: str) -> None:
         if not isinstance(token, str):
             raise TypeError("token must be str")
         if len(token) < 20:
             raise ValueError("token must be more than 20 characters long")
         self.token = token
+    
     
     def change_host(self, host: str):
         if not host.endswith("/"):
@@ -210,7 +224,72 @@ class SibylClient(PsychoPass):
     
     def invoke_request(self, url: str):
         return self.client.get(url).json()
+
+    #------------------------------------------------------
+    def get_div(self, target: Union[int, str, GeneralInfo, Ban]) -> int:
+        if isinstance(target, int):
+            return self.get_div_by_id(target=target)
+        elif isinstance(target, GeneralInfo):
+            return self.get_div_by_general(target=target)
+        elif isinstance(target, Ban):
+            return self.get_div_by_id(target=target.user_id)
+        
+        raise Exception(f"Invalid value passed as target: {target}")
+
+    def get_div_by_general(self, target: GeneralInfo) -> int:
+        if not isinstance(target, GeneralInfo):
+            raise Exception("target should be of type 'GeneralInfo'")
+        if target.result and target.result.division != None:
+            if target.result.division < 1:
+                return None
+            
+            str_div = str(target.result.division)
+            if len(str_div) < 2:
+                return '0' + str_div
+            return str_div
+        return None
     
+    def get_div_by_id(self, target: int) -> int:
+        general = self.get_general_info(user_id=target)
+        return self.get_div_by_general(target=general)
+    
+
+    def get_general_str(self, target: Union[int, str, GeneralInfo, Ban]) -> str:
+        if isinstance(target, int):
+            return self.get_general_str_by_id(target=target)
+        elif isinstance(target, GeneralInfo):
+            return self.get_general_str_by_general(target=target)
+        elif isinstance(target, Ban):
+            return self.get_general_str_by_id(target=target.user_id)
+        
+        raise Exception(f"Invalid value passed as target: {target}")
+
+    def get_general_str_by_general(self, target: GeneralInfo) -> str:
+        if not isinstance(target, GeneralInfo):
+            raise Exception("target should be of type 'GeneralInfo'")
+        if not target.result:
+            return None
+        return self.get_general_str_by_perm(target.result.permission)
+    
+    def get_general_str_by_id(self, target: int) -> int:
+        general = self.get_general_info(user_id=target)
+        return self.get_div_by_general(target=general)
+
+    def get_general_str_by_perm(self, perm: Permissions) -> str:
+        if perm == Permissions.ENFORCER:
+            return "enforcer"
+        elif perm == Permissions.INSPECTOR or perm == Permissions.OWNER:
+            return "inspector"
+        
+        return None
+    
+    #------------------------------------------------------
+
+
+
+
+
+
     
 # helper functions:
 
