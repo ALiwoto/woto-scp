@@ -91,7 +91,7 @@ async def sinfo_handler(_, message: Message):
                 txt += html_bold("‍ • Ban flags: ") + html_mono(f, "\n")
             txt += html_bold("‍ • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
             txt += html_bold("‍ • Last update: ") + html_mono(the_info.date, "\n")
-            txt += html_bold("‍ • Ban reason: ")+ + html_mono(the_info.reason, "\n")
+            txt += html_bold("‍ • Ban reason: ")+ html_mono(the_info.reason, "\n")
         else:
             txt += html_bold("‍ • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
             txt += html_bold("‍ • Last update: ") + html_mono(the_info.date, "\n")
@@ -105,8 +105,8 @@ async def sinfo_handler(_, message: Message):
         
         await my_msg.edit_text(txt, parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
-        print(e)
-        logging.exception("some errors found")
+        #print(e)
+        #logging.exception("some errors found")
         await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
         return
 
