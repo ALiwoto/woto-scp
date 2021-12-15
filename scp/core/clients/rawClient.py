@@ -183,6 +183,7 @@ class ScpClient(Client):
     _config.read('config.ini')
     _sudo = []
     _owners = []
+    _enforcers = []
     for x in _config.get('scp-5170', 'SudoList').split():
         _sudo.append(int(x))
     try:
@@ -191,11 +192,16 @@ class ScpClient(Client):
     except Exception as e:
         logging.warning(f'{e}')
 
-
+    try:
+        for x in _config.get('sibyl-system', 'enforcers').split():
+            _owners.append(int(x))
+    except Exception as e:
+        logging.warning(f'{e}')
     
 
     sudo = (filters.me | filters.user(_sudo))
     owner = (filters.me | filters.user(_owners))
+    enforcer = (filters.me | filters.user(_enforcers))
     cmd_prefixes = _config.get('scp-5170', 'prefixes').split() or ['!', '.']
     
     log_channel = _config.getint('scp-5170', 'LogChannel')

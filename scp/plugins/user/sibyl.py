@@ -18,7 +18,7 @@ from scp.utils.parser import(
 )
 
 @user.on_message(
-    (user.sudo | user.owner) &
+    (user.owner | user.enforcer) &
     user.command(
         ['sinfo', 'sinfo!'],
     ),
@@ -113,7 +113,7 @@ async def sinfo_handler(_, message: Message):
 
 
 @user.on_message(
-    (user.sudo | user.owner) &
+    (user.owner) &
     user.command('scan'),
 )
 async def scan_handler(_, message: Message):
