@@ -50,7 +50,13 @@ async def sinfo_handler(_, message: Message):
         ptxt += "."
         my_msg = await my_msg.edit_text(ptxt)
     
+    my_user : User
     try:
+        my_user = await user.get_users(the_user)
+    except Exception: pass
+    try:
+        if my_user:
+            the_user = my_user.id
         the_info = user.sibyl.user_info(the_user)
         general_info: GeneralInfo
         try:
@@ -60,12 +66,12 @@ async def sinfo_handler(_, message: Message):
             await my_msg.edit_text('failed to receive info from Sibyl System.')
             return
         txt = html_bold("Sibyl System scan results:", "\n")
-        the_men = html_mention(
-            value=the_info.user_id,
-            client=user,
-        )
-        if isinstance(the_men, str) and len(the_men) > 0:
-            txt += html_bold("‍ • User: ") + the_men + "\n"
+        if my_user:
+            the_mention = await html_mention(
+                value=my_user,
+                client=user,
+            )
+            txt += html_bold("‍ • User: ") + the_mention + "\n"
         
         txt += html_bold("‍ • ID: ") + html_mono(the_info.user_id, "\n")
         txt += html_bold("‍ • Is banned: ") + html_mono(the_info.banned, "\n")
@@ -73,7 +79,7 @@ async def sinfo_handler(_, message: Message):
             if the_info.banned_by != 0:
                 the_banner: User
                 try:
-                    the_banner = user.get_users(the_info.banned_by)
+                    the_banner = await user.get_users(the_info.banned_by)
                 except Exception: pass
                 txt += html_bold("‍ • Banned by: ") + (
                     html_mono(the_info.banned_by, "\n") 
