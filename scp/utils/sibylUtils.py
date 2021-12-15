@@ -268,8 +268,8 @@ class SibylClient(PsychoPass):
         if not isinstance(target, GeneralInfo):
             raise Exception("target should be of type 'GeneralInfo'")
         if not target.result:
-            print('result is ', target.result)
             return None
+        print('result is ', target.result)
         return self.get_general_str_by_perm(target.result.permission)
     
     def get_general_str_by_id(self, target: int) -> int:
@@ -277,9 +277,12 @@ class SibylClient(PsychoPass):
         return self.get_div_by_general(target=general)
 
     def get_general_str_by_perm(self, perm: Permissions) -> str:
-        if perm == Permissions.ENFORCER:
+        if perm == Permissions.ENFORCER or perm == Permissions.ENFORCER.value:
             return "enforcer"
-        elif perm == Permissions.INSPECTOR or perm == Permissions.OWNER:
+        elif (
+            perm == Permissions.INSPECTOR or perm == Permissions.INSPECTOR.value or
+            perm == Permissions.OWNER or perm == Permissions.OWNER.value
+        ):
             return "inspector"
         
         print('perm is ', perm)
