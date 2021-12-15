@@ -268,6 +268,7 @@ class SibylClient(PsychoPass):
         if not isinstance(target, GeneralInfo):
             raise Exception("target should be of type 'GeneralInfo'")
         if not target.result:
+            print('result is ', target.result)
             return None
         return self.get_general_str_by_perm(target.result.permission)
     
