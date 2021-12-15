@@ -60,6 +60,13 @@ async def sinfo_handler(_, message: Message):
             await my_msg.edit_text('failed to receive info from Sibyl System.')
             return
         txt = html_bold("Sibyl System scan results:", "\n")
+        the_men = html_mention(
+            value=the_info.user_id,
+            client=user,
+        )
+        if isinstance(the_men, str) and len(the_men) > 0:
+            txt += html_bold("‍ • User: ") + the_men + "\n"
+        
         txt += html_bold("‍ • ID: ") + html_mono(the_info.user_id, "\n")
         txt += html_bold("‍ • Is banned: ") + html_mono(the_info.banned, "\n")
         if the_info.banned:
