@@ -269,7 +269,7 @@ class SibylClient(PsychoPass):
             raise Exception("target should be of type 'GeneralInfo'")
         if not target.result:
             return None
-        print('result is ', target.result)
+        
         return self.get_general_str_by_perm(target.result.permission)
     
     def get_general_str_by_id(self, target: int) -> int:
@@ -285,7 +285,6 @@ class SibylClient(PsychoPass):
         ):
             return "inspector"
         
-        print('perm is ', perm)
         return None
     
     #------------------------------------------------------
