@@ -51,7 +51,7 @@ class ScpClient(Client):
     def is_silent(self, message: types.Message) -> bool:
         return (
             isinstance(message, types.Message)
-            and isinstance(message.command, list[str])
+            and message.command != None
             and len(message.command) > 0
             and message.command[0x0].endswith('!')
         )
