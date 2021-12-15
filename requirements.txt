@@ -17,4 +17,4 @@ TgCrypto==1.2.2
 ujson==4.3.0
 yarl==1.6.3
 httpx==0.21.0
-SibylSystem==0.0.14.1
+SibylSystem==0.0.14.2
