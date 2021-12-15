@@ -282,6 +282,7 @@ class SibylClient(PsychoPass):
         elif perm == Permissions.INSPECTOR or perm == Permissions.OWNER:
             return "inspector"
         
+        print('perm is ', perm)
         return None
     
     #------------------------------------------------------
