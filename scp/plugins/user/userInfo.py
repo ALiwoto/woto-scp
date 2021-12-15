@@ -7,6 +7,7 @@ from pyrogram.types import (
     CallbackQuery,
 )
 
+
 __PLUGIN__ = 'UserInfo'
 __DOC__ = str(
     user.md.KanTeXDocument(
@@ -50,7 +51,7 @@ async def _(_, message: Message):
         user.exceptions.PeerIdInvalid,
         user.exceptions.BotResponseTimeout,
     ) as err:
-        return await message.reply(err, quote=True)
+        return await message.reply_text(err, quote=True)
     for m in x.results:
         await message.reply_inline_bot_result(x.query_id, m.id, quote=True)
 
@@ -146,6 +147,16 @@ async def _(_, query: InlineQuery):
                     user.md.Bold(
                         'is_contact',
                     ), user.md.Code(u.is_contact),
+                ),
+                user.md.KeyValueItem(
+                    user.md.Bold(
+                        'mutual_contact',
+                    ), user.md.Code(u.is_mutual_contact),
+                ),
+                user.md.KeyValueItem(
+                    user.md.Bold(
+                        'common_groups',
+                    ), user.md.Code(len(await u.get_common_chats())),
                 ),
                 user.md.KeyValueItem(
                     user.md.Bold(
