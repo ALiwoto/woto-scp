@@ -1,4 +1,3 @@
-import logging
 from time import sleep
 from pyrogram.types import (
     Message,
@@ -6,7 +5,6 @@ from pyrogram.types import (
 from pyrogram.types.user_and_chats.user import User
 
 from scp import user
-import html
 from SibylSystem.types import GeneralInfo
 
 from scp.utils.parser import( 
@@ -114,7 +112,9 @@ async def sinfo_handler(_, message: Message):
 
 @user.on_message(
     (user.owner) &
-    user.command('scan'),
+    user.command(
+        ['scan', 'scan!']
+    ),
 )
 async def scan_handler(_, message: Message):
     cmd = message.command
