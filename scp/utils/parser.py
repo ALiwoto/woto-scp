@@ -134,7 +134,7 @@ async def html_mention(value: Union[User, int], name: str = None, client: Client
     elif isinstance(value, User):
         return f"<a href=tg://user?id={value.id}>{html.escape(value.first_name)}</a>"
 
-def html_mention_by_user(value: User,*argv):
+def html_mention_by_user(value: User, *argv):
     if not isinstance(value, User):
         return html_mono(value, *argv)
     return (
