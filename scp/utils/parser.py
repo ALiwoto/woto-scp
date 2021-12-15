@@ -124,9 +124,10 @@ def html_mention(value: Union[User, int], name: str = None, client: Client = Non
         if not name and client:
             try:
                 the_user: User
-                the_user = client.get_users(value)
+                the_user = client.get_users(user_ids=value)
                 name = the_user.first_name
-            except Exception:
+            except Exception as e:
+                print(e)
                 return html_mono(value, *argv)
         elif not name:
             name = str(value)
