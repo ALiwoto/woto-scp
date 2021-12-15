@@ -58,7 +58,7 @@ async def sinfo_handler(_, message: Message):
         if my_user:
             the_user = my_user.id
         the_info = user.sibyl.user_info(the_user)
-        general_info: GeneralInfo
+        general_info: GeneralInfo = None
         try:
             general_info = user.sibyl.get_general_info(the_user)
         except Exception: pass
