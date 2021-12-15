@@ -147,7 +147,10 @@ def get_html_normal(*argv) -> str:
     return html.escape(''.join(argv))
 
 def html_normal(value, *argv) -> str:
-    return html.escape(str(value)) + html.escape(''.join(argv))
+    return html.escape(str(value)) + (
+        "" if argv is None or len(argv) == 0
+        else html.escape(''.join(argv))
+    )
 
 async def in_common_length(user: types.User) -> int:
     if not user:
