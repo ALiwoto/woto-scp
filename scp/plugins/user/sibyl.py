@@ -25,7 +25,7 @@ from scp.utils.parser import(
 )
 async def sinfo_handler(_, message: Message):
     cmd = message.command
-    is_silent = cmd[0].endswith('!')
+    is_silent = user.is_silent(message)
     the_user = 0
     if not message.reply_to_message and len(cmd) == 1:
         the_user = message.from_user.id
@@ -99,16 +99,16 @@ async def sinfo_handler(_, message: Message):
         
         await my_msg.edit_text(txt, parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
-        await my_msg.edit_text("Got error: " +html_mono(str(e)), parse_mode="HTML")
+        await my_msg.edit_text("Got error: " + html_mono(str(e)), parse_mode="HTML")
         return
 
 
 
 @user.on_message(
     (user.sudo | user.owner) &
-    user.command('sban'),
+    user.command('scan'),
 )
-async def sban_handler(_, message: user.types.Message):
+async def scan_handler(_, message: Message):
     cmd = message.command
     if not message.reply_to_message and len(cmd) == 1:
         the_user = message.from_user.id
@@ -136,26 +136,26 @@ async def sban_handler(_, message: user.types.Message):
         if not the_info:
             await my_msg.edit_text('failed to receive info from Sibyl System.')
             return
-        txt = "<b>" + "Sibyl System scan results:" + "</b>\n"
-        txt += "<b>" + "‍ • ID: " + "</b><code>" + str(the_info.user_id) + "</code>\n"
-        txt += "<b>" + "‍ • Is banned: " + "</b><code>" + str(the_info.banned) + "</code>\n"
+        txt = html_bold("Sibyl System scan results:") 
+        txt += html_bold( "‍ • ID: ") + html_mono(the_info.user_id, "\n")
+        txt += html_bold("‍ • Is banned: ") + html_mono(the_info.banned, "\n")
         if the_info.banned:
             if the_info.banned_by != 0:
-                txt += "<b>" + "‍ • Banned by: " + "</b><code>" + str(the_info.banned_by) + "</code>\n"
+                txt += html_bold("‍ • Banned by: ") + html_mono(the_info.banned_by, "\n")
             if the_info.ban_flags and len(the_info.ban_flags) > 0:
                 f = ', '.join(the_info.ban_flags)
-                txt += "<b>" + "‍ • Ban flags: " + "</b><code>" + html.escape(f) + "</code>\n"
-            txt += "<b>" + "‍ • Crime Coefficient: " + "</b><code>" + str(the_info.crime_coefficient) + "</code>\n"
-            txt += "<b>" + "‍ • Last update: " + "</b><code>" + str(the_info.date) + "</code>\n"
-            txt += "<b>" + "‍ • Ban reason: " + "</b><code>" + html.escape(the_info.reason) + "</code>\n"
+                txt += html_bold("‍ • Ban flags: ") + html_mono(f)
+            txt +=  html_bold("‍ • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
+            txt += html_bold(" • Last update: ") + html_mono(the_info.date, "\n")
+            txt += html_bold("‍ • Ban reason: ") + html_mono(the_info.reason, "\n")
         else:
-            txt += "<b>" + "‍ • Crime Coefficient: " + "</b><code>" + str(the_info.crime_coefficient) + "</code>\n"
-            txt += "<b>" + "‍ • Last update: " + "</b><code>" + str(the_info.date) + "</code>\n"
+            txt +=  html_bold("‍ • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
+            txt += html_bold("‍ • Last update: ") + html_mono(the_info.date, "\n")
         
         
         await my_msg.edit_text(txt, parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
-        await my_msg.edit_text("Got error: <code>" + html.escape(str(e)) + "</code>", parse_mode="HTML")
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
         return
 
 

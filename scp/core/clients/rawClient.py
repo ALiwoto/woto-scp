@@ -47,6 +47,14 @@ class ScpClient(Client):
 
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
+    
+    def is_silent(self, message: types.Message) -> bool:
+        return (
+            isinstance(message, types.Message)
+            and isinstance(message.command, list[str])
+            and len(message.command) > 0
+            and message.command[0x0].endswith('!')
+        )
 
     async def send(
         self,
