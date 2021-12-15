@@ -144,13 +144,19 @@ def html_mention_by_user(value: User,*argv):
 
 def get_html_normal(*argv) -> str:
     if argv is None or len(argv) == 0: return ""
-    return html.escape(''.join(argv))
+    my_str = ""
+    for value in argv:
+        if isinstance(value, str):
+            my_str += value
+    
+    return my_str
 
 def html_normal(value, *argv) -> str:
-    return html.escape(str(value)) + (
-        "" if argv is None or len(argv) == 0
-        else html.escape(''.join(argv))
-    )
+    my_str = html.escape(str(value))
+    for value in argv:
+        if isinstance(value, str):
+            my_str += value
+    return my_str
 
 async def in_common_length(user: types.User) -> int:
     if not user:
