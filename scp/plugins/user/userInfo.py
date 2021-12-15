@@ -1,6 +1,11 @@
 from scp import user, bot
 from scp.utils.selfInfo import info
 from scp.utils.strUtils import name_check, permissionParser
+from pyrogram.types import (
+    Message,
+    InlineQuery,
+    CallbackQuery,
+)
 
 __PLUGIN__ = 'UserInfo'
 __DOC__ = str(
@@ -20,7 +25,7 @@ __DOC__ = str(
     (user.sudo | user.owner) &
     user.command('info'),
 )
-async def _(_, message: user.types.Message):
+async def _(_, message: Message):
     cmd = message.command
     if not message.reply_to_message and len(cmd) == 1:
         get_user = message.from_user.id
@@ -56,7 +61,7 @@ async def _(_, message: user.types.Message):
     )
     & user.filters.regex('^_userInfo'),
 )
-async def _(_, query: bot.types.InlineQuery):
+async def _(_, query: InlineQuery):
     try:
         answers = []
         get_user = int(query.query.split(' ')[1])
@@ -183,7 +188,7 @@ async def _(_, query: bot.types.InlineQuery):
     (bot.filters.user(bot._sudo) | bot.filters.user(info['_user_id']))
     & bot.filters.regex('^cperm_'),
 )
-async def _(_, query: user.types.CallbackQuery):
+async def _(_, query: CallbackQuery):
     await query.answer(
         permissionParser(
             (await user.get_chat(int(query.data.split('_')[1]))).permissions,
@@ -195,7 +200,7 @@ async def _(_, query: user.types.CallbackQuery):
     (bot.filters.user(bot._sudo) | bot.filters.user(info['_user_id']))
     & bot.filters.regex('^cdesc_'),
 )
-async def _(_, query: user.types.CallbackQuery):
+async def _(_, query: CallbackQuery):
     chat = await user.get_chat(int(query.data.split('_')[1]))
     await query.answer(
         chat.description[:150] if chat.description else chat.bio,
