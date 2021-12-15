@@ -27,6 +27,7 @@
         "pyrogram",
         "Referer",
         "SIGUSR",
+        "substrs",
         "ujson",
         "unmute",
         "wfilters",

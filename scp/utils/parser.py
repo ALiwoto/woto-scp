@@ -109,7 +109,7 @@ def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
 
 
 def html_mono(value, *argv) -> str:
-    return f"<code>{html.escape(str(value))}</code>" +  html.escape(''.join(argv))
+    return f"<code>{html.escape(str(value))}</code>" +  get_html_normal(argv)
 
 def html_in_parantesis(value) -> str:
     if not value:
@@ -117,7 +117,7 @@ def html_in_parantesis(value) -> str:
     return f" ({ html.escape(value)}): "
 
 def html_bold(value, *argv) -> str:
-    return f"<b>{html.escape(str(value))}</b>" + html.escape(''.join(argv))
+    return f"<b>{html.escape(str(value))}</b>" + get_html_normal(argv)
 
 def html_mention(value: Union[User, int], name: str = None, client: Client = None, *argv):
     if isinstance(value, int):
@@ -139,9 +139,12 @@ def html_mention_by_user(value: User,*argv):
         return html_mono(value, *argv)
     return (
         f"<a href=tg://user?id={value.id}>{html.escape(value.first_name)}</a>" 
-        + html.escape(''.join(argv))
+        + get_html_normal(argv)
     )
 
+def get_html_normal(*argv) -> str:
+    if argv is None: return ""
+    return html.escape(''.join(argv))
 
 def html_normal(value, *argv) -> str:
     return html.escape(str(value)) + html.escape(''.join(argv))
