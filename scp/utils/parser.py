@@ -128,7 +128,7 @@ def html_mention(value: Union[User, int], name: str = None, client: Client = Non
                 name = the_user.first_name
             except Exception:
                 return html_mono(value, *argv)
-        if not name:
+        elif not name:
             name = str(value)
         return f"<a href=tg://user?id={value}>{html.escape(name)}</a>"
     elif isinstance(value, User):
