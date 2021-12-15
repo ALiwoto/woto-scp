@@ -119,15 +119,14 @@ def html_in_parantesis(value) -> str:
 def html_bold(value, *argv) -> str:
     return f"<b>{html.escape(str(value))}</b>" + get_html_normal(*argv)
 
-def html_mention(value: Union[User, int], name: str = None, client: Client = None, *argv):
+async def html_mention(value: Union[User, int], name: str = None, client: Client = None, *argv):
     if isinstance(value, int):
         if not name and client:
             try:
                 the_user: User
-                the_user = client.get_users(user_ids=value)
+                the_user = await client.get_users(user_ids=value)
                 name = the_user.first_name
-            except Exception as e:
-                print(e)
+            except Exception:
                 return html_mono(value, *argv)
         elif not name:
             name = str(value)
