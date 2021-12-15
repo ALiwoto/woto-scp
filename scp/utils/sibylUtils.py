@@ -176,11 +176,33 @@ class SibylClient(PsychoPass):
     def user_info(self, user_id: int) -> Ban:
         return self.get_info(user_id)
     
-    def ban(self, user_id: int, reason: str, message: str=None, source: str=None) -> BanRes:
-        return self.add_ban(user_id, reason, message, source)
+    def ban(
+        self, 
+        user_id: int, 
+        reason: str, 
+        message: str='', 
+        source: str='',
+        is_bot: bool = False,
+    ) -> BanRes:
+        return self.add_ban(user_id, reason, message, source, is_bot)
     
-    def ban_user(self, user_id: int, reason: str, message: str=None, source: str=None) -> BanRes:
-        return self.add_ban(user_id, reason, message, source)
+    def ban_user(
+        self, 
+        user_id: int, 
+        reason: str, 
+        message: str=None, 
+        source: str=None,
+    ) -> BanRes:
+        return self.add_ban(user_id, reason, message, source, False)
+    
+    def ban_bot(
+        self, 
+        user_id: int, 
+        reason: str, 
+        message: str=None, 
+        source: str=None,
+    ) -> BanRes:
+        return self.add_ban(user_id, reason, message, source, True)
 
     def stats(self) -> StatsResult:
         resp = self.invoke_request(f"{self.host}stats?token={self.token}")

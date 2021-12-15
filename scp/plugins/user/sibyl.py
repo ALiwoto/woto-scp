@@ -17,7 +17,7 @@ from scp.utils.parser import(
 )
 
 @user.on_message(
-    (user.owner | user.enforcer) &
+    (user.owner | user.enforcer | user.inspector) &
     user.command(
         ['sinfo', 'sinfo!'],
     ),
@@ -116,13 +116,16 @@ async def sinfo_handler(_, message: Message):
         ['fScan', 'fScan!']
     ),
 )
-async def scan_handler(_, message: Message):
+async def fScan_handler(_, message: Message):
     if not message.reply_to_message: return # TODO
     #cmd = message.command
     #is_silent = user.is_silent(message)
     replied = message.reply_to_message
     target_user = replied.from_user.id
-    the_reason = split_some(message.text, 2, ' ', '\n')
+    reason_list = split_some(message.text, 2, ' ', '\n')
+    if len(reason_list) < 2:
+        await message.reply_text('reason is required for this action')
+    the_reason = reason_list[1]
 
     ptxt = "Sending cymatic scan request to Sibyl System."
     my_msg = await message.reply_text(ptxt)
@@ -134,6 +137,42 @@ async def scan_handler(_, message: Message):
             source=message.link,
             message=replied.text,
         )
+    except Exception as e:
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
+        return
+    
+    await my_msg.edit_text(
+        html_mono('Cymatic scan request has been sent to Sibyl.'), 
+        parse_mode="HTML",
+    )
+
+
+@user.on_message(
+    (user.owner | user.inspector) &
+    user.command(
+        ['revert', 'revert!']
+    ),
+)
+async def revert_handler(_, message: Message):
+    target_user: int = 0
+    cmd = message.command
+    replied = message.reply_to_message
+    if replied and replied.from_user:
+        target_user = replied.from_user.id
+    
+    if target_user == 0:
+        if cmd and len(cmd) > 0:
+            the_user = await user.get_users(cmd[0])
+            if the_user and isinstance(the_user, User):
+                target_user = the_user.id
+            else:
+                target_user = cmd[1]
+
+
+    my_msg = await message.reply_text("Sending cymatic scan request to Sibyl System.")
+
+    try:
+        user.sibyl.revert(target_user)
     except Exception as e:
         await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
         return
