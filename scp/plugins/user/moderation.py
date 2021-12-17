@@ -50,9 +50,9 @@ async def admins_handler(_, message: Message):
     except Exception as ex:
         await top_msg.edit_text(text=html_mono(ex))
         return
-    creator: user.types.ChatMember = None
-    admins: list[user.types.ChatMember] = []
-    bots: list[user.types.ChatMember] = []
+    creator: ChatMember = None
+    admins: list[ChatMember] = []
+    bots: list[ChatMember] = []
     for i in m:
         if i.status == 'creator':
             creator = i
@@ -105,7 +105,8 @@ async def admins_handler(_, message: Message):
 	user.filters.command(
         ['members'],
         prefixes=user.cmd_prefixes,
-    ))
+    ),
+)
 async def members_handler(_, message: Message):
     all_strs = message.text.split(' ')
     if len(all_strs) < 2:
@@ -163,6 +164,91 @@ async def members_handler(_, message: Message):
         return
 
     await top_msg.edit_text(text=txt, parse_mode="html")
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['bots'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def bots_handler(_, message: Message):
+    all_strs = message.text.split(' ')
+    if len(all_strs) < 2:
+        if not message.reply_to_message:
+            the_chat = message.chat.id
+        else:
+            replied = message.reply_to_message
+            if replied.text.isdigit() and replied.text.startswith('-100'):
+                the_chat = int(replied.text)
+            else:
+                the_chat = message.chat.id
+    else:
+        the_chat = message.text.split(' ')[1]
+        if the_chat.find('/') > 0:
+            all_strs = the_chat.split('/')
+            index = len(all_strs) - 1
+            if all_strs[index].isdigit():
+                index -= 1
+            if all_strs[index].isdigit():
+                all_strs[index] = '-100' + all_strs[index]
+            the_chat = all_strs[index]
+        
+    top_msg = await message.reply_text(html_mono('fetching group bots...'))
+    txt: str = ''
+    m = None
+    try:
+        m = await user.get_chat_members(the_chat)
+    except Exception as ex:
+        await top_msg.edit_text(text=html_mono(ex))
+        return
+    
+    admin_bots: list[ChatMember] = []
+    member_bots: list[ChatMember] = []
+    async for current in await user.iter_chat_members(the_chat):
+        if not isinstance(current, ChatMember) or not current.user.is_bot:
+            continue
+
+        if current.status == 'administrator':
+            admin_bots.append(current)
+            continue
+
+        if current.status != 'left' and current.status != 'kicked':
+            member_bots.append(current)
+            continue
+
+
+
+    if  len(admin_bots) == 0 and len(member_bots) == 0:
+        await top_msg.edit_text(text="Seems like this group doesn't have any bots...")
+        return
+
+    starter = html_mono(" • ") 
+    if len(admin_bots) > 0:
+        txt += html_bold("Members:", "\n")
+        for member in admin_bots:
+            u = member.user
+            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
+        txt += "\n"
+    
+    if len(member_bots) > 0:
+        txt += html_bold("Members:", "\n")
+        for member in member_bots:
+            u = member.user
+            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
+        txt += "\n"
+    
+    
+    if len(txt) > 4096:
+        await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
+        return
+
+    await top_msg.edit_text(text=txt, parse_mode="html")
+
 
 
 @user.on_message(~user.filters.scheduled & 
