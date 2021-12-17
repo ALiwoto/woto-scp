@@ -238,7 +238,6 @@ async def bots_handler(_, message: Message):
         await top_msg.edit_text(text="Seems like this group doesn't have any bots...")
         return
 
-    
     txt += '▫ Bots list in ' + html_normal_chat_link(the_group.title, the_group, "\n\n")
     if len(admin_bots) > 0:
         txt += html_bold(f"Admin bots: ({len(admin_bots)})", "\n")
