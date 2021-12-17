@@ -210,7 +210,7 @@ async def bots_handler(_, message: Message):
     
     the_group: Chat = None
     try:
-        the_group = user.get_chat(the_chat)
+        the_group = await user.get_chat(the_chat)
     except Exception as e:
         await top_msg.edit_text(text=html_mono(e))
         return
