@@ -1,6 +1,9 @@
 from scp import user
 from base64 import b64encode as Base64
 import ujson as json
+from pyrogram.types import (
+    Message,
+)
 
 
 __PLUGIN__ = 'Grabify'
@@ -18,7 +21,7 @@ __DOC__ = str(
 
 
 @user.on_message(user.sudo & user.command('grabiFy'))
-async def _(_, message: user.types.Message):
+async def _(_, message: Message):
     if len(message.text.split()) == 1:
         return await message.delete()
     b64Decode = Base64(message.text.split(None, 1)[1].encode('utf-8'))

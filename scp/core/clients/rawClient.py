@@ -189,7 +189,10 @@ class ScpClient(Client):
         _sudo.append(int(x))
     try:
         for x in _config.get('scp-5170', 'OwnerList').split():
-            _owners.append(int(x))
+            the_id = int(x)
+            if not x in _sudo:
+                _sudo.append(the_id)
+            _owners.append(the_id)
     except Exception as e:
         logging.warning(f'{e}')
 
