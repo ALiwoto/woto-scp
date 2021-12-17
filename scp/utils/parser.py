@@ -128,12 +128,15 @@ def html_link(value, link: str, *argv) -> str:
         return html_mono(value, *argv)
     return f"<a href={html.escape(link)}>{html.escape(str(value))}</a>" +  get_html_normal(*argv)
 
-def html_normal_chat_link(value, chat: Chat, *argv) -> str:
+async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
     if not isinstance(chat, Chat):
         return html_mono(value, *argv)
     link: str = ''
     if not isinstance(chat.username, str) or len(chat.username) == 0:
-        link = f'https://t.me/c/{str(chat.id)[4:]}/1'
+        count = 1
+        if chat._client:
+            count = await chat._client.get_history_count(chat.id)
+        link = f'https://t.me/c/{str(chat.id)[4:]}/{count}'
     else:
         link = f'https://t.me/{chat.username}'
 
