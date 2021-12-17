@@ -12,7 +12,8 @@ from scp.utils.parser import (
     html_bold,
     html_in_common,
     html_link,
-    html_mono, 
+    html_mono,
+    html_normal_chat_link, 
     mention_user_html,
     split_all, 
     to_output_file,
@@ -238,7 +239,7 @@ async def bots_handler(_, message: Message):
         return
 
     
-    txt += '▫ Bots list in ' + html_link(the_group.title, the_group.invite_link, "\n")
+    txt += '▫ Bots list in ' + html_normal_chat_link(the_group.title, the_group, "\n")
     if len(admin_bots) > 0:
         txt += html_bold(f"Admin bots: ({len(admin_bots)})", "\n")
         for member in admin_bots:
