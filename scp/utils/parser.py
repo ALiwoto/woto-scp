@@ -135,7 +135,10 @@ async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
     if not isinstance(chat.username, str) or len(chat.username) == 0:
         count = 1
         if chat._client:
-            count = await chat._client.get_history_count(chat.id)
+            count = await chat._client.get_history(
+                chat_id=chat.id,
+                limit=1,
+            )
         link = f'https://t.me/c/{str(chat.id)[4:]}/{count}'
     else:
         link = f'https://t.me/{chat.username}'
