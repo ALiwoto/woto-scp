@@ -209,7 +209,7 @@ async def bots_handler(_, message: Message):
     
     admin_bots: list[ChatMember] = []
     member_bots: list[ChatMember] = []
-    async for current in await user.iter_chat_members(the_chat):
+    async for current in user.iter_chat_members(the_chat):
         if not isinstance(current, ChatMember) or not current.user.is_bot:
             continue
 
@@ -229,14 +229,14 @@ async def bots_handler(_, message: Message):
 
     starter = html_mono(" • ") 
     if len(admin_bots) > 0:
-        txt += html_bold("Members:", "\n")
+        txt += html_bold("Admin bots:", "\n")
         for member in admin_bots:
             u = member.user
             txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
         txt += "\n"
     
     if len(member_bots) > 0:
-        txt += html_bold("Members:", "\n")
+        txt += html_bold("Normal bots:", "\n")
         for member in member_bots:
             u = member.user
             txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
