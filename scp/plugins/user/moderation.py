@@ -11,12 +11,14 @@ from scp.utils.misc import can_member_match, remove_special_chars
 from scp.utils.parser import (
     html_bold,
     html_in_common,
+    html_link,
     html_mono, 
     mention_user_html,
     split_all, 
     to_output_file,
 )
 
+STARTER = html_mono("• ") 
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -235,20 +237,20 @@ async def bots_handler(_, message: Message):
         await top_msg.edit_text(text="Seems like this group doesn't have any bots...")
         return
 
-    starter = html_mono(" • ") 
-    txt += 'list of bots in ' + the_group.title[:16] + '\n'
+    
+    txt += '▫ Bots list in ' + html_link(the_group.title, the_group.invite_link, "\n")
     if len(admin_bots) > 0:
         txt += html_bold(f"Admin bots: ({len(admin_bots)})", "\n")
         for member in admin_bots:
             u = member.user
-            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
+            txt += STARTER + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
         txt += "\n"
     
     if len(member_bots) > 0:
         txt += html_bold(f"Normal bots: ({len(member_bots)})", "\n")
         for member in member_bots:
             u = member.user
-            txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
+            txt += STARTER + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
         txt += "\n"
     
     
