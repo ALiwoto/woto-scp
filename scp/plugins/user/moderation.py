@@ -259,7 +259,11 @@ async def bots_handler(_, message: Message):
         await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
-    await top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(
+        text=txt, 
+        parse_mode="html",
+        disable_web_page_preview=True,
+    )
 
 
 
