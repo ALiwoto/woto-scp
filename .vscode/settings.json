@@ -5,6 +5,7 @@
         "aiohttp",
         "bprint",
         "cdesc",
+        "skick",
         "cperm",
         "duckduckgo",
         "DUCKGO",
@@ -33,5 +34,5 @@
         "unmute",
         "wfilters",
         "yimage"
-    ]
+    ],
 }

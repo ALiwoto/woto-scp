@@ -119,6 +119,10 @@ def html_in_parantesis(value) -> str:
 def html_bold(value, *argv) -> str:
     return f"<b>{html.escape(str(value))}</b>" + get_html_normal(*argv)
 
+
+def html_link(value, link: str, *argv) -> str:
+    return f"<a href={html.escape(link)}>{html.escape(str(value))}</a>" +  get_html_normal(*argv)
+
 async def html_mention(value: Union[User, int], name: str = None, client: Client = None, *argv):
     if isinstance(value, int):
         if not name and client:
