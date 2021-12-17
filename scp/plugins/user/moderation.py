@@ -170,7 +170,7 @@ async def members_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	~user.filters.edited & 
-	user.owner & 
+	(user.owner | user.sudo) & 
 	user.filters.command(
         ['bots'],
         prefixes=user.cmd_prefixes,
