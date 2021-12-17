@@ -133,7 +133,7 @@ def html_normal_chat_link(value, chat: Chat, *argv) -> str:
         return html_mono(value, *argv)
     link: str = ''
     if not isinstance(chat.username, str) or len(chat.username) == 0:
-        link = f'https://t.me/c/{chat.id}/1'
+        link = f'https://t.me/c/{str(chat.id)[4:]}/1'
     else:
         link = f'https://t.me/{chat.username}'
 
