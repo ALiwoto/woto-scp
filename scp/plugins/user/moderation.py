@@ -18,7 +18,7 @@ from scp.utils.parser import (
     to_output_file,
 )
 
-STARTER = html_mono("• \u200F") 
+STARTER = html_mono("• \u200D") 
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
