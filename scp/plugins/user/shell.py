@@ -23,7 +23,7 @@ from scp.utils.parser import html_mono, split_some
     ),
 )
 async def shell(_, message: Message):
-    all_strs = split_some(message.text, 2, ' ', '\n')
+    all_strs = split_some(message.text, 1, ' ', '\n')
     if len(all_strs) < 2:
         return
     
