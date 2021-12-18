@@ -128,7 +128,96 @@ async def purge_handler(_, message: Message):
                 message_ids=current,
             )
         except Exception: pass
+
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+    user.filters.reply &
+	user.owner & 
+	user.filters.command(
+        ['tPurge'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def purge_handler(_, message: Message):
+    first = message.reply_to_message.message_id
+    current = message.message_id
+    limit = current - first
+    my_strs = message.text.split(' ')
+    message_type = 'text'
+    if len(my_strs) > 2:
+        # all
+        # text
+        # service
+        # media
+        # new_chat_members:: join
+        # left_chat_member:: left
+        # new_chat_title:: new_title
+        # new_chat_photo:: new_photo
+        # delete_chat_photo:: del_photo
+        # group_chat_created:: group_created
+        # supergroup_chat_created:: supergroup_created
+        # channel_chat_created:: channel_created
+        # migrate_to_chat_id:: migrated
+        # migrate_from_chat_id:: migrated_from
+        # pinned_message:: pinned
+        message_type = message.text.split(' ')[1].lower()
     
+    async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset=first):
+        if not isinstance(current, Message):
+            continue
+        try:
+            if message_type == 'all':
+                await current.delete()
+            elif message_type == 'text':
+                if current.text:
+                    await current.delete()
+            elif message_type == 'service':
+                if current.service:
+                    await current.delete()
+            elif message_type == 'media':
+                if current.media:
+                    await current.delete()
+            elif message_type == 'join':
+                if current.new_chat_members:
+                    await current.delete()
+            elif message_type == 'left':
+                if current.left_chat_member:
+                    await current.delete()
+            elif message_type == 'new_title':
+                if current.new_chat_title:
+                    await current.delete()
+            elif message_type == 'new_photo':
+                if current.new_chat_photo:
+                    await current.delete()
+            elif message_type == 'del_photo':
+                if current.delete_chat_photo:
+                    await current.delete()
+            elif message_type == 'group_created':
+                if current.group_chat_created:
+                    await current.delete()
+            elif message_type == 'supergroup_created':
+                if current.supergroup_chat_created:
+                    await current.delete()
+            elif message_type == 'channel_created':
+                if current.channel_chat_created:
+                    await current.delete()
+            elif message_type == 'migrated':
+                if current.migrate_to_chat_id:
+                    await current.delete()
+            elif message_type == 'migrated_from':
+                if current.migrate_from_chat_id:
+                    await current.delete()
+            elif message_type == 'pinned':
+                if current.pinned_message:
+                    await current.delete()
+        except Exception: pass
+
+
+
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
