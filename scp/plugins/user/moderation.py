@@ -215,9 +215,12 @@ async def purge_handler(_, message: Message):
                     await current.delete()
             elif message_type == 'pinned':
                 if current.pinned_message:
+                    print('came here')
                     await current.delete()
                 else:
                     print('came here but not pinned')
+            else:
+                print(f'type is: "{message_type}"')
         except Exception as e: print(e)
 
 
