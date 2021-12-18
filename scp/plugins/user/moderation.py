@@ -479,6 +479,7 @@ async def remspec_handler(_, message: Message):
 	user.owner & 
 	user.filters.command(
         ['ban'],
+        prefixes=user.cmd_prefixes,
     ),
 )
 async def ban_handler(_, message: Message):
