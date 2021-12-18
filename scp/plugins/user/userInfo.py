@@ -47,7 +47,7 @@ async def _(_, message: Message):
             info['_bot_username'],
             '_userInfo ' + str(Uid),
         )
-        print(x)
+        print(type(x))
     except (
         user.exceptions.PeerIdInvalid,
         user.exceptions.BotResponseTimeout,
