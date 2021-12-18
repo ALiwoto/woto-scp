@@ -119,15 +119,12 @@ async def purge_handler(_, message: Message):
     # messages between first and current
     messages = [m for m in range(first, current + 1)]
 
-    # list in chunks of 100
-    all_messages  = [messages[i:i + 100] for i in range(0, len(messages), 100)]
-    for current in all_messages:
-        try:
-            await user.delete_messages(
-                chat_id=message.chat.id,
-                message_ids=current,
-            )
-        except Exception: pass
+    try:
+        await user.delete_messages(
+            chat_id=message.chat.id,
+            message_ids=messages,
+        )
+    except Exception: pass
 
 
 @user.on_message(~user.filters.scheduled & 
@@ -136,7 +133,7 @@ async def purge_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
     user.filters.reply &
-	user.owner & 
+	user.sudo & 
 	user.filters.command(
         ['tPurge'],
         prefixes=user.cmd_prefixes,
@@ -153,6 +150,8 @@ async def purge_handler(_, message: Message):
         # text
         # service
         # media
+        # bot
+        # via_bot
         # new_chat_members:: join
         # left_chat_member:: left
         # new_chat_title:: new_title
@@ -170,57 +169,73 @@ async def purge_handler(_, message: Message):
         await message.delete()
     except Exception: pass
 
+    the_messages = []
+
     async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset_id=current):
         if not isinstance(current, Message):
             continue
         try:
             if message_type == 'all':
-                await current.delete()
+                the_messages.append(current.message_id)
             elif message_type == 'text':
                 if current.text:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'service':
                 if current.service:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'media':
                 if current.media:
-                    await current.delete()
+                    the_messages.append(current.message_id)
+            elif message_type == 'bot':
+                if current.from_user.is_bot:
+                    the_messages.append(current.message_id)
+            elif message_type == 'via_bot':
+                if current.via_bot:
+                    the_messages.append(current.message_id)
             elif message_type == 'join':
                 if current.new_chat_members:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'left':
                 if current.left_chat_member:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'new_title':
                 if current.new_chat_title:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'new_photo':
                 if current.new_chat_photo:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'del_photo':
                 if current.delete_chat_photo:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'group_created':
                 if current.group_chat_created:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'supergroup_created':
                 if current.supergroup_chat_created:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'channel_created':
                 if current.channel_chat_created:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'migrated':
                 if current.migrate_to_chat_id:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'migrated_from':
                 if current.migrate_from_chat_id:
-                    await current.delete()
+                    the_messages.append(current.message_id)
             elif message_type == 'pinned':
                 if current.pinned_message:
-                    await current.delete()
+                    the_messages.append(current.message_id)
         except Exception as e: print(e)
+    
+    if len(the_messages) < 1:
+        return
 
-
+    try:
+        await user.delete_messages(
+            chat_id=message.chat.id,
+            message_ids=the_messages,
+        )
+    except Exception: pass
 
 
 @user.on_message(~user.filters.scheduled & 
