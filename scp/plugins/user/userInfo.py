@@ -6,6 +6,9 @@ from pyrogram.types import (
     InlineQuery,
     CallbackQuery,
 )
+from pyrogram.raw.types.messages.bot_results import (
+    BotResults,
+)
 
 
 __PLUGIN__ = 'UserInfo'
@@ -43,18 +46,21 @@ async def _(_, message: Message):
             pass
     try:
         Uid = (await user.get_chat(get_user)).id
-        x = await user.get_inline_bot_results(
+        x: BotResults = await user.get_inline_bot_results(
             info['_bot_username'],
             '_userInfo ' + str(Uid),
         )
-        print(type(x))
     except (
         user.exceptions.PeerIdInvalid,
         user.exceptions.BotResponseTimeout,
     ) as err:
         return await message.reply_text(err, quote=True)
     for m in x.results:
-        await message.reply_inline_bot_result(x.query_id, m.id, quote=True)
+        await message.reply_inline_bot_result(
+            x.query_id, 
+            m.id, 
+            quote=True,
+        )
 
 
 @bot.on_inline_query(
