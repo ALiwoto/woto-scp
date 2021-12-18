@@ -148,6 +148,7 @@ async def purge_handler(_, message: Message):
     limit = current - first
 
     my_strs: list[str] = split_some(message.text, 1, ' ', '\n')
+    print(my_strs)
     flags = PurgeFlags(my_strs[1] if len(my_strs) > 1 else '')
     
     the_messages = []
@@ -165,7 +166,7 @@ async def purge_handler(_, message: Message):
             the_messages.append(current.message_id)
         elif flags.flag_media and current.media:
             the_messages.append(current.message_id)
-        elif flags.flag_bots and current.from_user.is_bot:
+        elif flags.flag_bot and current.from_user.is_bot:
             the_messages.append(current.message_id)
         elif flags.flag_via_bot and current.via_bot:
             the_messages.append(current.message_id)
