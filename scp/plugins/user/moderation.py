@@ -166,8 +166,10 @@ async def purge_handler(_, message: Message):
         # pinned_message:: pinned
         message_type = my_strs[1].lower().strip()
     
+    print('type is ', message_type)
     async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset=first):
         if not isinstance(current, Message):
+            print('not message:', type(current))
             continue
         try:
             if message_type == 'all':
