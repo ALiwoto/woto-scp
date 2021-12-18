@@ -214,7 +214,7 @@ async def purge_handler(_, message: Message):
             elif message_type == 'pinned':
                 if current.pinned_message:
                     await current.delete()
-        except Exception: pass
+        except Exception as e: print(e)
 
 
 
