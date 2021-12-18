@@ -111,9 +111,16 @@ async def _(_, message: Message):
     ) as err:
         return await message.reply_text(err, quote=True)
     for m in x.results:
-        await message.reply_inline_bot_result(
-            x.query_id, 
-            m.id, 
+        #await message.reply_inline_bot_result(
+        #    x.query_id, 
+        #    m.id, 
+        #    quote=True,
+        #    hide_via=True,
+        #)
+        await user.send_inline_bot_result(
+            chat_id=message.chat.id,
+            query_id=x.query_id,
+            result_id=m.id,
             hide_via=True,
         )
 
