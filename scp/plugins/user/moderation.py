@@ -167,7 +167,8 @@ async def purge_handler(_, message: Message):
         message_type = my_strs[1].lower().strip()
     
     print('type is ', message_type)
-    async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset=current):
+    print('limit is ', limit)
+    async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset_id=current):
         print('in loop, limit is:', limit)
         if not isinstance(current, Message):
             print('not message:', type(current))
