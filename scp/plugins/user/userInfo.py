@@ -1,8 +1,10 @@
 from scp import user, bot
+from scp.utils.parser import html_mono
 from scp.utils.selfInfo import info
 from scp.utils.strUtils import name_check, permissionParser
 from pyrogram.types import (
     Message,
+    User,
     InlineQuery,
     CallbackQuery,
 )
@@ -20,6 +22,62 @@ __DOC__ = str(
         ),
     ),
 )
+
+
+
+@user.on_message(
+    (user.owner | user.enforcer | user.inspector) &
+    user.command(
+        ['bInfo', 'bInfo!'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def sinfo_handler(_, message: Message):
+    cmd = message.command
+    is_silent = user.is_silent(message)
+    the_user = 0
+    if not message.reply_to_message and len(cmd) == 1:
+        the_user = message.from_user.id
+    elif len(cmd) == 1:
+        if message.reply_to_message.forward_from:
+            the_user = message.reply_to_message.forward_from.id
+        else:
+            the_user = message.reply_to_message.from_user.id
+    elif len(cmd) > 1:
+        the_user = cmd[1]
+        try:
+            the_user = int(cmd[1])
+        except ValueError:
+            pass
+    #ptxt = "Sending cymatic scan request to Sibyl System."
+    #my_msg = await message.reply_text(ptxt)
+    
+    my_user : User = None
+    try:
+        my_user = await user.get_users(the_user)
+    except Exception: pass
+    keyboard = user.types.InlineKeyboardMarkup(
+            [[
+                user.types.InlineKeyboardButton(
+                    'UserLink',
+                    url=f'tg://user?id={my_user.id}',
+                ),
+                user.types.InlineKeyboardButton(
+                    'Description', callback_data=f'cdesc_{my_user.id}',
+                ),
+            ]],
+        )
+    try:
+        await message.reply_text(
+            text="this a test",
+            reply_markup=keyboard,
+        )
+    except Exception as e:
+        await message.reply_text(
+            text=html_mono(e),
+            reply_markup=keyboard,
+        )
+
 
 
 @user.on_message(
