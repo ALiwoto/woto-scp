@@ -30,7 +30,8 @@ STARTER = html_mono("• \u200D")
 	user.filters.command(
         ['admins'],
         prefixes=user.cmd_prefixes,
-    ))
+    ),
+)
 async def admins_handler(_, message: Message):
     all_strs = message.text.split(' ')
     if len(all_strs) < 2:
@@ -99,6 +100,35 @@ async def admins_handler(_, message: Message):
 
     await top_msg.edit_text(text=txt, parse_mode="html")
 
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+    user.filters.reply &
+	user.owner & 
+	user.filters.command(
+        ['purge'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def purge_handler(_, message: Message):
+    first = message.reply_to_message.message_id
+    current = message.message_id
+    # messages between first and current
+    messages = [m for m in range(first, current + 1)]
+
+    # list in chunks of 100
+    all_messages  = [messages[i:i + 100] for i in range(0, len(messages), 100)]
+    for current in all_messages:
+        try:
+            await user.delete_messages(
+                chat_id=message.chat.id,
+                message_ids=current,
+            )
+        except Exception: pass
+    
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
