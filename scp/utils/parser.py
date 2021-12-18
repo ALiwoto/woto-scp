@@ -7,6 +7,7 @@ from pyrogram.client import Client
 
 from pyrogram.types import (
     User,
+    Message,
     Chat,
 )
 
@@ -18,7 +19,8 @@ class PurgeFlags:
         me
         text
         sticker
-        gif
+        gif (animation)
+        file (document)
         service
         media
         bot
@@ -40,6 +42,7 @@ class PurgeFlags:
     flag_text: bool = False
     flag_sticker: bool = False
     flag_gif: bool = False
+    flag_file: bool = False
     flag_service: bool = False
     flag_media: bool = False
     flag_bot: bool = False
@@ -67,6 +70,7 @@ class PurgeFlags:
         self.flag_text = 'text' in flags
         self.flag_sticker = 'sticker' in flags
         self.flag_gif = 'gif' in flags or 'animation' in flags
+        self.flag_file = 'file' in flags or 'document' in flags
         self.flag_service = 'service' in flags
         self.flag_media = 'media' in flags
         self.flag_bot = 'bot' in flags
@@ -82,6 +86,51 @@ class PurgeFlags:
         self.flag_migrated_to = 'migrated_to' in flags
         self.flag_migrated_from = 'migrated_from' in flags
         self.flag_pinned = 'pinned' in flags
+
+    def can_match(self, message: Message) -> bool:
+        if self.flag_all:
+            return True
+        elif self.flag_me and message.outgoing:
+            return True
+        elif self.flag_text and message.text:
+            return True
+        elif self.flag_sticker and message.sticker:
+            return True
+        elif self.flag_gif and message.animation:
+            return True
+        elif self.flag_file and message.document:
+            return True
+        elif self.flag_service and message.service:
+            return True
+        elif self.flag_media and message.media:
+            return True
+        elif self.flag_bot and message.from_user.is_bot:
+            return True
+        elif self.flag_via_bot and message.via_bot:
+            return True
+        elif self.flag_join and message.new_chat_members:
+            return True
+        elif self.flag_left and message.left_chat_member:
+            return True
+        elif self.flag_new_title and message.new_chat_title:
+            return True
+        elif self.flag_new_photo and message.new_chat_photo:
+            return True
+        elif self.flag_del_photo and message.delete_chat_photo:
+            return True
+        elif self.flag_group_created and message.group_chat_created:
+            return True
+        elif self.flag_supergroup_created and message.supergroup_chat_created:
+            return True
+        elif self.flag_channel_created and message.channel_chat_created:
+            return True
+        elif self.flag_migrated_to and message.migrate_to_chat_id:
+            return True
+        elif self.flag_migrated_from and message.migrate_from_chat_id:
+            return True
+        elif self.flag_pinned and message.pinned_message:
+            return True
+    
 
 
 
