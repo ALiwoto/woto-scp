@@ -165,10 +165,6 @@ async def purge_handler(_, message: Message):
         # pinned_message:: pinned
         message_type = my_strs[1].lower().strip()
     
-    try:
-        await message.delete()
-    except Exception: pass
-
     the_messages = []
 
     async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset_id=current):
@@ -227,8 +223,8 @@ async def purge_handler(_, message: Message):
                     the_messages.append(current.message_id)
         except Exception as e: print(e)
     
-    if len(the_messages) < 1:
-        return
+    if not message.message_id in the_messages:
+        the_messages.append(message.message_id)
 
     try:
         await user.delete_messages(
