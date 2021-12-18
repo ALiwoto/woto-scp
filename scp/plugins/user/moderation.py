@@ -155,47 +155,10 @@ async def purge_handler(_, message: Message):
     async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset_id=current):
         if not isinstance(current, Message):
             continue
-        if flags.flag_all:
+        
+        if flags.can_match(current):
             the_messages.append(current.message_id)
-        elif flags.flag_me and current.outgoing:
-            the_messages.append(current.message_id)
-        elif flags.flag_text and current.text:
-            the_messages.append(current.message_id)
-        elif flags.flag_sticker and current.sticker:
-            the_messages.append(current.message_id)
-        elif flags.flag_gif and current.animation:
-            the_messages.append(current.message_id)
-        elif flags.flag_service and current.service:
-            the_messages.append(current.message_id)
-        elif flags.flag_media and current.media:
-            the_messages.append(current.message_id)
-        elif flags.flag_bot and current.from_user.is_bot:
-            the_messages.append(current.message_id)
-        elif flags.flag_via_bot and current.via_bot:
-            the_messages.append(current.message_id)
-        elif flags.flag_join and current.new_chat_members:
-            the_messages.append(current.message_id)
-        elif flags.flag_left and current.left_chat_member:
-            the_messages.append(current.message_id)
-        elif flags.flag_new_title and current.new_chat_title:
-            the_messages.append(current.message_id)
-        elif flags.flag_new_photo and current.new_chat_photo:
-            the_messages.append(current.message_id)
-        elif flags.flag_del_photo and current.delete_chat_photo:
-            the_messages.append(current.message_id)
-        elif flags.flag_group_created and current.group_chat_created:
-            the_messages.append(current.message_id)
-        elif flags.flag_supergroup_created and current.supergroup_chat_created:
-            the_messages.append(current.message_id)
-        elif flags.flag_channel_created and current.channel_chat_created:
-            the_messages.append(current.message_id)
-        elif flags.flag_migrated_to and current.migrate_to_chat_id:
-            the_messages.append(current.message_id)
-        elif flags.flag_migrated_from and current.migrate_from_chat_id:
-            the_messages.append(current.message_id)
-        elif flags.flag_pinned and current.pinned_message:
-            the_messages.append(current.message_id)
-    
+
     if not message.message_id in the_messages:
         the_messages.append(message.message_id)
 
