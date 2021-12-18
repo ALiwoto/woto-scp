@@ -14,9 +14,11 @@ from pyrogram.types import (
 
 class PurgeFlags:
     """
-        me
         all
+        me
         text
+        sticker
+        gif
         service
         media
         bot
@@ -36,6 +38,8 @@ class PurgeFlags:
     flag_all: bool = False
     flag_me: bool = False
     flag_text: bool = False
+    flag_sticker: bool = False
+    flag_gif: bool = False
     flag_service: bool = False
     flag_media: bool = False
     flag_bot: bool = False
@@ -61,6 +65,8 @@ class PurgeFlags:
         self.flag_all = 'all' in flags
         self.flag_me = 'me' in flags
         self.flag_text = 'text' in flags
+        self.flag_sticker = 'sticker' in flags
+        self.flag_gif = 'gif' in flags or 'document' in flags
         self.flag_service = 'service' in flags
         self.flag_media = 'media' in flags
         self.flag_bot = 'bot' in flags
