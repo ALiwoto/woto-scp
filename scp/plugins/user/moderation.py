@@ -164,8 +164,7 @@ async def purge_handler(_, message: Message):
         # migrate_to_chat_id:: migrated
         # migrate_from_chat_id:: migrated_from
         # pinned_message:: pinned
-        message_type = my_strs[1].lower()
-        print('type is: ', message_type)
+        message_type = my_strs[1].lower().strip()
     
     async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset=first):
         if not isinstance(current, Message):
