@@ -20,6 +20,7 @@ from scp.utils.parser import(
     (user.owner | user.enforcer | user.inspector) &
     user.command(
         ['sinfo', 'sinfo!'],
+        prefixes=user.cmd_prefixes,
     ),
 )
 async def sinfo_handler(_, message: Message):
@@ -113,7 +114,8 @@ async def sinfo_handler(_, message: Message):
 @user.on_message(
     (user.owner | user.inspector) &
     user.command(
-        ['fScan', 'fScan!']
+        ['fScan', 'fScan!'],
+        prefixes=user.cmd_prefixes,
     ),
 )
 async def fScan_handler(_, message: Message):
@@ -150,7 +152,8 @@ async def fScan_handler(_, message: Message):
 @user.on_message(
     (user.owner | user.inspector) &
     user.command(
-        ['revert', 'revert!']
+        ['revert', 'revert!'],
+        prefixes=user.cmd_prefixes,
     ),
 )
 async def revert_handler(_, message: Message):
