@@ -166,6 +166,10 @@ async def purge_handler(_, message: Message):
         # pinned_message:: pinned
         message_type = my_strs[1].lower().strip()
     
+    try:
+        await message.delete()
+    except Exception: pass
+
     async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset_id=current):
         if not isinstance(current, Message):
             continue
