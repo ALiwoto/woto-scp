@@ -14,7 +14,9 @@ from pyrogram.types import (
 
 
 class PurgeFlags:
-    """
+    """A list of all flags that can be used in purge commands
+
+    Possible flags:
         all
         me
         text
