@@ -66,7 +66,7 @@ class PurgeFlags:
         self.flag_me = 'me' in flags
         self.flag_text = 'text' in flags
         self.flag_sticker = 'sticker' in flags
-        self.flag_gif = 'gif' in flags or 'document' in flags
+        self.flag_gif = 'gif' in flags or 'animation' in flags
         self.flag_service = 'service' in flags
         self.flag_media = 'media' in flags
         self.flag_bot = 'bot' in flags

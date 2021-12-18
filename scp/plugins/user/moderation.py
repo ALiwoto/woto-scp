@@ -163,7 +163,7 @@ async def purge_handler(_, message: Message):
             the_messages.append(current.message_id)
         elif flags.flag_sticker and current.sticker:
             the_messages.append(current.message_id)
-        elif flags.flag_gif and current.document:
+        elif flags.flag_gif and current.animation:
             the_messages.append(current.message_id)
         elif flags.flag_service and current.service:
             the_messages.append(current.message_id)
