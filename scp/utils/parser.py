@@ -53,7 +53,7 @@ class PurgeFlags:
     flag_pinned: bool = False
 
     def __init__(self, flags: str):
-        if not isinstance(flags, str) or len(flags) < 3:
+        if not isinstance(flags, str) or len(flags) < 2:
             self.flag_text = True
             return
         
