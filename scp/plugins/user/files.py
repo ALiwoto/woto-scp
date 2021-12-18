@@ -134,6 +134,9 @@ async def upload(_, message: Message):
         )
     except user.exceptions.MediaInvalid:
         await message.reply_text('Upload cancelled!')
+    except Exception as e:
+        await message.reply_text(html_mono(str(e)[:4000]), parse_mode='html')
+        raise e
     else:
         await reply.delete()
 
