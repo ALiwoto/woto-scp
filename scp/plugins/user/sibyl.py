@@ -122,7 +122,7 @@ async def fScan_handler(_, message: Message):
     #is_silent = user.is_silent(message)
     replied = message.reply_to_message
     target_user = replied.from_user.id
-    reason_list = split_some(message.text, 2, ' ', '\n')
+    reason_list = split_some(message.text, 1, ' ', '\n')
     if len(reason_list) < 2:
         await message.reply_text('reason is required for this action')
     the_reason = reason_list[1]
