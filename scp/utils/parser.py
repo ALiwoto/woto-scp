@@ -11,6 +11,75 @@ from pyrogram.types import (
 )
 
 
+
+class PurgeFlags:
+    """
+        me
+        all
+        text
+        service
+        media
+        bot
+        via_bot
+        new_chat_members:: join
+        left_chat_member:: left
+        new_chat_title:: new_title
+        new_chat_photo:: new_photo
+        delete_chat_photo:: del_photo
+        group_chat_created:: group_created
+        supergroup_chat_created:: supergroup_created
+        channel_chat_created:: channel_created
+        migrate_to_chat_id:: migrated_to
+        migrate_from_chat_id:: migrated_from
+        pinned_message:: pinned
+    """
+    flag_all: bool = False
+    flag_me: bool = False
+    flag_text: bool = False
+    flag_service: bool = False
+    flag_media: bool = False
+    flag_bot: bool = False
+    flag_via_bot: bool = False
+    flag_join: bool = False
+    flag_left: bool = False
+    flag_new_title: bool = False
+    flag_new_photo: bool = False
+    flag_del_photo: bool = False
+    flag_group_created: bool = False
+    flag_supergroup_created: bool = False
+    flag_channel_created: bool = False
+    flag_migrated_to: bool = False
+    flag_migrated_from: bool = False
+    flag_pinned: bool = False
+
+    def __init__(self, flags: str):
+        if not isinstance(flags, str) or len(flags) < 3:
+            self.flag_text = True
+            return
+        
+        flags = flags.lower().strip()
+        self.flag_all = 'all' in flags
+        self.flag_me = 'me' in flags
+        self.flag_text = 'text' in flags
+        self.flag_service = 'service' in flags
+        self.flag_media = 'media' in flags
+        self.flag_bot = 'bot' in flags
+        self.flag_via_bot = 'via_bot' in flags
+        self.flag_join = 'join' in flags
+        self.flag_left = 'left' in flags
+        self.flag_new_title = 'new_title' in flags
+        self.flag_new_photo = 'new_photo' in flags
+        self.flag_del_photo = 'del_photo' in flags
+        self.flag_group_created = 'group_created' in flags
+        self.flag_supergroup_created = 'supergroup_created' in flags
+        self.flag_channel_created = 'channel_created' in flags
+        self.flag_migrated_to = 'migrated_to' in flags
+        self.flag_migrated_from = 'migrated_from' in flags
+        self.flag_pinned = 'pinned' in flags
+
+
+
+
 def HumanizeTime(seconds: int) -> str:
     count = 0
     ping_time = ''

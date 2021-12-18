@@ -9,15 +9,18 @@ from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
 from scp import user
 from scp.utils.misc import can_member_match, remove_special_chars
 from scp.utils.parser import (
+    PurgeFlags,
     html_bold,
     html_in_common,
     html_link,
     html_mono,
     html_normal_chat_link, 
     mention_user_html,
-    split_all, 
+    split_all,
+    split_some, 
     to_output_file,
 )
+
 
 STARTER = html_mono("• \u200D") 
 
@@ -143,85 +146,51 @@ async def purge_handler(_, message: Message):
     first = message.reply_to_message.message_id
     current = message.message_id
     limit = current - first
-    my_strs = message.text.split(' ')
-    message_type = 'text'
-    if len(my_strs) > 1:
-        # all
-        # text
-        # service
-        # media
-        # bot
-        # via_bot
-        # new_chat_members:: join
-        # left_chat_member:: left
-        # new_chat_title:: new_title
-        # new_chat_photo:: new_photo
-        # delete_chat_photo:: del_photo
-        # group_chat_created:: group_created
-        # supergroup_chat_created:: supergroup_created
-        # channel_chat_created:: channel_created
-        # migrate_to_chat_id:: migrated
-        # migrate_from_chat_id:: migrated_from
-        # pinned_message:: pinned
-        message_type = my_strs[1].lower().strip()
+
+    my_strs: list[str] = split_some(message.text, 1, ' ', '\n')
+    flags = PurgeFlags(my_strs[1] if len(my_strs) > 1 else '')
     
     the_messages = []
 
     async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset_id=current):
         if not isinstance(current, Message):
             continue
-        try:
-            if message_type == 'all':
-                the_messages.append(current.message_id)
-            elif message_type == 'text':
-                if current.text:
-                    the_messages.append(current.message_id)
-            elif message_type == 'service':
-                if current.service:
-                    the_messages.append(current.message_id)
-            elif message_type == 'media':
-                if current.media:
-                    the_messages.append(current.message_id)
-            elif message_type == 'bot':
-                if current.from_user.is_bot:
-                    the_messages.append(current.message_id)
-            elif message_type == 'via_bot':
-                if current.via_bot:
-                    the_messages.append(current.message_id)
-            elif message_type == 'join':
-                if current.new_chat_members:
-                    the_messages.append(current.message_id)
-            elif message_type == 'left':
-                if current.left_chat_member:
-                    the_messages.append(current.message_id)
-            elif message_type == 'new_title':
-                if current.new_chat_title:
-                    the_messages.append(current.message_id)
-            elif message_type == 'new_photo':
-                if current.new_chat_photo:
-                    the_messages.append(current.message_id)
-            elif message_type == 'del_photo':
-                if current.delete_chat_photo:
-                    the_messages.append(current.message_id)
-            elif message_type == 'group_created':
-                if current.group_chat_created:
-                    the_messages.append(current.message_id)
-            elif message_type == 'supergroup_created':
-                if current.supergroup_chat_created:
-                    the_messages.append(current.message_id)
-            elif message_type == 'channel_created':
-                if current.channel_chat_created:
-                    the_messages.append(current.message_id)
-            elif message_type == 'migrated':
-                if current.migrate_to_chat_id:
-                    the_messages.append(current.message_id)
-            elif message_type == 'migrated_from':
-                if current.migrate_from_chat_id:
-                    the_messages.append(current.message_id)
-            elif message_type == 'pinned':
-                if current.pinned_message:
-                    the_messages.append(current.message_id)
-        except Exception as e: print(e)
+        if flags.flag_all:
+            the_messages.append(current.message_id)
+        elif flags.flag_me and current.outgoing:
+            the_messages.append(current.message_id)
+        elif flags.flag_text and current.text:
+            the_messages.append(current.message_id)
+        elif flags.flag_service and current.service:
+            the_messages.append(current.message_id)
+        elif flags.flag_media and current.media:
+            the_messages.append(current.message_id)
+        elif flags.flag_bots and current.from_user.is_bot:
+            the_messages.append(current.message_id)
+        elif flags.flag_via_bot and current.via_bot:
+            the_messages.append(current.message_id)
+        elif flags.flag_join and current.new_chat_members:
+            the_messages.append(current.message_id)
+        elif flags.flag_left and current.left_chat_member:
+            the_messages.append(current.message_id)
+        elif flags.flag_new_title and current.new_chat_title:
+            the_messages.append(current.message_id)
+        elif flags.flag_new_photo and current.new_chat_photo:
+            the_messages.append(current.message_id)
+        elif flags.flag_del_photo and current.delete_chat_photo:
+            the_messages.append(current.message_id)
+        elif flags.flag_group_created and current.group_chat_created:
+            the_messages.append(current.message_id)
+        elif flags.flag_supergroup_created and current.supergroup_chat_created:
+            the_messages.append(current.message_id)
+        elif flags.flag_channel_created and current.channel_chat_created:
+            the_messages.append(current.message_id)
+        elif flags.flag_migrated_to and current.migrate_to_chat_id:
+            the_messages.append(current.message_id)
+        elif flags.flag_migrated_from and current.migrate_from_chat_id:
+            the_messages.append(current.message_id)
+        elif flags.flag_pinned and current.pinned_message:
+            the_messages.append(current.message_id)
     
     if not message.message_id in the_messages:
         the_messages.append(message.message_id)
@@ -397,7 +366,6 @@ async def bots_handler(_, message: Message):
         parse_mode="html",
         disable_web_page_preview=True,
     )
-
 
 
 @user.on_message(~user.filters.scheduled & 
