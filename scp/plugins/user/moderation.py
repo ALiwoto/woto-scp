@@ -166,12 +166,8 @@ async def purge_handler(_, message: Message):
         # pinned_message:: pinned
         message_type = my_strs[1].lower().strip()
     
-    print('type is ', message_type)
-    print('limit is ', limit)
     async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset_id=current):
-        print('in loop, limit is:', limit)
         if not isinstance(current, Message):
-            print('not message:', type(current))
             continue
         try:
             if message_type == 'all':
@@ -217,12 +213,7 @@ async def purge_handler(_, message: Message):
                     await current.delete()
             elif message_type == 'pinned':
                 if current.pinned_message:
-                    print('came here')
                     await current.delete()
-                else:
-                    print('came here but not pinned')
-            else:
-                print(f'type is: "{message_type}"')
         except Exception as e: print(e)
 
 
