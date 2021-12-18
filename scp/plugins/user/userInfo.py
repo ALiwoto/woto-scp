@@ -111,7 +111,12 @@ async def _(_, message: Message):
     ) as err:
         return await message.reply_text(err, quote=True)
     for m in x.results:
-        await message.reply_inline_bot_result(x.query_id, m.id, quote=True)
+        await message.reply_inline_bot_result(
+            x.query_id, 
+            m.id, 
+            quote=True,
+            hide_via=True,
+        )
 
 
 @bot.on_inline_query(
