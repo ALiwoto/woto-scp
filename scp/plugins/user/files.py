@@ -130,7 +130,10 @@ async def upload(_, message: Message):
             progress=progress_callback, 
             progress_args=(reply, text, True), 
             force_document=True, 
-            reply_to_message_id=None if message.chat.type in ('private', 'bot') else message.message_id,
+            reply_to_message_id=(
+                None if message.chat.type in ('private', 'bot') 
+                else message.message_id,
+            ),
         )
     except user.exceptions.MediaInvalid:
         await message.reply_text('Upload cancelled!')
