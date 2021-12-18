@@ -114,7 +114,6 @@ async def _(_, message: Message):
         await message.reply_inline_bot_result(
             x.query_id, 
             m.id, 
-            quote=True,
             hide_via=True,
         )
 
