@@ -148,7 +148,7 @@ async def purge_handler(_, message: Message):
     limit = current - first
     my_strs = message.text.split(' ')
     message_type = 'text'
-    if len(my_strs) > 2:
+    if len(my_strs) > 1:
         # all
         # text
         # service
