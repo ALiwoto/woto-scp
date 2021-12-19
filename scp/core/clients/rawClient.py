@@ -130,6 +130,11 @@ class ScpClient(Client):
         )
         return getattr(response, 'onlines', 0)
     
+    async def get_online_count(self, chat_id: Union[int, str]) -> int:
+        return await self.get_online_counts(chat_id)
+    async def get_onlines_count(self, chat_id: Union[int, str]) -> int:
+        return await self.get_online_counts(chat_id)
+    
     async def try_get_online_counts(self, chat_id: Union[int, str]) -> int:
         try:
             response = await self.send(
