@@ -29,13 +29,18 @@ exec_tasks = {}
         prefixes=user.cmd_prefixes,
     ),
 )
-async def pyexec(client: user, message: Message):
+async def pyexec(_, message: Message):
     code = user.get_non_cmd(message)
     if len(code) == 0:
         if not message.reply_to_message:
             return
         code = message.reply_to_message.text
     
+    await eval_base(user, message, code)
+    
+
+
+async def eval_base(client: user, message: Message, code: str):
     tree: TModule = None
     try:
         tree = ast.parse(code)
@@ -153,6 +158,9 @@ async def pyexec(client: user, message: Message):
         txt = html_bold('Output for') + html_mono(' ' + rnd_id, ':\n    ')
         txt += html_mono(output)
         await reply.edit_text(txt, parse_mode='html', disable_web_page_preview=True)
+
+
+
 
 
 @user.on_message(
