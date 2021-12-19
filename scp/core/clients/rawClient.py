@@ -89,7 +89,7 @@ class ScpClient(Client):
     async def html_normal_chat_link(self, value, chat: types.Chat, *argv) -> str:
         return await html_normal_chat_link(value, chat, *argv)
 
-    async def html_mono(self, value: Union[types.User, int], name: str = None, *argv) -> str:
+    async def html_mention(self, value: Union[types.User, int], name: str = None, *argv) -> str:
         return await html_mention(value, name, self, *argv)
 
     async def send(
