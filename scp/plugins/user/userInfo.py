@@ -27,9 +27,12 @@ __DOC__ = str(
 
 @user.on_message(
     (user.sudo | user.owner) &
-    user.command('info'),
+    user.command(
+        'info',
+        prefixes=user.cmd_prefixes,
+    ),
 )
-async def _(_, message: Message):
+async def info_handler(_, message: Message):
     cmd = message.command
     if not message.reply_to_message and len(cmd) == 1:
         get_user = message.from_user.id
@@ -164,6 +167,11 @@ async def _(_, query: InlineQuery):
                     user.md.Bold(
                         'common_groups',
                     ), user.md.Code(len(await u.get_common_chats())),
+                ),
+                user.md.KeyValueItem(
+                    user.md.Bold(
+                        'common_groups',
+                    ), user.md.Code(await user.get_profile_photos_count(u.id)),
                 ),
                 user.md.KeyValueItem(
                     user.md.Bold(
