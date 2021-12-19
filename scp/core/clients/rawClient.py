@@ -12,6 +12,7 @@ from pyrogram.raw.base import (
 )
 from scp.core.filters.Command import command
 from scp.utils import wfilters
+from scp.utils.parser import split_some
 from scp.utils.sibylUtils import SibylClient
 from scp.utils.misc import restart_scp as restart_woto_scp
 from configparser import ConfigParser
@@ -65,6 +66,12 @@ class ScpClient(Client):
             and len(message.command) > 0
             and message.command[0x0].endswith('!')
         )
+    
+    def get_non_cmd(self, message: types.Message) -> str:
+        my_strs = split_some(message.text, 1, ' ', '\n')
+        if len(my_strs) < 1:
+            return ''
+        return my_strs[1]
 
     async def send(
         self,

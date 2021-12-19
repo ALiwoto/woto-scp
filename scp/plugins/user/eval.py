@@ -29,12 +29,23 @@ exec_tasks = {}
     ),
 )
 async def pyexec(client: user, message: Message):
-    code = ""
-    if message.reply_to_message:
+    code = user.get_non_cmd(message)
+    if len(code) == 0:
+        if not message.reply_to_message:
+            return
         code = message.reply_to_message.text
-    else:
-        code = message.text.split(None, 1)[1]
-    tree = ast.parse(code)
+    
+    try:
+        tree = ast.parse(code)
+    except Exception as ex:
+        str_err = str(ex)
+        if len(str_err) > 4096:
+            await message.reply_document(to_output_file(str_err))
+            return
+        txt = html_mono(str_err)
+        return await message.reply_text(txt, parse_mode='html')
+
+    print('tree type is ', type(tree))
     o_body = tree.body
     body = o_body.copy()
     body.append(ast.Return(ast.Name('_ueri', ast.Load())))
@@ -43,7 +54,7 @@ async def pyexec(client: user, message: Message):
     except SyntaxError as ex:
         if ex.msg != "'return' with value in async generator":
             str_err = str(ex)
-            if len(str_err) > 4096:
+            if len(str_err) > 4000:
                 await message.reply_document(to_output_file(str_err))
                 return
             txt = html_mono(str_err)
