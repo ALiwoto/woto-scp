@@ -65,6 +65,8 @@ async def pyexec(client: user, message: Message):
     reply = await message.reply_text(
         html_bold('Executing task ') + html_mono(rnd_id, '...'),
         quote=True,
+        disable_notification=True,
+        disable_web_page_preview=True,
     )
     oasync_obj = exx(
         client,
@@ -146,7 +148,7 @@ async def pyexec(client: user, message: Message):
     else:
         txt = html_bold('Output for') + html_mono(' ' + rnd_id, ':\n    ')
         txt += html_mono(output)
-        await reply.edit_text(txt, parse_mode='html')
+        await reply.edit_text(txt, parse_mode='html', disable_web_page_preview=True)
 
 
 @user.on_message(
