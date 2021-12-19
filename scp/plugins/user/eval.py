@@ -9,7 +9,10 @@ from shortuuid import ShortUUID
 from io import StringIO, BytesIO
 from scp import user, bot
 from scp.utils.selfInfo import info
-from scp.utils.parser import getMediaAttr
+from scp.utils.parser import getMediaAttr, html_bold, html_mono, html_normal, to_output_file
+from pyrogram.types import (
+    Message,
+)
 
 exec_tasks = {}
 
@@ -25,25 +28,30 @@ exec_tasks = {}
         prefixes=user.cmd_prefixes,
     ),
 )
-async def pyexec(client: user, message: user.types.Message):
+async def pyexec(client: user, message: Message):
     code = ""
     if message.reply_to_message:
         code = message.reply_to_message.text
     else:
         code = message.text.split(None, 1)[1]
     tree = ast.parse(code)
-    obody = tree.body
-    body = obody.copy()
+    o_body = tree.body
+    body = o_body.copy()
     body.append(ast.Return(ast.Name('_ueri', ast.Load())))
     try:
         exx = _gf(body)
     except SyntaxError as ex:
         if ex.msg != "'return' with value in async generator":
-            raise
-        exx = _gf(obody)
-    rnd_id = '#' + str(ShortUUID().random(length=5))
+            str_err = str(ex)
+            if len(str_err) > 4096:
+                await message.reply_document(to_output_file(str_err))
+                return
+            txt = html_mono(str_err)
+            return await message.reply_text(txt, parse_mode='html')
+        exx = _gf(o_body)
+    rnd_id = '#' + str(ShortUUID().random(length=32))
     reply = await message.reply_text(
-        f'Executing <code>{rnd_id}</code>',
+        html_bold('Executing task ') + html_mono(rnd_id, '...'),
         quote=True,
     )
     oasync_obj = exx(
@@ -93,6 +101,15 @@ async def pyexec(client: user, message: user.types.Message):
                 ),
             ),
         )
+    except Exception as e:
+        str_err = str(e)
+        if len(str_err) > 4096:
+            await asyncio.gather(reply.delete(), message.reply_document(to_output_file(str_err)))
+            return
+        txt = html_bold('Error for task')
+        txt += html_mono(f' {rnd_id} ', ':\n')
+        txt += html_mono(f' {str(e)} ')
+        return await reply.edit_text()
     finally:
         sys.stdout = stdout
         sys.stderr = stderr
@@ -101,9 +118,9 @@ async def pyexec(client: user, message: user.types.Message):
     output = ''
     wrapped_stdout_text = wrapped_stdout.read().strip()
     if wrapped_stdout_text:
-        output += f'<code>{html.escape(wrapped_stdout_text)}</code>\n'
+        output += html_mono(wrapped_stdout_text, '\n')
     for i in returned:
-        output += f'<code>{html.escape(str(i).strip())}</code>\n'
+        output += html_mono(str(i).strip(), '\n')
     if not output.strip():
         output = 'Success'
 
