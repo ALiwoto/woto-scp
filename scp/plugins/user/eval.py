@@ -1,6 +1,7 @@
 # https://greentreesnakes.readthedocs.io/
 # https://gitlab.com/blankX/sukuinote/-/blob/master/sukuinote/plugins/pyexec.py
 import ast
+from _ast import Module as TModule
 import sys
 import html
 import inspect
@@ -35,6 +36,7 @@ async def pyexec(client: user, message: Message):
             return
         code = message.reply_to_message.text
     
+    tree: TModule = None
     try:
         tree = ast.parse(code)
     except Exception as ex:
@@ -44,8 +46,7 @@ async def pyexec(client: user, message: Message):
             return
         txt = html_mono(str_err)
         return await message.reply_text(txt, parse_mode='html')
-
-    print('tree type is ', type(tree))
+    
     o_body = tree.body
     body = o_body.copy()
     body.append(ast.Return(ast.Name('_ueri', ast.Load())))
@@ -60,7 +61,7 @@ async def pyexec(client: user, message: Message):
             txt = html_mono(str_err)
             return await message.reply_text(txt, parse_mode='html')
         exx = _gf(o_body)
-    rnd_id = '#' + str(ShortUUID().random(length=32))
+    rnd_id = '#' + str(ShortUUID().random(length=8))
     reply = await message.reply_text(
         html_bold('Executing task ') + html_mono(rnd_id, '...'),
         quote=True,
@@ -140,14 +141,12 @@ async def pyexec(client: user, message: Message):
         for i in returned:
             out += str(i).strip() + '\n'
         f = BytesIO(out.strip().encode('utf-8'))
-        f.name = 'output.txt'
+        f.name = f'output-{rnd_id}.txt'
         await asyncio.gather(reply.delete(), message.reply_document(f))
     else:
-        await reply.edit_text(
-            user.md.KanTeXDocument(
-                user.md.Section('Output:', user.md.Code(output)),
-            ),
-        )
+        txt = html_bold('Output for ') + html_mono(rnd_id, ':')
+        txt += html_mono('\n    ' + output)
+        await reply.edit_text(txt, parse_mode='html')
 
 
 @user.on_message(
