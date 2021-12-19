@@ -82,18 +82,9 @@ async def _(_, query: InlineQuery):
         u = await user.get_users(get_user)
     except user.exceptions.PeerIdInvalid:
         return None
-    except IndexError:
+    except Exception:
         u = await user.get_chat(get_user)
-    try:
-        onlines = (
-            await user.send(
-                user.raw.functions.messages.GetOnlines(
-                    peer=await user.resolve_peer(get_user),
-                ),
-            )
-        ).onlines
-    except user.exceptions.PeerIdInvalid:
-        onlines = 0
+    onlines = user.try_get_online_counts(get_user)
     if isinstance(u, user.types.Chat):
         text = user.md.Section(
             'ChatInfo:',

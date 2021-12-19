@@ -1,5 +1,15 @@
 from typing import NoReturn, Union
-from pyrogram import Client, filters, types, raw, errors, session
+from pyrogram import(
+    Client, 
+    filters, 
+    types, 
+    raw, 
+    errors, 
+    session,
+)
+from pyrogram.raw.base import (
+    ChatOnlines,
+)
 from scp.core.filters.Command import command
 from scp.utils import wfilters
 from scp.utils.sibylUtils import SibylClient
@@ -85,6 +95,26 @@ class ScpClient(Client):
                 timeout=timeout,
                 sleep_threshold=sleep_threshold,
             )
+    
+    async def get_online_counts(self, chat_id: Union[int, str]) -> int:
+        response = await self.send(
+            self.raw.functions.messages.GetOnlines(
+                peer=await self.resolve_peer(chat_id),
+            )
+        )
+        return getattr(response, 'onlines', 0)
+    
+    async def try_get_online_counts(self, chat_id: Union[int, str]) -> int:
+        try:
+            response = await self.send(
+                self.raw.functions.messages.GetOnlines(
+                    peer=await self.resolve_peer(chat_id),
+                )
+            )
+            return getattr(response, 'onlines', 0)
+        except Exception: return 0
+
+        
     
     async def delete_user_history(self, chat_id: Union[int, str], user_id: Union[int, str]) -> bool:
         """Delete all messages sent by a certain user in a supergroup.
