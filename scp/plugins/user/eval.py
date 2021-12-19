@@ -29,7 +29,7 @@ exec_tasks = {}
         prefixes=user.cmd_prefixes,
     ),
 )
-async def pyexec(_, message: Message):
+async def eval_handler(_, message: Message):
     code = user.get_non_cmd(message)
     if len(code) == 0:
         if not message.reply_to_message:
@@ -39,6 +39,34 @@ async def pyexec(_, message: Message):
     await eval_base(user, message, code)
     
 
+
+@user.on_message(
+    ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.owner
+    & user.filters.command(
+        'getsrc',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def getsrc_handler(_, message: Message):
+    code = user.get_non_cmd(message)
+    if len(code) == 0:
+        if not message.reply_to_message:
+            return
+        code = str(message.reply_to_message.text)
+    
+    code = (
+f"""
+import inspect
+import struct
+return inspect.getsource({code})
+"""
+    )
+
+    await eval_base(user, message, code)
 
 async def eval_base(client: user, message: Message, code: str):
     tree: TModule = None
