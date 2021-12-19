@@ -82,7 +82,7 @@ async def admins_handler(_, message: Message):
         txt += "\n\n"
 
     if len(admins) > 0:
-        txt += html_bold("Admins", f"({len(admins)})\n")
+        txt += html_bold("Admins", f" ({len(admins)}):\n")
         for admin in admins:
             u = admin.user
             txt += STARTER + mention_user_html(u, 16) + await html_in_common(u, common) + html_mono(u.id)
@@ -90,7 +90,7 @@ async def admins_handler(_, message: Message):
         txt += "\n"
     
     if len(bots) > 0:
-        txt += html_bold("Bots:", f"({len(bots)})\n")
+        txt += html_bold("Bots:", f" ({len(bots)}):\n")
         for bot in bots:
             u = bot.user
             txt += STARTER + mention_user_html(u, 16) + await html_in_common(u, common) + html_mono(u.id)
