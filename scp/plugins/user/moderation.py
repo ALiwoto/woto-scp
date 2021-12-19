@@ -309,12 +309,6 @@ async def bots_handler(_, message: Message):
         
     top_msg = await message.reply_text(html_mono('fetching group bots...'))
     txt: str = ''
-    m = None
-    try:
-        m = await user.get_chat_members(the_chat)
-    except Exception as ex:
-        await top_msg.edit_text(text=html_mono(ex))
-        return
     
     the_group: Chat = None
     try:
