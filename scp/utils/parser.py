@@ -233,7 +233,7 @@ def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
 
 
 def html_mono(value, *argv) -> str:
-    return f"<c>{html.escape(str(value))}</c>" +  get_html_normal(*argv)
+    return f"<code>{html.escape(str(value))}</code>" +  get_html_normal(*argv)
 
 def html_in_parantesis(value) -> str:
     if not value:
