@@ -144,7 +144,7 @@ async def pyexec(client: user, message: Message):
         f.name = f'output-{rnd_id}.txt'
         await asyncio.gather(reply.delete(), message.reply_document(f))
     else:
-        txt = html_bold('Output for ') + html_mono(rnd_id, ':\n    ')
+        txt = html_bold('Output for') + html_mono(' ' + rnd_id, ':\n    ')
         txt += html_mono(output)
         await reply.edit_text(txt, parse_mode='html')
 
