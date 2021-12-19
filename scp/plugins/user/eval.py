@@ -45,7 +45,11 @@ async def pyexec(client: user, message: Message):
             await message.reply_document(to_output_file(str_err))
             return
         txt = html_mono(str_err)
-        return await message.reply_text(txt, parse_mode='html')
+        return await message.reply_text(
+            txt, 
+            parse_mode='html', 
+            quote=True,
+        )
     
     o_body = tree.body
     body = o_body.copy()
