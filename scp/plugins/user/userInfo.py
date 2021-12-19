@@ -170,7 +170,7 @@ async def _(_, query: InlineQuery):
                 ),
                 user.md.KeyValueItem(
                     user.md.Bold(
-                        'common_groups',
+                        'pfp_count',
                     ), user.md.Code(await user.get_profile_photos_count(u.id)),
                 ),
                 user.md.KeyValueItem(
