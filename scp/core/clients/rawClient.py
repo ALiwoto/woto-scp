@@ -7,12 +7,16 @@ from pyrogram import(
     errors, 
     session,
 )
-from pyrogram.raw.base import (
-    ChatOnlines,
-)
 from scp.core.filters.Command import command
 from scp.utils import wfilters
-from scp.utils.parser import split_some
+from scp.utils.parser import(
+    html_bold,
+    html_link, 
+    html_mention, 
+    html_mono,
+    html_normal_chat_link, 
+    split_some,
+)
 from scp.utils.sibylUtils import SibylClient
 from scp.utils.misc import restart_scp as restart_woto_scp
 from configparser import ConfigParser
@@ -72,6 +76,21 @@ class ScpClient(Client):
         if len(my_strs) < 1:
             return ''
         return my_strs[1]
+    
+    def html_mono(self, value, *argv) -> str:
+        return html_mono(value, *argv)
+    
+    def html_bold(self, value, *argv) -> str:
+        return html_bold(value, *argv)
+    
+    def html_link(self, value, link: str, *argv) -> str:
+        return html_link(value, link, *argv)
+    
+    async def html_normal_chat_link(self, value, chat: types.Chat, *argv) -> str:
+        return await html_normal_chat_link(value, chat, *argv)
+
+    async def html_mono(self, value: Union[types.User, int], name: str = None, *argv) -> str:
+        return await html_mention(value, name, self, *argv)
 
     async def send(
         self,
