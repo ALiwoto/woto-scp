@@ -130,9 +130,9 @@ async def pyexec(client: user, message: Message):
     output = ''
     wrapped_stdout_text = wrapped_stdout.read().strip()
     if wrapped_stdout_text:
-        output += html_mono(wrapped_stdout_text, '\n')
+        output += wrapped_stdout_text + '\n'
     for i in returned:
-        output += html_mono(str(i).strip(), '\n')
+        output += str(i).strip() + '\n'
     if not output.strip():
         output = 'Success'
 
