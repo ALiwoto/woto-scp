@@ -52,7 +52,7 @@ async def admins_handler(_, message: Message):
         
     top_msg = await message.reply_text(html_mono("fetching group admins..."))
     txt = ''
-    common = not user.is_silent(message)
+    common = user.is_silent(message)
     m = None
     try:
         m = await user.get_chat_members(the_chat, filter=Filters.ADMINISTRATORS)
