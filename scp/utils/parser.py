@@ -11,8 +11,6 @@ from pyrogram.types import (
     Chat,
 )
 
-
-
 class PurgeFlags:
     """A list of all flags that can be used in purge commands
 
@@ -162,15 +160,12 @@ def HumanizeTime(seconds: int) -> str:
     return ping_time
 
 
-def getMediaAttr(
-    message: types.Message,
-    Attr: list,
+def getMediaAttr(message: Message, Attr: list,
 ):
     for attribute in Attr:
         attr = getattr(message, attribute)
         if attr:
             return attr
-
 
 def checkToken(token: str) -> bool:
     token = re.findall(
@@ -183,7 +178,7 @@ def checkToken(token: str) -> bool:
         return True, token[0]
 
 
-def mention_user_html(user: types.User, name_limit: int = -1) -> str:
+def mention_user_html(user: User, name_limit: int = -1) -> str:
     if not user:
         return ""
     return f"<a href=tg://user?id={user.id}>{html.escape(get_name(user, name_limit))}</a>"

@@ -174,6 +174,41 @@ async def purge_handler(_, message: Message):
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
+	~user.filters.edited &
+	user.sudo & 
+	user.filters.command(
+        ['deadaccs'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def deadaccs_handler(_, message: Message):
+    should_kick = message.text.find('kick') > 0
+    found_count = 0
+    kicked_count = 0
+    async for current in user.iter_chat_members(chat_id=message.chat.id):
+        if not isinstance(current, ChatMember) or current.status == 'left':
+            continue
+        if current.user.is_deleted:
+            found_count += 1
+            if should_kick:
+                try:
+                    await user.kick_chat_member(
+                        chat_id=message.chat.id,
+                        user_id=current.user.id,
+                    )
+                    kicked_count += 1
+                except Exception: pass
+    await message.reply_text(
+        text=html_mono(f'found {found_count} deleted accounts, kicked {kicked_count}.'),
+        parse_mode="html",
+        quote=True,
+    )
+    
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
 	user.filters.command(

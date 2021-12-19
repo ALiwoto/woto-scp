@@ -1,3 +1,4 @@
+import asyncio
 from time import sleep
 from pyrogram.types import (
     Message,
@@ -43,10 +44,10 @@ async def sinfo_handler(_, message: Message):
     ptxt = "Sending cymatic scan request to Sibyl System."
     my_msg = await message.reply_text(ptxt)
     if not is_silent:
-        sleep(1.2)
+        await asyncio.sleep(1.2)
         ptxt += "."
         my_msg = await my_msg.edit_text(ptxt)
-        sleep(1.2)
+        asyncio.sleep(1.2)
         ptxt += "."
         my_msg = await my_msg.edit_text(ptxt)
     
