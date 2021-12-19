@@ -31,7 +31,7 @@ STARTER = html_mono("• \u200D")
 	~user.filters.edited & 
 	user.owner & 
 	user.filters.command(
-        ['admins'],
+        ['admins', 'admins!'],
         prefixes=user.cmd_prefixes,
     ),
 )
@@ -52,6 +52,7 @@ async def admins_handler(_, message: Message):
         
     top_msg = await message.reply_text(html_mono("fetching group admins..."))
     txt = ''
+    common = not user.is_silent(message)
     m = None
     try:
         m = await user.get_chat_members(the_chat, filter=Filters.ADMINISTRATORS)
@@ -74,26 +75,25 @@ async def admins_handler(_, message: Message):
         await top_msg.edit_text(text="Seems like all admins are anon...")
         return
 
-    starter = "<code>" + " • " + "</code>"
     if creator:
         txt += html_bold("The creator:", "\n")
         u = creator.user
-        txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id)
+        txt += STARTER + mention_user_html(u, 16) + await html_in_common(u, common) + html_mono(u.id)
         txt += "\n\n"
 
     if len(admins) > 0:
-        txt += html_bold("Admins", "\n")
+        txt += html_bold(f"Admins {len(admins)}", "\n")
         for admin in admins:
             u = admin.user
-            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id)
+            txt += STARTER + mention_user_html(u, 16) + await html_in_common(u, common) + html_mono(u.id)
             txt += "\n"
         txt += "\n"
     
     if len(bots) > 0:
-        txt += html_bold("Bots:", "\n")
+        txt += html_bold(f"Bots:  {len(bots)}", "\n")
         for bot in bots:
             u = bot.user
-            txt += starter + mention_user_html(u, 16) + await html_in_common(u) + html_mono(u.id)
+            txt += STARTER + mention_user_html(u, 16) + await html_in_common(u, common) + html_mono(u.id)
             txt += "\n"
         txt += "\n"
     
@@ -488,7 +488,7 @@ async def fadmins_handler(_, message: Message):
         
     top_msg = await message.reply_text(html_mono('fetching group admins...'))
     txt: str = ''
-    common = all_strs[0][-1] == '!'
+    common = not user.is_silent(message)
     m = None
     try:
         m = await user.get_chat_members(the_chat, filter=Filters.ADMINISTRATORS)
