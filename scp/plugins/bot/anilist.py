@@ -262,7 +262,10 @@ async def anilist_nop(_, callback_query: CallbackQuery):
 message_info = dict()
 message_lock = asyncio.Lock()
 @user.the_bot.on_chosen_inline_result()
-async def anilist_chosen(_, inline_result):
+async def anilist_chosen(_, inline_result: InlineQueryResult):
+    global message_info
+    global message_lock
+
     if inline_result.result_id.startswith('anilist'):
         match = re.match(r'^a(?:ni)?l(?:ist)?(c(?:har(?:acter)?)?)?\s+(.+)$', inline_result.query)
         if match:
@@ -288,6 +291,9 @@ async def anilist_chosen(_, inline_result):
 
 @user.the_bot.on_callback_query(filters.regex('^anilist_(back|next)$'))
 async def anilist_move(_, callback_query: CallbackQuery):
+    global message_info
+    global message_lock
+    
     print('came to func')
     if callback_query.from_user.id not in user._sudo:
         await callback_query.answer('...no', cache_time=3600, show_alert=True)
