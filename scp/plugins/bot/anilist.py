@@ -213,7 +213,9 @@ async def generate_character(anilist):
     filters.regex(r'^a(?:ni)?l(?:ist)?(c(?:har(?:acter)?)?)?\s+(.+)$'),
 )
 async def anilist_query(client, inline_query: InlineQuery):
+    print('came to func')
     if inline_query.from_user.id not in user._sudo:
+        print(f'here with id: {inline_query.from_user.id}')
         await user.send_message('me', f'here with id: {inline_query.from_user.id}')
         await inline_query.answer([
             InlineQueryResultArticle('...no', InputTextMessageContent('...no'))
