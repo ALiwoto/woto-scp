@@ -1,6 +1,9 @@
 from scp import user
-from scp.plugins.user.similarwords import get_similar_words_async
+from scp.utils.similarwords import get_similar_words_async
 from scp.utils.mdparser import escapeAny
+from pyrogram.types import (
+    Message,
+)
 
 
 __PLUGIN__ = 'UrbanDictionary'
@@ -38,7 +41,7 @@ def is_undefined(response) -> bool:
 @user.on_message(
     (user.sudo | user.owner) & 
     user.command('ud'))
-async def _(_, message: user.types.Message):
+async def ud_handler(_, message: Message):
     text = ""
     if len(message.text.split()) <= 1:
         if not message.reply_to_message:
@@ -52,17 +55,17 @@ async def _(_, message: user.types.Message):
         type='get',
     )
     if is_undefined(response):
-        similars = await get_similar_words_async(text)
-        if (not similars) or (len(similars) == 0):
+        similarities = await get_similar_words_async(text)
+        if (not similarities) or (len(similarities) == 0):
             text = escapeAny(f'No definition found for "{text}"...')
         else:
             text = escapeAny(f'No definition found for "{text}"...\n'+
                 '✧ but here are some similarities:')
             num = 0
-            for similar in similars:
+            for similar in similarities:
                 num += 1
                 text += escapeAny(f'\n{num}- ') + '__' + escapeAny(similar) + '__ '
-        return await message.reply(text, parse_mode="markdown")
+        return await message.reply_text(text, parse_mode="markdown")
     else:    
         text = user.md.KanTeXDocument(
             user.md.Section(
@@ -85,4 +88,4 @@ async def _(_, message: user.types.Message):
                 ),
             ),
         )
-    await message.reply(text, quote=True)
+    await message.reply_text(text, quote=True)

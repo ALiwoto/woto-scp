@@ -48,7 +48,6 @@ async def get_similar_words_async(query: str) -> list:
     Returns a list of similar words to the given query.
     """
 
-    
     if (not query) or (len(query) < 3):
         return []
     

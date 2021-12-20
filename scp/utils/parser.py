@@ -160,8 +160,7 @@ def HumanizeTime(seconds: int) -> str:
     return ping_time
 
 
-def getMediaAttr(message: Message, Attr: list,
-):
+def getMediaAttr(message: Message, Attr: list):
     for attribute in Attr:
         attr = getattr(message, attribute)
         if attr:

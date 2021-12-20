@@ -3,16 +3,27 @@
 import ast
 from _ast import Module as TModule
 import sys
-import html
 import inspect
+
 import asyncio
 from shortuuid import ShortUUID
 from io import StringIO, BytesIO
+from asyncio.tasks import Task as AsyncTask
 from scp import user, bot
 from scp.utils.selfInfo import info
-from scp.utils.parser import getMediaAttr, html_bold, html_mono, html_normal, to_output_file
+from scp.utils.parser import(
+    getMediaAttr, 
+    html_bold, 
+    html_mono, 
+    to_output_file,
+)
 from pyrogram.types import (
     Message,
+    InlineQuery,
+    CallbackQuery,
+)
+from pyrogram.raw.types.messages.bot_results import (
+    BotResults,
 )
 
 exec_tasks = {}
@@ -129,7 +140,7 @@ async def eval_base(client: user, message: Message, code: str):
     wrapped_stdout = StringIO()
     try:
         sys.stdout = sys.stderr = wrapped_stdout
-        task = asyncio.create_task(async_obj())
+        task: AsyncTask = asyncio.create_task(async_obj())
         exec_tasks[rnd_id] = task
         try:
             returned = await task
@@ -160,7 +171,12 @@ async def eval_base(client: user, message: Message, code: str):
         txt = html_bold('Error for task')
         txt += html_mono(f' {rnd_id} ', ':\n')
         txt += html_mono(f' {str(e)} ')
-        return await reply.edit_text()
+        return await reply.edit_text(
+            text=txt,
+            parse_mode='html',
+            quote=True,
+            disable_web_page_preview=True,
+        )
     finally:
         sys.stdout = stdout
         sys.stderr = stderr
@@ -185,10 +201,11 @@ async def eval_base(client: user, message: Message, code: str):
     else:
         txt = html_bold('Output for') + html_mono(' ' + rnd_id, ':\n    ')
         txt += html_mono(output)
-        await reply.edit_text(txt, parse_mode='html', disable_web_page_preview=True)
-
-
-
+        await reply.edit_text(
+            txt, 
+            parse_mode='html', 
+            disable_web_page_preview=True,
+        )
 
 
 @user.on_message(
@@ -202,16 +219,16 @@ async def eval_base(client: user, message: Message, code: str):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def exitexec(_, message: user.types.Message):
+async def exitexec(_, message: Message):
     if message.reply_to_message:
         return
     exit(0)
 
 
 @user.on_message(user.owner & user.command('listEval'))
-async def listexec(_, message: user.types.Message):
+async def listexec(_, message: Message):
     try:
-        x = await user.get_inline_bot_results(
+        x: BotResults = await user.get_inline_bot_results(
             info['_bot_username'],
             '_listEval',
         )
@@ -219,16 +236,23 @@ async def listexec(_, message: user.types.Message):
         user.exceptions.PeerIdInvalid,
         user.exceptions.BotResponseTimeout,
     ):
-        return await message.reply('no tasks', quote=True)
+        return await message.reply_text(
+            'no tasks', 
+            quote=True,
+        )
     for m in x.results:
-        await message.reply_inline_bot_result(x.query_id, m.id, quote=True)
+        await message.reply_inline_bot_result(
+            x.query_id, 
+            m.id, 
+            quote=True,
+        )
 
 
 @bot.on_inline_query(
     user.filters.user(info['_user_id'])
     & user.filters.regex('^_listEval'),
 )
-async def _(_, query: user.types.InlineQuery):
+async def _(_, query: InlineQuery):
     buttons = [[
         user.types.InlineKeyboardButton(
             text='cancel all',
@@ -269,22 +293,24 @@ async def _(_, query: user.types.InlineQuery):
     user.filters.user(info['_user_id'])
     & user.filters.regex('^cancel_'),
 )
-async def cancelexec(_, query: user.types.CallbackQuery):
+async def cancelexec(_, query: CallbackQuery):
     Type = query.data.split('_')[1]
     taskID = query.data.split('_')[2]
     if Type == 'eval':
         if taskID == 'all':
             for _, i in exec_tasks.items():
+                if not isinstance(i, AsyncTask):
+                    continue
                 i.cancel()
             return await query.edit_message_text(
-                'All tasks has been cancelled',
+                'All tasks have been cancelled.',
             )
         else:
             try:
                 task = exec_tasks.get(taskID)
             except IndexError:
                 return
-        if not task:
+        if not isinstance(task, AsyncTask):
             return await query.answer(
                 'Task does not exist anymore',
                 show_alert=True,
@@ -297,7 +323,7 @@ async def cancelexec(_, query: user.types.CallbackQuery):
     user.sudo
     & user.command('GetID'),
 )
-async def _(_, message: user.types.Message):
+async def get_id_handler(_, message: Message):
     message = message.reply_to_message or message
     media = getMediaAttr(
         message,
@@ -327,22 +353,25 @@ async def _(_, message: user.types.Message):
     if not media:
         for a in appendable:
             text.append(a)
-        return await message.reply(user.md.KanTeXDocument(text))
+        return await message.reply_text(user.md.KanTeXDocument(text))
+
+    f_id = getattr(media, 'file_id', None)
+    f_unique_id = getattr(media, 'file_unique_id', None)
     medias = [
         user.md.KeyValueItem(
             user.md.Bold('fileID'),
-            user.md.Code(media.file_id),
+            user.md.Code(f_id),
         ),
         user.md.KeyValueItem(
             user.md.Bold('fileUniqueID'),
-            user.md.Code(media.file_unique_id),
+            user.md.Code(f_unique_id),
         ),
     ]
     for media in medias:
         appendable.append(media)
     for a in appendable:
         text.append(a)
-    return await message.reply(user.md.KanTeXDocument(text))
+    return await message.reply_text(user.md.KanTeXDocument(text))
 
 
 def _gf(body):
