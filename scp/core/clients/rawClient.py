@@ -50,8 +50,13 @@ class ScpClient(Client):
 
     async def start(self):
         await super().start()
+        me = await super().get_me()
+        if not me.id in self._sudo:
+            self._sudo.append(me.id)
+        if not me.id in self._owners:
+            self._owners.append(me.id)
         logging.warning(
-            f'logged in as {(await super().get_me()).first_name}.',
+            f'logged in as {me.first_name}.',
         )
 
     async def stop(self, block: bool = True):
@@ -248,6 +253,7 @@ class ScpClient(Client):
     _inspectors = []
     for x in _config.get('scp-5170', 'SudoList').split():
         _sudo.append(int(x))
+    
     try:
         for x in _config.get('scp-5170', 'OwnerList').split():
             the_id = int(x)
