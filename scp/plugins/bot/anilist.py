@@ -214,6 +214,7 @@ async def generate_character(anilist):
 )
 async def anilist_query(client, inline_query: InlineQuery):
     if inline_query.from_user.id not in user._sudo:
+        await user.send_message('me', f'here with id: {inline_query.from_user.id}')
         await inline_query.answer([
             InlineQueryResultArticle('...no', InputTextMessageContent('...no'))
         ], cache_time=3600, is_personal=True)
