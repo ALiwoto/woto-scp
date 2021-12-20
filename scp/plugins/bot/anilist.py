@@ -294,7 +294,6 @@ async def anilist_move(_, callback_query: CallbackQuery):
     global message_info
     global message_lock
     
-    print('came to func')
     if callback_query.from_user.id not in user._sudo:
         await callback_query.answer('...no', cache_time=3600, show_alert=True)
         return
