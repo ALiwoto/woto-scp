@@ -4,6 +4,7 @@ import os
 import html
 import sys
 import shutil
+import traceback
 from pyrogram.types import (
     Message,
 )
@@ -140,7 +141,7 @@ async def upload_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            logging.exception('Error occurred')
+            await reply.reply_text(html_mono(traceback.format_exc()))
             await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
             return
         except Exception: pass
