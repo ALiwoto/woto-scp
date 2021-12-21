@@ -127,8 +127,8 @@ async def upload_handler(_, message: Message):
     
     try:
         await user.send_document(
-            message.chat.id, 
-            file, 
+            chat_id=message.chat.id, 
+            document=file, 
             progress=progress_callback, 
             progress_args=(reply, text, True), 
             force_document=True, 
