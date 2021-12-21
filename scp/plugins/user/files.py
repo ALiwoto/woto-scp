@@ -141,7 +141,7 @@ async def upload_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await reply.reply_text(html_mono(traceback.format_exc()))
+            await reply.reply_text(html_mono(traceback.format_exc() +"\n file type is:" + type(file)))
             await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
             return
         except Exception: pass
