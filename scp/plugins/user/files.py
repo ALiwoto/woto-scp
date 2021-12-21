@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 import html
 import sys
@@ -112,7 +113,7 @@ async def gitpull(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def upload(_, message: Message):
+async def upload_handler(_, message: Message):
     file = os.path.expanduser(' '.join(message.command[1:]))
     if not file:
         return
@@ -139,6 +140,7 @@ async def upload(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
+            logging.exception('Error occurred')
             await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
             return
         except Exception: pass
