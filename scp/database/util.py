@@ -1,5 +1,6 @@
 class Temp:
     unallowed = [int, float]
+    data: dict
 
     def __init__(
         self,
