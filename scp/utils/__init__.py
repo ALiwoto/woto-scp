@@ -2,6 +2,9 @@ import time
 import asyncio
 import mimetypes
 from datetime import timedelta
+from pyrogram.types import(
+    Message,
+)
 from . import wfilters
 
 
@@ -36,7 +39,7 @@ def calculate_eta(current, total, start_time):
     return ', '.join(thing)
 
 progress_callback_data = dict()
-async def progress_callback(current, total, reply, text, upload):
+async def progress_callback(current: int, total: int, reply: Message, text: str, upload: bool):
     message_identifier = (reply.chat.id, reply.message_id)
     last_edit_time, prevtext, start_time = progress_callback_data.get(message_identifier, (0, None, time.time()))
     if current == total:

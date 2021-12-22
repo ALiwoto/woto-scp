@@ -134,7 +134,7 @@ async def upload_handler(_, message: Message):
             force_document=True, 
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
-                else message.message_id,
+                else message.message_id
             ),
         )
     except user.exceptions.MediaInvalid:
