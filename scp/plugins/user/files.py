@@ -141,7 +141,52 @@ async def upload_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await reply.reply_text(html_mono(traceback.format_exc() +"\n file type is:" + str(type(file))))
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            return
+        except Exception: pass
+        await message.reply_text(html_mono(str(e)[:4000]), parse_mode='html')
+    else:
+        await reply.delete()
+
+
+@user.on_message(
+    ~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['uld'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def upload_handler(_, message: Message):
+    file = os.path.expanduser(' '.join(message.command[1:]))
+    if not file:
+        return
+    text = f'Uploading {html_mono(file)}...'
+    reply = await message.reply_text(text)
+    file_name = os.path.basename(file)
+    if os.path.isdir(file):
+        shutil.make_archive(f"{file_name}-archive", 'zip', file)
+        file = os.path.expanduser(f"{file_name}-archive.zip")
+    
+    try:
+        await user.send_document(
+            chat_id=message.chat.id, 
+            document=file, 
+            progress=progress_callback, 
+            progress_args=(reply, text, True),
+            reply_to_message_id=(
+                None if message.chat.type in ('private', 'bot') 
+                else message.message_id
+            ),
+        )
+    except user.exceptions.MediaInvalid:
+        await message.reply_text('Upload cancelled!')
+    except Exception as e:
+        try:
             await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
             return
         except Exception: pass
@@ -162,7 +207,7 @@ async def upload_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def download(_, message: Message):
+async def download_handler(_, message: Message):
     file = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or './'))
     if os.path.isdir(file):
         file = os.path.join(file, '')
