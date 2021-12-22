@@ -1,6 +1,9 @@
 import asyncio
 from scp import user
 from scp.utils import parser
+from pyrogram.types import (
+    Message,
+)
 
 
 __PLUGIN__ = 'create'
@@ -21,7 +24,7 @@ convLock = asyncio.Lock()
 
 
 @user.on_message(user.sudo & user.command('create'))
-async def _(_, message: user.types.Message):
+async def create_handler(_, message: Message):
     if len(message.command) == 1:
         return await message.delete()
     arg = message.text.split(None, 1)[1].split(None, 1)

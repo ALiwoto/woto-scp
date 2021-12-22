@@ -30,6 +30,12 @@ class WotoClientBase(Client):
             return ''
         return my_strs[1]
     
+    def split_some(self, value: str, max_count: int = -1, *delimiters) -> list:
+        return split_some(value, max_count, *delimiters)
+    
+    def split_message(self, message: types.Message, max_count: int = -1) -> list:
+        return split_some(message.text, max_count, ' ', '\n')
+
     def html_mono(self, value, *argv) -> str:
         return html_mono(value, *argv)
     
