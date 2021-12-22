@@ -27,7 +27,7 @@ from scp.utils.parser import (
         prefixes=user.cmd_prefixes,
     ),
 )
-async def ls(_, message: Message):
+async def ls_handler(_, message: Message):
     dir = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or '.'))
     text = ''
     folders = []
@@ -47,7 +47,6 @@ async def ls(_, message: Message):
         for i in files:
             text += f'<code>{html.escape(i)}</code>\n'
     await message.reply_text(text or 'Empty', disable_web_page_preview=True)
-
 
 
 @user.on_message(~user.filters.scheduled & 
@@ -235,9 +234,4 @@ async def download_handler(_, message: Message):
         await message.reply_text('Download cancelled!')
     else:
         await reply.edit_text(f'Downloaded to {html.escape(file)}')
-
-
-
-
-
 
