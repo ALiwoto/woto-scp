@@ -5,8 +5,6 @@ from pyrogram import(
     types, 
     raw, 
 )
-from scp.core.filters.Command import command
-from scp.utils import wfilters
 from scp.utils.parser import(
     html_bold,
     html_link, 
@@ -15,17 +13,7 @@ from scp.utils.parser import(
     html_normal_chat_link, 
     split_some,
 )
-from scp.utils.sibylUtils import SibylClient
-from scp.utils.misc import restart_scp as restart_woto_scp
-from configparser import ConfigParser
-from kantex import md as Markdown
-from aiohttp import ClientSession, client_exceptions
-import asyncio
-import logging
-
 from scp.utils.unpack import unpackInlineMessage
-
-
 
 class WotoClientBase(Client):
     def is_silent(self, message: types.Message) -> bool:
