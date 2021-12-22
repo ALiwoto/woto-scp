@@ -59,7 +59,7 @@ async def ls_handler(_, message: Message):
         ['pwd', 'dir'],
         prefixes=user.cmd_prefixes,
     ))
-async def pwd(_, message: Message):
+async def pwd_handler(_, message: Message):
     dir = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or '.'))
     await message.reply_text(dir or 'Empty', disable_web_page_preview=True)
 
@@ -160,7 +160,7 @@ async def upload_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def upload_handler(_, message: Message):
+async def uld_handler(_, message: Message):
     file = os.path.expanduser(' '.join(message.command[1:]))
     if not file:
         return
@@ -182,6 +182,7 @@ async def upload_handler(_, message: Message):
                 else message.message_id
             ),
         )
+        os.remove(file)
     except user.exceptions.MediaInvalid:
         await message.reply_text('Upload cancelled!')
     except Exception as e:
