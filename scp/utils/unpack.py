@@ -3,7 +3,7 @@ import struct
 from attrify import Attrify as Atr
 
 
-def unpackInlineMessage(inline_message_id: str):
+def unpackInlineMessage(inline_message_id: str) -> Atr:
     temp = {}
     dc_id, message_id, chat_id, query_id = struct.unpack(
         '<iiiq',
