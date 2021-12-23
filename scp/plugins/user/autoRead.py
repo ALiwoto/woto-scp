@@ -7,6 +7,7 @@ __PLUGIN__ = 'autoread'
         user.owner | 
         user.sudo | 
         user.wfilters.my_contacts | 
+        user.wfilters.stalk_text | 
         user.filters.private
     ),
     group=100,
