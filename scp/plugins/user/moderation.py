@@ -47,7 +47,7 @@ async def admins_handler(_, message: Message):
     action: str = commands[1].lower()
     all_members: typing.List[ChatMember] = []
     minimum: int = 2
-    sleep_time = 2
+    sleep_time = 4
     my_text = html_mono(f'searching for stalkers with less than {minimum} message(s)...')
     top_message = await message.reply_text(my_text, quote=True)
     try:
@@ -60,15 +60,15 @@ async def admins_handler(_, message: Message):
         await asyncio.sleep(sleep_time)
 
         if member.status == 'administrator' or member.status == 'creator':
-            sleep_time = 3
+            sleep_time = 13
             continue
             
         if member.is_anonymous or member.user.is_contact:
-            sleep_time = 4
+            sleep_time = 12
             continue
 
         if member.user.is_bot or member.user.is_self:
-            sleep_time = 2
+            sleep_time = 18
             continue
         
         message_count = await user.try_get_messages_count(
