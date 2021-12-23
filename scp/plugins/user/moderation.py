@@ -74,7 +74,8 @@ async def admins_handler(_, message: Message):
             message_count += 1
         
         if message_count < minimum:
-            if await user.get_common_chats(member.user.id) < 4:
+            user.try_get_online_counts
+            if await user.try_get_common_chats_count(user_id=member.user.id) < 4:
                 all_members.append(member)
     
     my_text = ''

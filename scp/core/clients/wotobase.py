@@ -76,6 +76,11 @@ class WotoClientBase(Client):
             return getattr(response, 'onlines', 0)
         except Exception: return 0
     
+    async def try_get_common_chats_count(self, user_id: Union[int, str]) -> int:
+        try:
+            return len(await self.get_common_chats(user_id))
+        except Exception: return 0
+    
     def unpack_inline_message_id(inline_message_id: str) -> Atr:
         return unpackInlineMessage(inline_message_id)
 
