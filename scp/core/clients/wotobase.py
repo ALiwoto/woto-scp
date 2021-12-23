@@ -90,6 +90,8 @@ class WotoClientBase(Client):
                 from_user=user_id,
             ):
                 message_count += 1
+            
+            return message_count
         except Exception: return 0
     
     def unpack_inline_message_id(inline_message_id: str) -> Atr:
