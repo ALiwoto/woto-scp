@@ -77,7 +77,7 @@ async def admins_handler(_, message: Message):
         )
 
         if message_count >= minimum:
-            sleep_time = 5
+            sleep_time = 15
             continue
 
         common = await user.try_get_common_chats_count(user_id=member.user.id)
