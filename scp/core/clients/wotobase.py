@@ -1,4 +1,5 @@
 from typing import Union
+import typing
 from attrify import Attrify as Atr
 from pyrogram import(
     Client, 
@@ -33,7 +34,7 @@ class WotoClientBase(Client):
     def split_some(self, value: str, max_count: int = -1, *delimiters) -> list:
         return split_some(value, max_count, *delimiters)
     
-    def split_message(self, message: types.Message, max_count: int = -1) -> list:
+    def split_message(self, message: types.Message, max_count: int = -1) -> typing.List[str]:
         return split_some(message.text, max_count, ' ', '\n')
 
     def html_mono(self, value, *argv) -> str:
