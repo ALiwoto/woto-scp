@@ -195,7 +195,7 @@ def split_all(value: str, *delimiters) -> list:
     regP = '|'.join(map(re.escape, delimiters))
     return remove_empty_strs(re.split(regP, value))
 
-def split_some(value: str, max_count: int = -1, *delimiters) -> list:
+def split_some(value: str, max_count: int = 0, *delimiters) -> list:
     regP = '|'.join(map(re.escape, delimiters))
     return remove_empty_strs(re.split(regP, value, max_count))
 
