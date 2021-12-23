@@ -91,11 +91,11 @@ async def admins_handler(_, message: Message):
             except Exception: pass
         
         my_text = html_mono(f'found {len(all_members)} stalkers in ')
-        my_text += await html_normal_chat_link(message.chat, ' .\n')
+        my_text += await html_normal_chat_link(message.chat.title, message.chat, ' .\n')
         my_text += html_mono(f'kicked {my_count} of them.')
     else:
         my_text = html_mono(f'found {len(all_members)} stalkers in ')
-        my_text += await html_normal_chat_link(message.chat, ' .')
+        my_text += await html_normal_chat_link(message.chat.title, message.chat, ' .')
     
     await top_message.edit_text(text=my_text, disable_web_page_preview=True)
     
