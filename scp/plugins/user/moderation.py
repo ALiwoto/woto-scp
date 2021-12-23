@@ -1,4 +1,5 @@
 import asyncio
+import typing
 from pyrogram.types import (
     Message,
     Chat,
@@ -23,6 +24,80 @@ from scp.utils.parser import (
 
 
 STARTER = html_mono("• \u200D") 
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['stalkers'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def admins_handler(_, message: Message):
+    commands = user.split_message(message)
+    if len(commands) < 3:
+        return
+    
+    # commad should be sent like this:
+    # .stalkers kick 2
+    
+    action: str = commands[1].lower()
+    all_members: typing.List[ChatMember] = []
+    minimum: int = 2
+    my_text = html_mono(f'searching for stalkers with less message than {minimum}...')
+    top_message = await message.reply_text(my_text, quote=True)
+    try:
+        minimum = int(commands[2])
+    except Exception: pass
+    async for member in user.iter_chat_members(message.chat):
+        if not isinstance(member, ChatMember):
+            continue
+
+        if member.status == 'administrator' or member.status == 'creator':
+            continue
+            
+        if member.is_anonymous or member.user.is_contact:
+            continue
+
+        if member.user.is_bot or member.user.is_self:
+            continue
+        
+        message_count = 0
+        async for _ in await user.search_messages(
+            chat_id=message.chat.id, 
+            query="",
+            from_user=member.user.id,
+        ):
+            message_count += 1
+        
+        if message_count < minimum:
+            if user.get_common_chats(member.user.id) < 4:
+                all_members.append(member)
+    
+    my_text = ''
+    if action == 'kick':
+        my_count = 0
+        for current in all_members:
+            try:
+                await user.kick_chat_member(
+                    chat_id=message.chat.id,
+                    user_id=current.user.id,
+                )
+                my_count += 1
+            except Exception: pass
+        
+        my_text = html_mono(f'found {len(all_members)} stalkers in ')
+        my_text += await html_normal_chat_link(message.chat, ' .\n')
+        my_text += html_mono(f'kicked {my_count} of them.')
+    else:
+        my_text = html_mono(f'found {len(all_members)} stalkers in ')
+        my_text += await html_normal_chat_link(message.chat, ' .')
+    
+    await top_message.edit_text(text=my_text, disable_web_page_preview=True)
+    
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
