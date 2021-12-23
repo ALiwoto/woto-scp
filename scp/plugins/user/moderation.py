@@ -57,7 +57,7 @@ async def admins_handler(_, message: Message):
         if not isinstance(member, ChatMember):
             continue
 
-        asyncio.sleep(sleep_time)
+        await asyncio.sleep(sleep_time)
 
         if member.status == 'administrator' or member.status == 'creator':
             sleep_time = 3
