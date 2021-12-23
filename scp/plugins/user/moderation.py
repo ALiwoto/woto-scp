@@ -65,18 +65,18 @@ async def admins_handler(_, message: Message):
         if member.user.is_bot or member.user.is_self:
             continue
         
-        message_count = 0
-        async for _ in await user.search_messages(
-            chat_id=message.chat.id, 
-            query="",
-            from_user=member.user.id,
-        ):
-            message_count += 1
+        message_count = await user.try_get_messages_count(
+            chat_id=message.chat.id,
+            user_id=member.user.id,
+        )
+
+        if message_count >= minimum:
+            continue
+
+        common = await user.try_get_common_chats_count(user_id=member.user.id)
         
-        if message_count < minimum:
-            user.try_get_online_counts
-            if await user.try_get_common_chats_count(user_id=member.user.id) < 4:
-                all_members.append(member)
+        if common < 4:
+            all_members.append(member)
     
     my_text = ''
     if action == 'kick':
