@@ -52,7 +52,7 @@ async def admins_handler(_, message: Message):
     try:
         minimum = int(commands[2])
     except Exception: pass
-    async for member in user.iter_chat_members(message.chat):
+    async for member in user.iter_chat_members(message.chat.id):
         if not isinstance(member, ChatMember):
             continue
 
