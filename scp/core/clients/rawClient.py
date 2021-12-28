@@ -239,4 +239,4 @@ class ScpClient(WotoClientBase):
         private_listener,
     )
     sibyl: SibylClient = SibylClient(sibyl_token)
-    auto_read_enabled = True
+    auto_read_enabled = False

@@ -1,4 +1,7 @@
 from scp import user
+from pyrogram.types import (
+    Message,
+)
 
 __PLUGIN__ = 'autoread'
 
@@ -8,11 +11,12 @@ __PLUGIN__ = 'autoread'
         user.sudo | 
         user.wfilters.my_contacts | 
         user.wfilters.stalk_text | 
-        user.filters.private
+        user.filters.private |
+        user.filters.group
     ),
     group=100,
 )
-async def auto_read_handler(_, message: user.types.Message):
+async def auto_read_handler(_, message: Message):
     if not user.auto_read_enabled:
         return
     try:
@@ -24,7 +28,7 @@ async def auto_read_handler(_, message: user.types.Message):
 @user.on_message(
     user.owner & user.command('gautoread'),
 )
-async def sinfo_handler(_, message: user.types.Message):
+async def sinfo_handler(_, message: Message):
     if message.text.find('true') > 0:
         if user.auto_read_enabled:
             await message.reply_text('Auto read is already enabled.')
