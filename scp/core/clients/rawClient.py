@@ -48,6 +48,8 @@ class ScpClient(WotoClientBase):
             self._sudo.append(me.id)
         if not me.id in self._owners:
             self._owners.append(me.id)
+        
+        self.original_phone_number = me.phone_number
         logging.warning(
             f'logged in as {me.first_name}.',
         )
@@ -176,6 +178,7 @@ class ScpClient(WotoClientBase):
         await writer.wait_closed()
         return data
 
+    original_phone_number: str = ''
     is_scp_bot: bool = False
     the_bot: 'ScpClient'
     the_user: 'ScpClient'
