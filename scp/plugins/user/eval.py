@@ -190,6 +190,8 @@ async def eval_base(client: user, message: Message, code: str):
         output += str(i).strip() + '\n'
     if not output.strip():
         output = 'Success'
+    
+    output = output.replace(user.original_phone_number, '$PHONE_NUMBER')
 
     if len(output) > 4096:
         out = wrapped_stdout_text + '\n'
