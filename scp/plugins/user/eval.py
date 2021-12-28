@@ -195,6 +195,7 @@ async def eval_base(client: user, message: Message, code: str):
 
     if len(output) > 4096:
         out = wrapped_stdout_text + '\n'
+        out = out.replace(user.original_phone_number, '$PHONE_NUMBER')
         for i in returned:
             out += str(i).strip() + '\n'
         f = BytesIO(out.strip().encode('utf-8'))
