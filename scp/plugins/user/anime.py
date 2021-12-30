@@ -72,9 +72,6 @@ async def anilist(_, message: Message):
             await message.reply_text(text, disable_web_page_preview=True, parse_mode='through')
 
 
-
-#['trace', 'tracemoe', 'whatanime', 'wa', 'wait']
-
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
@@ -82,7 +79,7 @@ async def anilist(_, message: Message):
 	~user.filters.edited & 
 	user.owner & 
 	user.filters.command(
-        ['investigate'],
+        ['trace', 'tracemoe', 'whatanime', 'wa', 'wait'],
         prefixes=user.cmd_prefixes,
     ),
 )
