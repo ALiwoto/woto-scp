@@ -320,11 +320,11 @@ def get_name(user: types.User, name_limit: int = -1) -> str:
     if not user:
         return ""
     
-    if len(user.first_name) > 0:
+    if user.first_name and len(user.first_name) > 0:
         return user.first_name if name_limit == -1 else user.first_name[:name_limit]
     
-    if len(user.last_name) > 0:
+    if user.last_name and len(user.last_name) > 0:
         return user.last_name if name_limit == -1 else user.last_name[:name_limit]
     
-    if len(user.username) > 0:
+    if user.username and len(user.username) > 0:
         return user.username if name_limit == -1 else user.username[:name_limit]

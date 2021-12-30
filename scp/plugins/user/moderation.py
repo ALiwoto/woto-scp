@@ -25,6 +25,21 @@ from scp.utils.parser import (
 
 STARTER = html_mono("• \u200D") 
 
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['investigate'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def admins_handler(_, message: Message):
+    pass
+
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
@@ -36,7 +51,7 @@ STARTER = html_mono("• \u200D")
         prefixes=user.cmd_prefixes,
     ),
 )
-async def admins_handler(_, message: Message):
+async def stalkers_handler(_, message: Message):
     commands = user.split_message(message)
     if len(commands) < 3:
         return
