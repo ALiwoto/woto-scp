@@ -14,10 +14,10 @@ from scp.utils.parser import html_mono, split_some
 BACKUP_SHELL_SCRIPT = (
     "rm -r -f 'my-backup' &&"
     " mkdir 'my-backup' &&"
-    " mv scp-bot.session my-backup/scp-bot.session &&"
-    " mv scp-user.session my-backup/scp-user.session &&"
-    " mv scp-user.session-journal my-backup/scp-user.session-journal &&"
-    " mv config.ini my-backup/config.ini"
+    " cp scp-bot.session my-backup/scp-bot.session &&"
+    " cp scp-user.session my-backup/scp-user.session &&"
+    " cp scp-user.session-journal my-backup/scp-user.session-journal &&"
+    " cp config.ini my-backup/config.ini"
 )
 
 @user.on_message(
