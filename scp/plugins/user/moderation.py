@@ -38,9 +38,32 @@ STARTER = html_mono("• \u200D")
     ),
 )
 async def admins_handler(_, message: Message):
-    pass
+    all_strs = message.text.split(' ')
+    if len(all_strs) < 2:
+        the_chat = message.chat.id
+    else:
+        the_chat = message.text.split(' ')[1]
+        if the_chat.find('/') > 0:
+            all_strs = the_chat.split('/')
+            index = len(all_strs) - 1
+            if all_strs[index].isdigit():
+                index -= 1
+            if all_strs[index].isdigit():
+                all_strs[index] = '-100' + all_strs[index]
+            the_chat = all_strs[index]
+    done = 0
+    async for _ in user.iter_chat_members(the_chat):
+        done += 1
 
-@user.on_message(~user.filters.scheduled & 
+    await message.reply_text(
+        f"investigated {done} members in {the_chat}",
+        quote=True,
+        parse_mode="html",
+    )
+
+
+@user.on_message(
+    ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
@@ -147,7 +170,7 @@ async def admins_handler(_, message: Message):
             if all_strs[index].isdigit():
                 all_strs[index] = '-100' + all_strs[index]
             the_chat = all_strs[index]
-        
+    
     top_msg = await message.reply_text(html_mono("fetching group admins..."))
     txt = ''
     common = user.is_silent(message)

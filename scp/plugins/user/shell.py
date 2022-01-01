@@ -11,6 +11,34 @@ from scp.utils import progress_callback
 from scp import user
 from scp.utils.parser import html_mono, split_some
 
+BACKUP_SHELL_SCRIPT = (
+    "rm -r -f 'my-backup' &&"
+    " mkdir 'my-backup' &&"
+    " mv scp-bot.session my-backup/scp-bot.session &&"
+    " mv scp-user.session my-backup/scp-user.session &&"
+    " mv scp-user.session-journal my-backup/scp-user.session-journal &&"
+    " mv config.ini my-backup/config.ini"
+)
+
+@user.on_message(
+    ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.filters.me
+    & user.filters.command(
+        'sBackup',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def sBackup_handler(_, message: Message):
+    try:
+        await shell_base(message, BACKUP_SHELL_SCRIPT)
+    except Exception as e:
+        await message.reply_text(user.html_mono(e), quote=True)
+
+
+
 @user.on_message(
     ~user.filters.forwarded
     & ~user.filters.sticker
