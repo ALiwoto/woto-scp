@@ -38,13 +38,15 @@ async def pirate_handler(_, message: Message):
             if len(all_numbers) == 2:
                 from_id = int(all_numbers[0])
                 to_id = int(all_numbers[1])
-    except:
-        messages = await user.get_history(
+        else:
+            messages = await user.get_history(
                 chat_id=target_chat,
                 limit=1,
-        )
-        if messages:
-            to_id = messages[0].message_id
+            )
+            if messages:
+                to_id = messages[0].message_id
+    except Exception as e:
+        return await message.reply_text(user.html_mono(e))
     
     current_bot_index: int = 0
     done: int = 0
