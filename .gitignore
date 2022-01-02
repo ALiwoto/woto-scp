@@ -121,6 +121,7 @@ scp/plugins/private/*.py
 test.py
 woto_files
 unknown_errors.txt
+bots.json
 
 # old and deprecated pyfiles
 *.pyold

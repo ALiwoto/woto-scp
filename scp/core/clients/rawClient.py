@@ -1,6 +1,11 @@
-from typing import NoReturn, Union
+import typing
+import os
+import json
+from typing import(
+    NoReturn, 
+    Union,
+)
 from pyrogram import(
-    Client, 
     filters, 
     types, 
     raw, 
@@ -19,6 +24,36 @@ import asyncio
 import logging
 
 session.Session.notice_displayed = True
+
+
+def _get_scp_bots(config: ConfigParser) -> typing.List[WotoClientBase]:
+    # open the file "bots.json"
+    try:
+        api_id = config.get('pyrogram', 'api_id')
+        api_hash = config.get('pyrogram', 'api_hash')
+        my_str = open('bots.json').read()
+        # load into json
+        my_json = json.loads(my_str)
+        if not isinstance(my_json, list): 
+            return None
+
+        my_bots: typing.List[WotoClientBase] = []
+        current_client: WotoClientBase = None
+
+        for current in my_json:
+            if not isinstance(current, str):
+                continue
+            try:
+                current_client = WotoClientBase(
+                    session_name=':memory:',
+                    bot_token=current,
+                    api_id=api_id,
+                    api_hash=api_hash,
+                )
+                my_bots.append(current_client)
+            except Exception: continue
+
+    except: return None
 
 class ScpClient(WotoClientBase):
     def __init__(
@@ -62,37 +97,6 @@ class ScpClient(WotoClientBase):
 
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
-    
-    async def send(
-        self,
-        data: raw.core.TLObject,
-        retries: int = session.Session.MAX_RETRIES,
-        timeout: float = session.Session.WAIT_TIMEOUT,
-        sleep_threshold: float = None
-    ):
-        try:
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
-        except (
-            errors.SlowmodeWait,
-            errors.FloodWait,
-            errors.exceptions.flood_420.FloodWait,
-            errors.exceptions.flood_420.Flood,
-            errors.exceptions.Flood,
-            errors.exceptions.ApiIdPublishedFlood,
-        ) as e:
-            await asyncio.sleep(e.x)
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
-    
     
     async def delete_user_history(self, chat_id: Union[int, str], user_id: Union[int, str]) -> bool:
         """Delete all messages sent by a certain user in a supergroup.
@@ -219,6 +223,8 @@ class ScpClient(WotoClientBase):
         logging.warning(f'{e}')
     
 
+    the_bots: typing.List[WotoClientBase] = _get_scp_bots(_config)
+
     sudo = (filters.me | filters.user(_sudo))
     owner = (filters.me | filters.user(_owners))
     enforcer = (filters.me | filters.user(_enforcers))
@@ -226,6 +232,7 @@ class ScpClient(WotoClientBase):
     cmd_prefixes = _config.get('scp-5170', 'prefixes').split() or ['!', '.']
     
     log_channel = _config.getint('scp-5170', 'LogChannel')
+    private_resources = _config.getint('scp-5170', 'private_resources')
     # sibyl configuration stuff:
     sibyl_token = _config.get('sibyl-system', 'token')
     public_listener = _config.getint('sibyl-system', 'public_listener')
