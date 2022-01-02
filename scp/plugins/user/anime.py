@@ -57,7 +57,10 @@ async def anilist(_, message: Message):
     except IndexError:
         await message.reply_text(f'There are only {len(results.results)} results')
     except (Forbidden, ChatSendInlineForbidden):
-        text = {'message': results.results[page].send_message.message, 'entities': results.results[page].send_message.entities}
+        text = {
+            'message': results.results[page].send_message.message, 
+            'entities': results.results[page].send_message.entities,
+        }
         photo = url = None
         if getattr(results.results[page], 'photo', None) is not None:
             photo = Photo._parse(user, results.results[page].photo)
@@ -72,7 +75,8 @@ async def anilist(_, message: Message):
             await message.reply_text(text, disable_web_page_preview=True, parse_mode='through')
 
 
-@user.on_message(~user.filters.scheduled & 
+@user.on_message(
+    ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
@@ -110,7 +114,14 @@ async def whatanime(_, message: Message):
             progress_args=(reply, 'Downloading...', False),
         )
         new_path = os.path.join(tempdir, '1.png')
-        proc = await asyncio.create_subprocess_exec('ffmpeg', '-i', path, '-frames:v', '1', new_path)
+        proc = await asyncio.create_subprocess_exec(
+            'ffmpeg', 
+            '-hide_banner', 
+            '-loglevel', 'error', 
+            '-i', path, 
+            '-frames:v', '1', 
+            new_path,
+        )
         await proc.communicate()
         await reply.edit_text('Uploading...')
         with open(new_path, 'rb') as file:
