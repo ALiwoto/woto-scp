@@ -17,12 +17,13 @@ from pyrogram import(
     raw, 
 )
 from scp.utils.parser import(
+    html_mono,
     html_bold,
     html_link, 
-    html_mention, 
-    html_mono,
-    html_normal_chat_link, 
     split_some,
+    html_normal,
+    html_mention, 
+    html_normal_chat_link,
 )
 from scp.utils.unpack import unpackInlineMessage
 
@@ -49,6 +50,9 @@ class WotoClientBase(Client):
 
     def html_mono(self, value, *argv) -> str:
         return html_mono(value, *argv)
+    
+    def html_normal(self, value, *argv) -> str:
+        return html_normal(value, *argv)
     
     def html_bold(self, value, *argv) -> str:
         return html_bold(value, *argv)
