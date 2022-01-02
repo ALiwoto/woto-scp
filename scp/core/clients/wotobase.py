@@ -1,4 +1,14 @@
 from typing import Union
+import asyncio
+from pyrogram import(
+    Client, 
+    filters, 
+    types, 
+    raw, 
+    errors, 
+    session,
+)
+from typing import Union
 import typing
 from attrify import Attrify as Atr
 from pyrogram import(
@@ -96,4 +106,39 @@ class WotoClientBase(Client):
     
     def unpack_inline_message_id(inline_message_id: str) -> Atr:
         return unpackInlineMessage(inline_message_id)
+
+    async def send(
+        self,
+        data: raw.core.TLObject,
+        retries: int = session.Session.MAX_RETRIES,
+        timeout: float = session.Session.WAIT_TIMEOUT,
+        sleep_threshold: float = None
+    ):
+        try:
+            return await super().send(
+                data=data,
+                retries=retries,
+                timeout=timeout,
+                sleep_threshold=sleep_threshold,
+            )
+        except (
+            errors.SlowmodeWait,
+            errors.FloodWait,
+            errors.exceptions.flood_420.FloodWait,
+            errors.exceptions.flood_420.Flood,
+            errors.exceptions.Flood,
+            errors.exceptions.ApiIdPublishedFlood,
+        ) as e:
+            await asyncio.sleep(e.x)
+            return await super().send(
+                data=data,
+                retries=retries,
+                timeout=timeout,
+                sleep_threshold=sleep_threshold,
+            )
+    
+    
+
+
+
 
