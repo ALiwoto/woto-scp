@@ -52,6 +52,8 @@ def _get_scp_bots(config: ConfigParser) -> typing.List[WotoClientBase]:
                 )
                 my_bots.append(current_client)
             except Exception: continue
+        
+        return my_bots
 
     except: return None
 
