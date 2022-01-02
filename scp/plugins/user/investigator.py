@@ -24,7 +24,7 @@ async def pirate_handler(_, message: Message):
     if not args or len(args) < 1:
         return
     
-    target_chat = args[0]
+    target_chat = args
     the_chat: Chat = None
     from_id: int = 1
     to_id: int = 0
