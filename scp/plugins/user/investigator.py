@@ -65,7 +65,7 @@ async def pirate_handler(_, message: Message):
             continue
 
     text = user.html_bold(f'Tried to pirate {done+failed} messages from ')
-    text += user.html_mono(f'{the_chat.title} [') + user.html_mono(f'{target_chat}', '].\n')
+    text += user.html_normal(f'{the_chat.title} [') + user.html_mono(f'{target_chat}', '].\n')
     text += user.html_mono(done, ' messages were pirated successfully.\n')
     text += user.html_mono(failed, ' messages were not pirated.')
     await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
