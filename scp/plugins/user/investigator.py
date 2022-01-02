@@ -20,11 +20,11 @@ async def pirate_handler(_, message: Message):
     if not user.the_bots or len(user.the_bots) < 1:
         await message.reply_text('bot lists is empty.')
         return
-    args = user.get_non_cmd(message)
-    if not args or len(args) < 1:
+    args = user.split_message(message)
+    if not args or len(args) < 2:
         return
     
-    target_chat = args
+    target_chat = args[1]
     the_chat: Chat = None
     from_id: int = 1
     to_id: int = 0
@@ -33,8 +33,8 @@ async def pirate_handler(_, message: Message):
     except Exception as e:
         return await message.reply_text(user.html_mono(e))
     try:
-        if len(args) > 1:
-            all_numbers = args[1].split('-')
+        if len(args) > 2:
+            all_numbers = args[2].split('-')
             if len(all_numbers) == 2:
                 from_id = int(all_numbers[0])
                 to_id = int(all_numbers[1])
@@ -64,7 +64,7 @@ async def pirate_handler(_, message: Message):
             failed += 1
             continue
 
-    text = user.html_bold(f'Tried to pirate {done+failed} messages from {the_chat.title}.\n')
+    text = user.html_bold(f'Tried to pirate {done+failed} messages from {the_chat.title}.', '\n')
     text += user.html_bold(f'{done} messages were copied successfully.\n')
     text += user.html_bold(f'{failed} messages were not copied.\n')
     await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
