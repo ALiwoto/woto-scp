@@ -60,7 +60,8 @@ async def pirate_handler(_, message: Message):
                 message_id=index,
             )
             done += 1
-        except: 
+        except Exception as e: 
+            print(e)
             failed += 1
             continue
 

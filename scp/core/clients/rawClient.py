@@ -86,10 +86,22 @@ class ScpClient(WotoClientBase):
         if not me.id in self._owners:
             self._owners.append(me.id)
         
+        if self.is_scp_bot and self.the_bots and len(self.the_bots) > 0:
+            await self.start_all_bots()
+        
         self.original_phone_number = me.phone_number
         logging.warning(
             f'logged in as {me.first_name}.',
         )
+
+    async def start_all_bots(self):
+        try:
+            for bot in self.the_bots:
+                await bot.start()
+        except Exception as e:
+            logging.warning(
+                f'failed to start bot: {e}',
+            )
 
     async def stop(self, block: bool = True):
         logging.warning(
