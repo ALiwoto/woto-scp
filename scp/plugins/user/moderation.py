@@ -226,6 +226,16 @@ async def admins_handler(_, message: Message):
     await top_msg.edit_text(text=txt, parse_mode="html")
 
 
+@user.on_message(
+	~user.filters.edited &
+    user.wfilters.channel_in_group
+)
+async def by_channels_handler(_, message: Message):
+    try:
+        await user.send_message(chat_id=user.log_channel, text=f'from {message.chat.id}')
+        await message.forward(chat_id=user.log_channel)
+    except Exception: pass
+
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
