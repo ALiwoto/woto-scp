@@ -20,7 +20,7 @@ stalk_text = filters.create(stalk_filter)
 async def channel_in_group_filter(_, __, m: types.Message) -> bool:
     if m.service or not m.chat or not m.chat.title:
         return False
-    elif m.game and not await m._client.storage.is_bot():
+    elif m.game:
         return False
     elif m.empty:
         return False
@@ -32,7 +32,8 @@ async def channel_in_group_filter(_, __, m: types.Message) -> bool:
         my_lower.find('discussion') >= 0 or
         my_lower.find('tele') >= 0
     ):
-        return my_lower.find('anime') >= 0
+        if not my_lower.find('anime') >= 0:
+            return False
     return (
         m and
         m.chat.type in ['group', 'supergroup'] and
