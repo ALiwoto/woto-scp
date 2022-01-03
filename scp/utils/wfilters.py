@@ -25,6 +25,9 @@ async def channel_in_group_filter(_, __, m: types.Message) -> bool:
     elif m.empty:
         return False
     my_lower = m.chat.title.lower()
+    if m.chat.username:
+        if m.chat.username.lower().find('night') >= 0:
+            return False
     if (
         my_lower.find('chat') >= 0 or
         my_lower.find('talk') >= 0 or
