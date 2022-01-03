@@ -33,7 +33,8 @@ async def channel_in_group_filter(_, __, m: types.Message) -> bool:
         my_lower.find('talk') >= 0 or
         my_lower.find('@') >= 0 or
         my_lower.find('discussion') >= 0 or
-        my_lower.find('tele') >= 0
+        my_lower.find('tele') >= 0 or
+        my_lower.find('dev') >= 0
     ):
         if not my_lower.find('anime') >= 0:
             return False
