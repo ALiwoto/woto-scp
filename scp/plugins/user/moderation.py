@@ -26,7 +26,8 @@ from scp.utils.parser import (
 STARTER = html_mono("• \u200D") 
 
 
-@user.on_message(~user.filters.scheduled & 
+@user.on_message(
+    ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
