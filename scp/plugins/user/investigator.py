@@ -54,8 +54,12 @@ async def pirate_handler(_, message: Message):
     except Exception as e:
         return await message.reply_text(user.html_mono(e))
 
+    link_pre = f'https://t.me/c/{str(the_chat.id)[4:]}/'
     channel_text = f'Pirating messages from {from_id} to {to_id} in {the_chat.title}\n'
     channel_text += 'target username: @' + the_chat.username + '\n'
+    channel_text += f'format: @{the_chat.username} [' + user.html_mono(the_chat.id) + ']: '
+    channel_text += user.html_link(from_id, link_pre + f'{from_id}') + '-'
+    channel_text += user.html_link(to_id, link_pre + f'{to_id}')
     channel_post: Message = await user.send_message(
         chat_id=user.private_resources,
         text=channel_text,
