@@ -231,10 +231,16 @@ async def admins_handler(_, message: Message):
     user.wfilters.channel_in_group
 )
 async def by_channels_handler(_, message: Message):
+    from_message: Message = None
+    original_message: Message = None
     try:
-        await user.send_message(chat_id=user.log_channel, text=f'from {message.chat.id}')
-        await message.forward(chat_id=user.log_channel)
+        from_message = await user.send_message(
+            chat_id=user.log_channel, text=f'from {message.chat.id}',
+        )
+        original_message = await message.forward(chat_id=user.log_channel)
     except Exception: pass
+    if not original_message and from_message:
+        await from_message.delete()
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
