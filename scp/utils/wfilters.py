@@ -18,7 +18,7 @@ stalk_text = filters.create(stalk_filter)
 
 
 async def channel_in_group_filter(_, __, m: types.Message) -> bool:
-    if m.service:
+    if m.service or not m.chat or not m.chat.title:
         return False
     elif m.game and not await m._client.storage.is_bot():
         return False
@@ -33,7 +33,12 @@ async def channel_in_group_filter(_, __, m: types.Message) -> bool:
         my_lower.find('tele') >= 0
     ):
         return my_lower.find('anime') >= 0
-    return m and m.sender_chat and m.sender_chat.type == 'channel'
+    return (
+        m and
+        m.chat.type in ['group', 'supergroup'] and
+        m.sender_chat and
+        m.sender_chat.type == 'channel'
+    )
 
 channel_in_group = filters.create(channel_in_group_filter)
 """Filter messages sent by contact users."""
