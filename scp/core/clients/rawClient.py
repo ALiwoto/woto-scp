@@ -25,8 +25,13 @@ import logging
 
 session.Session.notice_displayed = True
 
+__scp__helper__bots__: typing.List[WotoClientBase] = None
+
 
 def _get_scp_bots(config: ConfigParser) -> typing.List[WotoClientBase]:
+    global __scp__helper__bots__
+    if __scp__helper__bots__ is not None:
+        return __scp__helper__bots__
     # open the file "bots.json"
     try:
         api_id = config.get('pyrogram', 'api_id')
@@ -53,6 +58,7 @@ def _get_scp_bots(config: ConfigParser) -> typing.List[WotoClientBase]:
                 my_bots.append(current_client)
             except Exception: continue
         
+        __scp__helper__bots__ = my_bots
         return my_bots
 
     except: return None
@@ -86,9 +92,6 @@ class ScpClient(WotoClientBase):
         if not me.id in self._owners:
             self._owners.append(me.id)
         
-        if self.is_scp_bot and self.the_bots and len(self.the_bots) > 0:
-            await self.start_all_bots()
-        
         self.original_phone_number = me.phone_number
         logging.warning(
             f'logged in as {me.first_name}.',
@@ -102,6 +105,8 @@ class ScpClient(WotoClientBase):
             logging.warning(
                 f'failed to start bot: {e}',
             )
+        self.are_bots_started = True
+        self.the_bot.are_bots_started = True
 
     async def stop(self, block: bool = True):
         logging.warning(
@@ -238,6 +243,7 @@ class ScpClient(WotoClientBase):
     
 
     the_bots: typing.List[WotoClientBase] = _get_scp_bots(_config)
+    are_bots_started: bool = False
 
     sudo = (filters.me | filters.user(_sudo))
     owner = (filters.me | filters.user(_owners))

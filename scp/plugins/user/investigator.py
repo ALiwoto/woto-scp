@@ -5,8 +5,7 @@ from pyrogram.types import (
 )
 
 @user.on_message(
-    ~user.filters.scheduled & 
-	~user.filters.forwarded & 
+	~user.filters.forwarded &
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	~user.filters.edited & 
@@ -20,6 +19,13 @@ async def pirate_handler(_, message: Message):
     if not user.the_bots or len(user.the_bots) < 1:
         await message.reply_text('bot lists is empty.')
         return
+    
+    if not user.are_bots_started:
+        top_message = await message.reply_text(user.html_mono('starting bots...'))
+        await user.start_all_bots()
+        await top_message.edit_text(user.html_mono('bots started.'))
+        
+
     args = user.split_message(message)
     if not args or len(args) < 2:
         return
@@ -47,6 +53,15 @@ async def pirate_handler(_, message: Message):
                 to_id = messages[0].message_id
     except Exception as e:
         return await message.reply_text(user.html_mono(e))
+
+    channel_text = f'Pirating messages from {from_id} to {to_id} in {the_chat.title}'
+    channel_post: Message = await user.send_message(
+        chat_id=user.private_resources,
+        text=channel_text,
+    )
+
+    await channel_post.pin()
+    
     
     current_bot_index: int = 0
     done: int = 0
@@ -60,8 +75,7 @@ async def pirate_handler(_, message: Message):
                 message_id=index,
             )
             done += 1
-        except Exception as e: 
-            print(e)
+        except:
             failed += 1
             continue
 
