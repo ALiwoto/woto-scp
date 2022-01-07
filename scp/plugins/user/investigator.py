@@ -89,3 +89,22 @@ async def pirate_handler(_, message: Message):
     text += user.html_mono(done, ' messages were pirated successfully.\n')
     text += user.html_mono(failed, ' messages were not pirated.')
     await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
+
+@user.on_message(
+    ~(
+        user.owner | 
+        user.sudo | 
+        user.wfilters.intemperate |
+        user.filters.private
+    ),
+    group=123,
+)
+async def send_stare_gif(_, message: Message):
+    if message.animation.file_unique_id != 'AgADbgADz3-YRg':
+        return
+    await user.send_animation(
+        message.chat.id, 
+        message.animation.file_id, 
+        reply_to_message_id=message.message_id,
+    )
+
