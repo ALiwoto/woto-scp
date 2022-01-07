@@ -94,10 +94,10 @@ async def pirate_handler(_, message: Message):
     ~(
         user.owner | 
         user.sudo | 
-        user.filters.animation |
-        user.wfilters.intemperate |
         user.filters.private
-    ),
+    ) & 
+    user.filters.animation &
+    user.wfilters.intemperate,
     group=123,
 )
 async def send_stare_gif(_, message: Message):
