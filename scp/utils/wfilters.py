@@ -10,6 +10,12 @@ async def my_contacts_filter(_, __, m: types.Message) -> bool:
 my_contacts = filters.create(my_contacts_filter)
 """Filter messages sent by contact users."""
 
+async def intemperate_filter(_, __, m: types.Message) -> bool:
+    return m and m.chat and m.chat.username == 'intemperate'
+
+intemperate = filters.create(intemperate_filter)
+"""Filter messages sent in intemperate."""
+
 async def stalk_filter(_, __, m: types.Message) -> bool:
     return m and m.text and m.text.find('stalk') != -1
 
