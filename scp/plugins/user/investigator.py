@@ -94,6 +94,7 @@ async def pirate_handler(_, message: Message):
     ~(
         user.owner | 
         user.sudo | 
+        user.filters.animation |
         user.wfilters.intemperate |
         user.filters.private
     ),
