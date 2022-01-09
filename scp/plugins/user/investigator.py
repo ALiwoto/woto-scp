@@ -240,6 +240,7 @@ async def cBackup_handler(_, message: Message):
                 continue
             done += 1
         except Exception as e:
+            print(e)
             failed += 1
     
     text = user.html_bold(f'Tried to backup {done+failed} messages from ')
