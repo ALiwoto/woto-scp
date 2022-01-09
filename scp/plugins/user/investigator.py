@@ -148,17 +148,21 @@ async def cBackup_handler(_, message: Message):
             )
 
             if current_user_message.service:
+                print('service')
                 continue
                 #log.warning(f"Service messages cannot be copied. "
                 #            f"chat_id: {self.chat.id}, message_id: {self.message_id}")
             elif current_user_message.game:
+                print('game')
                 continue
                 #log.warning(f"Users cannot send messages with Game media type. "
                 #            f"chat_id: {self.chat.id}, message_id: {self.message_id}")
             elif current_user_message.empty:
+                print('empty')
                 continue
                 #log.warning(f"Empty messages cannot be copied. ")
             elif not current_user_message.web_page:
+                print('no preview: ', current_user_message.text)
                 continue
 
             if current_user_message.web_page.document:
