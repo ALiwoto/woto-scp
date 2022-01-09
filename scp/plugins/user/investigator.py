@@ -224,6 +224,8 @@ async def cBackup_handler(_, message: Message):
                     text=current_user_message.web_page.description,
                 )
             else:
+                print('something else')
+                print(current_user_message.web_page)
                 continue
             done += 1
         except Exception as e:
