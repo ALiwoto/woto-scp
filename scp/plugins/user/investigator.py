@@ -1,3 +1,4 @@
+import asyncio
 from scp import user
 from pyrogram.types import (
     Message,
@@ -134,6 +135,7 @@ async def cBackup_handler(_, message: Message):
     failed: int = 0
     
     for index in range(from_id, to_id + 1):
+        await asyncio.sleep(2)
         try:
             current_user_message = await user.forward_messages(
                 chat_id=public_username,
