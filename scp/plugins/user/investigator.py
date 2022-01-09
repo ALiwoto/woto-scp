@@ -195,6 +195,11 @@ async def cBackup_handler(_, message: Message):
                     chat_id=backup_channel_id,
                     document=current_user_message.web_page.animation.file_id,
                 )
+            elif current_user_message.web_page.description:
+                await user.send_message(
+                    chat_id=backup_channel_id,
+                    text=current_user_message.web_page.description,
+                )
             else:
                 print("none of them...")
             done += 1
