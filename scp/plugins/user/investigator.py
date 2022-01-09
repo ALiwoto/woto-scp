@@ -135,7 +135,6 @@ async def cBackup_handler(_, message: Message):
     failed: int = 0
     
     for index in range(from_id, to_id + 1):
-        await asyncio.sleep(2)
         try:
             current_user_message = await user.forward_messages(
                 chat_id=public_username,
@@ -164,10 +163,15 @@ async def cBackup_handler(_, message: Message):
                 continue
                 #log.warning(f"Empty messages cannot be copied. ")
             elif not current_user_message.web_page:
-                current_user_message = await user.get_messages(
-                    chat_id=public_username,
-                    message_ids=current_user_message.message_id,
-                )
+                counter: int = 0
+                while True:
+                    counter += 1
+                    current_user_message = await user.get_messages(
+                        chat_id=public_username,
+                        message_ids=current_user_message.message_id,
+                    )
+                    if current_user_message.web_page or counter > 5:
+                        break
                 if not current_user_message.web_page:
                     print('no preview: ', current_user_message.text)
                     continue
