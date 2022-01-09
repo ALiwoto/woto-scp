@@ -4,6 +4,7 @@ from pyrogram.types import (
     Chat,
 )
 
+
 @user.on_message(
 	~user.filters.forwarded &
 	~user.filters.sticker & 
@@ -89,6 +90,124 @@ async def pirate_handler(_, message: Message):
     text += user.html_mono(done, ' messages were pirated successfully.\n')
     text += user.html_mono(failed, ' messages were not pirated.')
     await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
+
+@user.on_message(
+	~user.filters.forwarded &
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.filters.command(
+        ['cBackup'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def cBackup_handler(_, message: Message):
+    if not user.the_bots or len(user.the_bots) < 1:
+        await message.reply_text('bot lists is empty.')
+        return
+    
+    if not user.are_bots_started:
+        top_message = await message.reply_text(user.html_mono('starting bots...'))
+        await user.start_all_bots()
+        await top_message.edit_text(user.html_mono('bots started.'))
+
+    #pub username: public_woto_re78_mo96
+    #target username: rickychannel_movies
+    public_username = 'public_woto_re78_mo96'
+    target_chat = 'rickychannel_movies'
+    tg_link_first = f'https://t.me/{public_username}/'
+    the_chat: Chat = None
+    backup_channel_id = -1001675937900
+    from_id: int = 1
+    to_id: int = 0
+    try:
+        the_chat = await user.get_chat(target_chat)
+    except Exception as e:
+        return await message.reply_text(user.html_mono(e))
+    try:
+        messages = await user.get_history(
+            chat_id=target_chat,
+            limit=1,
+        )
+        if messages:
+            to_id = messages[0].message_id
+    except Exception as e:
+        return await message.reply_text(user.html_mono(e))
+    
+
+    current_bot_index: int = 0
+    current_user_message: Message = None
+    current_bot_message: Message = None
+    done: int = 0
+    failed: int = 0
+    
+    for index in range(from_id, to_id + 1):
+        current_bot_index = index % len(user.the_bots)
+        try:
+            current_user_message = await user.forward_messages(
+                chat_id=public_username,
+                from_chat_id=target_chat,
+                message_ids=index,
+            )
+
+            current_user_message = await user.send_message(
+                chat_id=public_username,
+                text=tg_link_first+str(current_user_message.message_id)
+            )
+
+            current_bot_message = await user.the_bots[current_bot_index].get_messages(
+                from_id=public_username,
+                message_ids=current_user_message.message_id,
+            )
+            if current_bot_message.service:
+                continue
+                #log.warning(f"Service messages cannot be copied. "
+                #            f"chat_id: {self.chat.id}, message_id: {self.message_id}")
+            elif current_bot_message.game:
+                continue
+                #log.warning(f"Users cannot send messages with Game media type. "
+                #            f"chat_id: {self.chat.id}, message_id: {self.message_id}")
+            elif current_bot_message.empty:
+                continue
+                #log.warning(f"Empty messages cannot be copied. ")
+
+            if current_bot_message.web_page.document:
+                await user.the_bots[current_bot_index].send_document(
+                    chat_id=backup_channel_id,
+                    document=current_bot_message.web_page.document.file_id,
+                )
+            elif current_bot_message.web_page.audio:
+                await user.the_bots[current_bot_index].send_audio(
+                    chat_id=backup_channel_id,
+                    document=current_bot_message.web_page.audio.file_id,
+                )
+            elif current_bot_message.web_page.video:
+                await user.the_bots[current_bot_index].send_video(
+                    chat_id=backup_channel_id,
+                    document=current_bot_message.web_page.video.file_id,
+                )
+            elif current_bot_message.web_page.photo:
+                await user.the_bots[current_bot_index].send_photo(
+                    chat_id=backup_channel_id,
+                    document=current_bot_message.web_page.photo.file_id,
+                )
+            elif current_bot_message.web_page.animation:
+                await user.the_bots[current_bot_index].send_animation(
+                    chat_id=backup_channel_id,
+                    document=current_bot_message.web_page.animation.file_id,
+                )
+            done += 1
+        except Exception as e:
+            print(e)
+            failed += 1
+    
+    text = user.html_bold(f'Tried to backup {done+failed} messages from ')
+    text += user.html_normal(f'{the_chat.title} [') + user.html_mono(f'{target_chat}', '].\n')
+    text += user.html_mono(done, ' messages were backed up successfully.\n')
+    text += user.html_mono(failed, ' messages were not backed up.')
+    await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
+
 
 @user.on_message(
     ~(
