@@ -147,7 +147,7 @@ async def cBackup_handler(_, message: Message):
     failed: int = 0
     
     for index in range(from_id, to_id + 1):
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
         current_bot_index = index % len(user.the_bots)
         public_username = all_usernames[index % len(all_usernames)]
         tg_link_first = f'https://t.me/{public_username}/'
@@ -158,8 +158,8 @@ async def cBackup_handler(_, message: Message):
                 message_ids=index,
             )
 
-            current_user_message = await user.the_bots[current_bot_index].send_message(
-                chat_id=public_username,
+            current_user_message = await user.send_message(
+                chat_id=current_user_message.from_user.id,
                 text=tg_link_first+str(current_user_message.message_id),
                 disable_web_page_preview=False,
             )
@@ -178,13 +178,13 @@ async def cBackup_handler(_, message: Message):
                 print('empty')
                 continue
                 #log.warning(f"Empty messages cannot be copied. ")
-            elif not current_user_message.web_page:
+            else:
                 counter: int = 0
                 while True:
                     await asyncio.sleep(2+counter)
                     counter += 1
                     current_user_message = await user.the_bots[current_bot_index].get_messages(
-                        chat_id=public_username,
+                        chat_id=current_user_message.chat.id,
                         message_ids=current_user_message.message_id,
                     )
                     if current_user_message.web_page or counter > 6:
