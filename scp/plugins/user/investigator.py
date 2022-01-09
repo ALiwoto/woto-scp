@@ -135,6 +135,9 @@ async def cBackup_handler(_, message: Message):
     except Exception as e:
         return await message.reply_text(user.html_mono(e))
     
+    if to_id < 10:
+        to_id = 77144
+    
 
     current_bot_index: int = 0
     current_user_message: Message = None
