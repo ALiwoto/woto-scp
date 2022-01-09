@@ -104,10 +104,21 @@ async def pirate_handler(_, message: Message):
     ),
 )
 async def cBackup_handler(_, message: Message):
-    #pub username: public_woto_re78_mo96
+    if not user.the_bots or len(user.the_bots) < 1:
+        await message.reply_text('bot lists is empty.')
+        return
+    
+    if not user.are_bots_started:
+        top_message = await message.reply_text(user.html_mono('starting bots...'))
+        await user.start_all_bots()
+        await top_message.edit_text(user.html_mono('bots started.'))
+    
     #target username: rickychannel_movies
-    public_username = 'public_woto_re78_mo96'
+    all_usernames = [
+        'tt_mm_ii_gg_mm_ll', 'tt_mm_meow_ff_moheyou', 'tt_mm_ss_ff_lolol'
+    ]
     target_chat = 'rickychannel_movies'
+    public_username: str = all_usernames[0]
     tg_link_first = f'https://t.me/{public_username}/'
     the_chat: Chat = None
     backup_channel_id = -1001675937900
@@ -131,18 +142,23 @@ async def cBackup_handler(_, message: Message):
         to_id = 77144
     
     current_user_message: Message = None
+    current_bot_index: int = 0
     done: int = 0
     failed: int = 0
     
     for index in range(from_id, to_id + 1):
+        await asyncio.sleep(1)
+        current_bot_index = index % len(user.the_bots)
+        public_username = all_usernames[index % len(all_usernames)]
+        tg_link_first = f'https://t.me/{public_username}/'
         try:
-            current_user_message = await user.forward_messages(
+            current_user_message = await user.the_bots[current_bot_index].forward_messages(
                 chat_id=public_username,
                 from_chat_id=target_chat,
                 message_ids=index,
             )
 
-            current_user_message = await user.send_message(
+            current_user_message = await user.the_bots[current_bot_index].send_message(
                 chat_id=public_username,
                 text=tg_link_first+str(current_user_message.message_id),
                 disable_web_page_preview=False,
@@ -165,49 +181,50 @@ async def cBackup_handler(_, message: Message):
             elif not current_user_message.web_page:
                 counter: int = 0
                 while True:
+                    await asyncio.sleep(2+counter)
                     counter += 1
-                    current_user_message = await user.get_messages(
+                    current_user_message = await user.the_bots[current_bot_index].get_messages(
                         chat_id=public_username,
                         message_ids=current_user_message.message_id,
                     )
-                    if current_user_message.web_page or counter > 5:
+                    if current_user_message.web_page or counter > 6:
                         break
                 if not current_user_message.web_page:
                     print('no preview: ', current_user_message.text)
                     continue
 
             if current_user_message.web_page.document:
-                await user.send_document(
+                await user.the_bots[current_bot_index].send_document(
                     chat_id=backup_channel_id,
                     document=current_user_message.web_page.document.file_id,
                 )
             elif current_user_message.web_page.audio:
-                await user.send_audio(
+                await user.the_bots[current_bot_index].send_audio(
                     chat_id=backup_channel_id,
                     audio=current_user_message.web_page.audio.file_id,
                 )
             elif current_user_message.web_page.video:
-                await user.send_video(
+                await user.the_bots[current_bot_index].send_video(
                     chat_id=backup_channel_id,
                     video=current_user_message.web_page.video.file_id,
                 )
             elif current_user_message.web_page.photo:
-                await user.send_photo(
+                await user.the_bots[current_bot_index].send_photo(
                     chat_id=backup_channel_id,
                     photo=current_user_message.web_page.photo.file_id,
                 )
             elif current_user_message.web_page.animation:
-                await user.send_animation(
+                await user.the_bots[current_bot_index].send_animation(
                     chat_id=backup_channel_id,
                     animation=current_user_message.web_page.animation.file_id,
                 )
             elif current_user_message.web_page.description:
-                await user.send_message(
+                await user.the_bots[current_bot_index].send_message(
                     chat_id=backup_channel_id,
                     text=current_user_message.web_page.description,
                 )
             else:
-                print("none of them...")
+                continue
             done += 1
         except Exception as e:
             failed += 1
