@@ -160,7 +160,7 @@ async def cBackup_handler(_, message: Message):
             )
 
             current_bot_message = await user.the_bots[current_bot_index].get_messages(
-                from_id=public_username,
+                chat_id=public_username,
                 message_ids=current_user_message.message_id,
             )
             if current_bot_message.service:
