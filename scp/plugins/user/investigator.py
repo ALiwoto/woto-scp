@@ -194,31 +194,42 @@ async def cBackup_handler(_, message: Message):
                     continue
 
             if current_user_message.web_page.document:
+                print('is document')
                 await user.the_bots[current_bot_index].send_document(
                     chat_id=backup_channel_id,
                     document=current_user_message.web_page.document.file_id,
                 )
             elif current_user_message.web_page.audio:
+                print('is audio')
+
                 await user.the_bots[current_bot_index].send_audio(
                     chat_id=backup_channel_id,
                     audio=current_user_message.web_page.audio.file_id,
                 )
             elif current_user_message.web_page.video:
+                print('is video')
+                
                 await user.the_bots[current_bot_index].send_video(
                     chat_id=backup_channel_id,
                     video=current_user_message.web_page.video.file_id,
                 )
             elif current_user_message.web_page.photo:
+                print('is photo')
+
                 await user.the_bots[current_bot_index].send_photo(
                     chat_id=backup_channel_id,
                     photo=current_user_message.web_page.photo.file_id,
                 )
             elif current_user_message.web_page.animation:
+                print('is animation')
+
                 await user.the_bots[current_bot_index].send_animation(
                     chat_id=backup_channel_id,
                     animation=current_user_message.web_page.animation.file_id,
                 )
             elif current_user_message.web_page.description:
+                print('is description')
+
                 await user.the_bots[current_bot_index].send_message(
                     chat_id=backup_channel_id,
                     text=current_user_message.web_page.description,
