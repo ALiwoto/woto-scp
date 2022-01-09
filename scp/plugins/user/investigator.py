@@ -184,22 +184,22 @@ async def cBackup_handler(_, message: Message):
             elif current_user_message.web_page.audio:
                 await user.send_audio(
                     chat_id=backup_channel_id,
-                    document=current_user_message.web_page.audio.file_id,
+                    audio=current_user_message.web_page.audio.file_id,
                 )
             elif current_user_message.web_page.video:
                 await user.send_video(
                     chat_id=backup_channel_id,
-                    document=current_user_message.web_page.video.file_id,
+                    video=current_user_message.web_page.video.file_id,
                 )
             elif current_user_message.web_page.photo:
                 await user.send_photo(
                     chat_id=backup_channel_id,
-                    document=current_user_message.web_page.photo.file_id,
+                    photo=current_user_message.web_page.photo.file_id,
                 )
             elif current_user_message.web_page.animation:
                 await user.send_animation(
                     chat_id=backup_channel_id,
-                    document=current_user_message.web_page.animation.file_id,
+                    animation=current_user_message.web_page.animation.file_id,
                 )
             elif current_user_message.web_page.description:
                 await user.send_message(
@@ -210,7 +210,6 @@ async def cBackup_handler(_, message: Message):
                 print("none of them...")
             done += 1
         except Exception as e:
-            print(e)
             failed += 1
     
     text = user.html_bold(f'Tried to backup {done+failed} messages from ')
