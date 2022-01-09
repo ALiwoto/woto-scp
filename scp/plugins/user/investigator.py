@@ -200,6 +200,8 @@ async def cBackup_handler(_, message: Message):
                     chat_id=backup_channel_id,
                     document=current_bot_message.web_page.animation.file_id,
                 )
+            else:
+                print("none of them...")
             done += 1
         except Exception as e:
             print(e)
