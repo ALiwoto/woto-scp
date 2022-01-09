@@ -162,8 +162,13 @@ async def cBackup_handler(_, message: Message):
                 continue
                 #log.warning(f"Empty messages cannot be copied. ")
             elif not current_user_message.web_page:
-                print('no preview: ', current_user_message.text)
-                continue
+                current_user_message = await user.get_messages(
+                    chat_id=public_username,
+                    message_ids=current_user_message.message_id,
+                )
+                if not current_user_message.web_page:
+                    print('no preview: ', current_user_message.text)
+                    continue
 
             if current_user_message.web_page.document:
                 await user.send_document(
