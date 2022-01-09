@@ -103,15 +103,6 @@ async def pirate_handler(_, message: Message):
     ),
 )
 async def cBackup_handler(_, message: Message):
-    if not user.the_bots or len(user.the_bots) < 1:
-        await message.reply_text('bot lists is empty.')
-        return
-    
-    if not user.are_bots_started:
-        top_message = await message.reply_text(user.html_mono('starting bots...'))
-        await user.start_all_bots()
-        await top_message.edit_text(user.html_mono('bots started.'))
-
     #pub username: public_woto_re78_mo96
     #target username: rickychannel_movies
     public_username = 'public_woto_re78_mo96'
@@ -138,14 +129,11 @@ async def cBackup_handler(_, message: Message):
     if to_id < 10:
         to_id = 77144
     
-
-    current_bot_index: int = 0
     current_user_message: Message = None
     done: int = 0
     failed: int = 0
     
     for index in range(from_id, to_id + 1):
-        current_bot_index = index % len(user.the_bots)
         try:
             current_user_message = await user.forward_messages(
                 chat_id=public_username,
