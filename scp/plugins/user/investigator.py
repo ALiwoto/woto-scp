@@ -141,7 +141,6 @@ async def cBackup_handler(_, message: Message):
 
     current_bot_index: int = 0
     current_user_message: Message = None
-    current_bot_message: Message = None
     done: int = 0
     failed: int = 0
     
@@ -156,49 +155,48 @@ async def cBackup_handler(_, message: Message):
 
             current_user_message = await user.send_message(
                 chat_id=public_username,
-                text=tg_link_first+str(current_user_message.message_id)
+                text=tg_link_first+str(current_user_message.message_id),
+                disable_web_page_preview=False,
             )
 
-            current_bot_message = await user.the_bots[current_bot_index].get_messages(
-                chat_id=public_username,
-                message_ids=current_user_message.message_id,
-            )
-            if current_bot_message.service:
+            if current_user_message.service:
                 continue
                 #log.warning(f"Service messages cannot be copied. "
                 #            f"chat_id: {self.chat.id}, message_id: {self.message_id}")
-            elif current_bot_message.game:
+            elif current_user_message.game:
                 continue
                 #log.warning(f"Users cannot send messages with Game media type. "
                 #            f"chat_id: {self.chat.id}, message_id: {self.message_id}")
-            elif current_bot_message.empty:
+            elif current_user_message.empty:
                 continue
                 #log.warning(f"Empty messages cannot be copied. ")
+            elif not current_user_message.web_page:
+                continue
 
-            if current_bot_message.web_page.document:
+            if current_user_message.web_page.document:
                 await user.the_bots[current_bot_index].send_document(
                     chat_id=backup_channel_id,
-                    document=current_bot_message.web_page.document.file_id,
+                    document=current_user_message.web_page.document.file_id,
                 )
-            elif current_bot_message.web_page.audio:
+            elif current_user_message.web_page.audio:
                 await user.the_bots[current_bot_index].send_audio(
                     chat_id=backup_channel_id,
-                    document=current_bot_message.web_page.audio.file_id,
+                    document=current_user_message.web_page.audio.file_id,
                 )
-            elif current_bot_message.web_page.video:
+            elif current_user_message.web_page.video:
                 await user.the_bots[current_bot_index].send_video(
                     chat_id=backup_channel_id,
-                    document=current_bot_message.web_page.video.file_id,
+                    document=current_user_message.web_page.video.file_id,
                 )
-            elif current_bot_message.web_page.photo:
+            elif current_user_message.web_page.photo:
                 await user.the_bots[current_bot_index].send_photo(
                     chat_id=backup_channel_id,
-                    document=current_bot_message.web_page.photo.file_id,
+                    document=current_user_message.web_page.photo.file_id,
                 )
-            elif current_bot_message.web_page.animation:
+            elif current_user_message.web_page.animation:
                 await user.the_bots[current_bot_index].send_animation(
                     chat_id=backup_channel_id,
-                    document=current_bot_message.web_page.animation.file_id,
+                    document=current_user_message.web_page.animation.file_id,
                 )
             else:
                 print("none of them...")
