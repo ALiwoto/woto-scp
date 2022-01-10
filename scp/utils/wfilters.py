@@ -24,19 +24,27 @@ stalk_text = filters.create(stalk_filter)
 
 
 async def channel_in_group_filter(_, __, m: types.Message) -> bool:
-    if m.service or not m.chat or not m.chat.title:
+    if not m.sender_chat or m.service or not m.chat or not m.chat.title:
         return False
-    elif m.game:
+    elif m.game or not m.views:
         return False
     elif m.empty:
         return False
-    my_lower = m.chat.title.lower()
+    my_lower = m.sender_chat.username.lower()
     if m.chat.username:
         if m.chat.username.lower().find('night') >= 0:
             return False
     if (
+        not m.sender_chat.username or
+        my_lower.find('fate') >= 0
+    ):
+        return False
+    my_lower = m.chat.title.lower()
+    if (
         my_lower.find('chat') >= 0 or
         my_lower.find('talk') >= 0 or
+        my_lower.find('saber') >= 0 or
+        my_lower.find('fate') >= 0 or
         my_lower.find('@') >= 0 or
         my_lower.find('discussion') >= 0 or
         my_lower.find('tele') >= 0 or
@@ -47,7 +55,6 @@ async def channel_in_group_filter(_, __, m: types.Message) -> bool:
     return (
         m and
         m.chat.type in ['group', 'supergroup'] and
-        m.sender_chat and
         m.sender_chat.type == 'channel'
     )
 
