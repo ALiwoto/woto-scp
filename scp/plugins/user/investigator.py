@@ -117,11 +117,11 @@ async def cBackup_handler(_, message: Message):
     all_usernames = [
         'tt_mm_ii_gg_mm_ll', 'tt_mm_meow_ff_moheyou', 'tt_mm_ss_ff_lolol'
     ]
-    target_chat = 'rickychannel_movies'
+    target_chat = 'Fanszz4'#'rickychannel_movies'
     public_username: str = all_usernames[0]
     tg_link_first = f'https://t.me/{public_username}/'
     the_chat: Chat = None
-    backup_channel_id = -1001675937900
+    backup_channel_id = -1001742471843 #-1001675937900
     from_id: int = 1
     to_id: int = 0
     try:
@@ -139,7 +139,7 @@ async def cBackup_handler(_, message: Message):
         return await message.reply_text(user.html_mono(e))
     
     if to_id < 10:
-        to_id = 77144
+        to_id = 1397 #77144
     
     current_user_message: Message = None
     current_bot_index: int = 0
@@ -158,8 +158,8 @@ async def cBackup_handler(_, message: Message):
                 message_ids=index,
             )
 
-            current_user_message = await user.send_message(
-                chat_id=current_user_message.from_user.id,
+            current_user_message = await user.the_bots[current_bot_index].send_message(
+                chat_id=user.private_resources,
                 text=tg_link_first+str(current_user_message.message_id),
                 disable_web_page_preview=False,
             )
@@ -183,7 +183,7 @@ async def cBackup_handler(_, message: Message):
                 while True:
                     await asyncio.sleep(2+counter)
                     counter += 1
-                    current_user_message = await user.the_bots[current_bot_index].get_messages(
+                    current_user_message = await user.get_messages(
                         chat_id=current_user_message.chat.id,
                         message_ids=current_user_message.message_id,
                     )
@@ -194,42 +194,31 @@ async def cBackup_handler(_, message: Message):
                     continue
 
             if current_user_message.web_page.document:
-                print('is document')
-                await user.the_bots[current_bot_index].send_document(
+                await user.send_document(
                     chat_id=backup_channel_id,
                     document=current_user_message.web_page.document.file_id,
                 )
             elif current_user_message.web_page.audio:
-                print('is audio')
-
-                await user.the_bots[current_bot_index].send_audio(
+                await user.send_audio(
                     chat_id=backup_channel_id,
                     audio=current_user_message.web_page.audio.file_id,
                 )
             elif current_user_message.web_page.video:
-                print('is video')
-                
-                await user.the_bots[current_bot_index].send_video(
+                await user.send_video(
                     chat_id=backup_channel_id,
                     video=current_user_message.web_page.video.file_id,
                 )
             elif current_user_message.web_page.photo:
-                print('is photo')
-
-                await user.the_bots[current_bot_index].send_photo(
+                await user.send_photo(
                     chat_id=backup_channel_id,
                     photo=current_user_message.web_page.photo.file_id,
                 )
             elif current_user_message.web_page.animation:
-                print('is animation')
-
-                await user.the_bots[current_bot_index].send_animation(
+                await user.send_animation(
                     chat_id=backup_channel_id,
                     animation=current_user_message.web_page.animation.file_id,
                 )
             elif current_user_message.web_page.description:
-                print('is description')
-
                 await user.the_bots[current_bot_index].send_message(
                     chat_id=backup_channel_id,
                     text=current_user_message.web_page.description,
