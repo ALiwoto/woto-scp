@@ -241,7 +241,7 @@ class ScpClient(WotoClientBase):
         logging.warning(f'{e}')
     
     for x in _config.get('scp-5170', 'public_dumps').split():
-        dump_usernames.append(int(x))
+        dump_usernames.append(x)
     
 
     the_bots: typing.List[WotoClientBase] = _get_scp_bots(_config)
