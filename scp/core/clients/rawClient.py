@@ -23,8 +23,6 @@ from .wotobase import WotoClientBase
 import asyncio
 import logging
 
-session.Session.notice_displayed = True
-
 __scp__helper__bots__: typing.List[WotoClientBase] = None
 
 
@@ -217,6 +215,7 @@ class ScpClient(WotoClientBase):
     _owners = []
     _enforcers = []
     _inspectors = []
+    dump_usernames = []
     for x in _config.get('scp-5170', 'SudoList').split():
         _sudo.append(int(x))
     
@@ -240,6 +239,9 @@ class ScpClient(WotoClientBase):
             _inspectors.append(int(x))
     except Exception as e:
         logging.warning(f'{e}')
+    
+    for x in _config.get('scp-5170', 'public_dumps').split():
+        dump_usernames.append(int(x))
     
 
     the_bots: typing.List[WotoClientBase] = _get_scp_bots(_config)
