@@ -4,6 +4,9 @@ from pyrogram.types import (
     Message,
     Chat,
 )
+from pyrogram.errors import(
+    MessageIdInvalid,
+)
 
 
 @user.on_message(
@@ -192,6 +195,9 @@ async def cBackup_handler(_, message: Message):
                 if not current_user_message.web_page:
                     print('no preview: ', current_user_message.text)
                     continue
+            
+            if not current_user_message.web_page.description:
+                current_user_message.web_page.description = ''
 
             if current_user_message.web_page.document:
                 await user.send_document(
@@ -233,6 +239,10 @@ async def cBackup_handler(_, message: Message):
                 print(current_user_message.web_page)
                 continue
             done += 1
+        except (
+            MessageIdInvalid
+        ): 
+            continue
         except Exception as e:
             print(e)
             failed += 1
