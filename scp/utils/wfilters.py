@@ -26,7 +26,7 @@ stalk_text = filters.create(stalk_filter)
 async def channel_in_group_filter(_, __, m: types.Message) -> bool:
     if not m.sender_chat or m.service or not m.chat or not m.chat.title:
         return False
-    elif m.game or not m.views or  not m.sender_chat.username:
+    elif m.game or not m.views or not m.sender_chat.username:
         return False
     elif m.empty:
         return False
