@@ -153,7 +153,7 @@ async def cBackup_handler(_, message: Message):
 
     my_username = the_chat.username
     if not my_username:
-        my_username = the_chat.id
+        my_username = str(the_chat.id)
     
     link_pre = f'https://t.me/c/{str(the_chat.id)[4:]}/'
     channel_text = f'Pirating messages from {from_id} to {to_id} in {the_chat.title}\n'
