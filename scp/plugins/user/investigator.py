@@ -150,6 +150,10 @@ async def cBackup_handler(_, message: Message):
         to_id = int(my_splits[1])
     except Exception as e:
         return await message.reply_text(user.html_mono(e))
+
+    my_username = the_chat.username
+    if not my_username:
+        my_username = the_chat.id
     
     link_pre = f'https://t.me/c/{str(the_chat.id)[4:]}/'
     channel_text = f'Pirating messages from {from_id} to {to_id} in {the_chat.title}\n'
