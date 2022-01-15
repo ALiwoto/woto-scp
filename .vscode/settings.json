@@ -41,6 +41,7 @@
         "popen",
         "psutil",
         "pydantic",
+        "pyro",
         "pyrogram",
         "qrcode",
         "Referer",

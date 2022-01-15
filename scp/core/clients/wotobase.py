@@ -5,6 +5,7 @@ from typing import (
 )
 import asyncio
 from pyrogram import(
+    utils as pUtils,
     Client, 
     filters, 
     types, 
@@ -16,6 +17,7 @@ from typing import Union
 import typing
 from attrify import Attrify as Atr
 from pyrogram import(
+    client as pyroClient,
     Client, 
     types, 
     raw, 
@@ -150,6 +152,55 @@ class WotoClientBase(Client):
             await self.stop()
             await self.start()
     
+    async def handle_updates(self, updates):
+        if isinstance(updates, (raw.types.Updates, raw.types.UpdatesCombined)):
+            is_min = (await self.fetch_peers(updates.users)) or (await self.fetch_peers(updates.chats))
+
+            users = {u.id: u for u in updates.users}
+            chats = {c.id: c for c in updates.chats}
+
+            for update in updates.updates:
+                channel_id = getattr(
+                    getattr(
+                        getattr(
+                            update, "message", None
+                        ), "peer_id", None
+                    ), "channel_id", None
+                ) or getattr(update, "channel_id", None)
+
+                pts = getattr(update, "pts", None)
+                pts_count = getattr(update, "pts_count", None)
+
+                if isinstance(update, raw.types.UpdateChannelTooLong):
+                    pyroClient.log.warning(update)
+
+                if isinstance(update, raw.types.UpdateNewChannelMessage) and is_min:
+                    message = update.message
+
+                    if not isinstance(message, raw.types.MessageEmpty):
+                        try:
+                            diff = await self.send(
+                                raw.functions.updates.GetChannelDifference(
+                                    channel=await self.resolve_peer(pUtils.get_channel_id(channel_id)),
+                                    filter=raw.types.ChannelMessagesFilter(
+                                        ranges=[raw.types.MessageRange(
+                                            min_id=update.message.id,
+                                            max_id=update.message.id
+                                        )]
+                                    ),
+                                    pts=pts - pts_count,
+                                    limit=pts
+                                )
+                            )
+                        except errors.ChannelPrivate:
+                            pass
+                        else:
+                            if not isinstance(diff, raw.types.updates.ChannelDifferenceEmpty):
+                                if hasattr(diff, 'users'):
+                                    users.update({u.id: u for u in diff.users})
+                                if hasattr(diff, 'chats'):
+                                    chats.update({c.id: c for c in diff.chats})
+
     
     async def copy_message(
         self,
