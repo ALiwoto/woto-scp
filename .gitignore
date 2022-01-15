@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+# weeb stuff
+*.mkv
+*.mp4
+*.movie
+
 # Distribution / packaging
 .Python
 build/
