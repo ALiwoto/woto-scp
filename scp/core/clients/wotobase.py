@@ -144,6 +144,11 @@ class WotoClientBase(Client):
                 timeout=timeout,
                 sleep_threshold=sleep_threshold,
             )
+        except (
+            TimeoutError, OSError,
+        ):
+            await self.stop()
+            await self.start()
     
     
     async def copy_message(
