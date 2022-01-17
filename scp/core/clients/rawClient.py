@@ -1,5 +1,4 @@
 import typing
-import os
 import json
 from typing import(
     NoReturn, 
@@ -10,8 +9,8 @@ from pyrogram import(
     types, 
     raw, 
     errors, 
-    session,
 )
+from wotoplatform import WotoClient
 from scp.core.filters.Command import command
 from scp.utils import wfilters
 from scp.utils.sibylUtils import SibylClient
@@ -20,20 +19,34 @@ from configparser import ConfigParser
 from kantex import md as Markdown
 from aiohttp import ClientSession, client_exceptions
 from .wotobase import WotoClientBase
+from ...wotoConfig import the_config
 import asyncio
 import logging
 
 __scp__helper__bots__: typing.List[WotoClientBase] = None
 
+__wp_client__: WotoClient = None
 
-def _get_scp_bots(config: ConfigParser) -> typing.List[WotoClientBase]:
+def __get_wp_client__() -> WotoClient:
+    global __wp_client__
+    if __wp_client__:
+        return __wp_client__
+    
+    __wp_client__ = WotoClient(
+        username=the_config.wp_username,
+        password=the_config.wp_password,
+        endpoint=the_config.wp_host,
+        port=the_config.wp_port,
+    )
+    return __wp_client__
+
+
+def _get_scp_bots() -> typing.List[WotoClientBase]:
     global __scp__helper__bots__
     if __scp__helper__bots__ is not None:
         return __scp__helper__bots__
     # open the file "bots.json"
     try:
-        api_id = config.get('pyrogram', 'api_id')
-        api_hash = config.get('pyrogram', 'api_hash')
         my_str = open('bots.json').read()
         # load into json
         my_json = json.loads(my_str)
@@ -50,8 +63,8 @@ def _get_scp_bots(config: ConfigParser) -> typing.List[WotoClientBase]:
                 current_client = WotoClientBase(
                     session_name=':memory:',
                     bot_token=current,
-                    api_id=api_id,
-                    api_hash=api_hash,
+                    api_id=the_config.api_id,
+                    api_hash=the_config.api_hash,
                 )
                 my_bots.append(current_client)
             except Exception: continue
@@ -115,31 +128,21 @@ class ScpClient(WotoClientBase):
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
     
-    async def delete_user_history(self, chat_id: Union[int, str], user_id: Union[int, str]) -> bool:
-        """Delete all messages sent by a certain user in a supergroup.
-
-        Parameters:
-            chat_id (``int`` | ``str``):
-                Unique identifier (int) or username (str) of the target chat.
-
-            user_id (``int`` | ``str``):
-                Unique identifier (int) or username (str) of the user whose messages will be deleted.
-
-        Returns:
-            ``bool``: True on success, False otherwise.
-        """
-
-        r = await self.send(
-            raw.functions.channels.DeleteParticipantHistory(
-                channel=await self.resolve_peer(chat_id),
-                participant=await self.resolve_peer(user_id),
-            )
-        )
-
-        # Deleting messages you don't have right onto won't raise any error.
-        # Check for pts_count, which is 0 in case deletes fail.
-        return bool(r.pts_count)
-        #return await super().delete_user_history(chat_id, user_id)
+    async def ban_chat_member(
+        self, 
+        chat_id: Union[int, str], 
+        user_id: Union[int, str], 
+        until_date: int = 0,
+    ) -> Union["types.Message", bool]:
+        return await super().ban_chat_member(chat_id, user_id, until_date=until_date)
+    
+    async def kick_chat_member(
+        self, 
+        chat_id: Union[int, str], 
+        user_id: Union[int, str], 
+        until_date: int = 0,
+    ) -> Union["types.Message", bool]:
+        return await super().ban_chat_member(chat_id, user_id, until_date=until_date)
 
     # from Kantek
     async def resolve_url(self, url: str) -> str:
@@ -244,7 +247,7 @@ class ScpClient(WotoClientBase):
         dump_usernames.append(x)
     
 
-    the_bots: typing.List[WotoClientBase] = _get_scp_bots(_config)
+    the_bots: typing.List[WotoClientBase] = _get_scp_bots()
     are_bots_started: bool = False
 
     sudo = (filters.me | filters.user(_sudo))
@@ -252,6 +255,7 @@ class ScpClient(WotoClientBase):
     enforcer = (filters.me | filters.user(_enforcers))
     inspector = (filters.me | filters.user(_inspectors))
     cmd_prefixes = _config.get('scp-5170', 'prefixes').split() or ['!', '.']
+    wp: WotoClient = __get_wp_client__()
     
     log_channel = _config.getint('scp-5170', 'LogChannel')
     private_resources = _config.getint('scp-5170', 'private_resources')
