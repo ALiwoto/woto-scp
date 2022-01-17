@@ -18,3 +18,4 @@ ujson==4.3.0
 yarl==1.6.3
 httpx==0.21.0
 git+https://github.com/MinistryOfWelfare/SibylSystem-Py
+git+https://github.com/AnimeKaizoku/wotoplatform-py
