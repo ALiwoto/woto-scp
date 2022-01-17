@@ -85,6 +85,8 @@ class ScpClient(WotoClientBase):
         super().__init__(
             name,
             workers=8,
+            device_model='kaizoku',
+            app_version='woto-scp'
         )
         self.aioclient:ClientSession = ClientSession()
         self.is_scp_bot = is_scp_bot
