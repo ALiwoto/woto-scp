@@ -40,7 +40,7 @@ class WotoConfig:
         self.prefixes = (
             self._the_config.get('scp-5170', 'Prefixes').split() or ['!', '.']
         )
-        self.log_channel = self._the_config.getint('scp-5170', 'log_channel')
+        self.log_channel = self._the_config.getint('scp-5170', 'LogChannel')
 
         try:
             for x in self._the_config.get('sibyl-system', 'enforcers').split():
