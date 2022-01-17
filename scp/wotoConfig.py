@@ -31,16 +31,16 @@ class WotoConfig:
         self.api_id = self._the_config.get('pyrogram', 'api_id')
         self.api_hash = self._the_config.get('pyrogram', 'api_hash')
 
-        for x in self._the_config.get('main', 'owner_list').split():
+        for x in self._the_config.get('scp-5170', 'OwnerList').split():
             self._owner_users.append(int(x))
         
-        for x in self._the_config.get('main', 'sudo_list').split():
+        for x in self._the_config.get('scp-5170', 'SudoList').split():
             self._sudo_users.append(int(x))
         
         self.prefixes = (
-            self._the_config.get('main', 'prefixes').split() or ['!', '.']
+            self._the_config.get('scp-5170', 'Prefixes').split() or ['!', '.']
         )
-        self.log_channel = self._the_config.getint('main', 'log_channel')
+        self.log_channel = self._the_config.getint('scp-5170', 'log_channel')
 
         try:
             for x in self._the_config.get('sibyl-system', 'enforcers').split():
