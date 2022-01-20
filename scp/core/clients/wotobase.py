@@ -152,7 +152,7 @@ class WotoClientBase(Client):
             await self.stop()
             await self.start()
     
-    async def handle_updates(self, updates):
+    async def handle_updates_woto(self, updates):
         if isinstance(updates, (raw.types.Updates, raw.types.UpdatesCombined)):
             is_min = (await self.fetch_peers(updates.users)) or (await self.fetch_peers(updates.chats))
 
