@@ -197,7 +197,7 @@ async def cat(_, message: Message):
                 if done:
                     await message.reply_text(html_mono(chunk), quote=False)
                 else:
-                    await getattr(reply, 'edit_text', message.reply_text)(chunk)
+                    await getattr(reply, 'edit_text', message.reply_text)(html_mono(chunk))
                     done = True
     finally:
         if rfile:
