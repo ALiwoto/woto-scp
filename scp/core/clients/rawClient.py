@@ -212,6 +212,18 @@ class ScpClient(WotoClientBase):
                 )
                 await asyncio.sleep(3)
             except Exception: pass
+    
+    async def get_my_dialogs(self) -> typing.List[types.Dialog]:
+        if not self.__my_all_dialogs__ or len(self.__my_all_dialogs__) < 2:
+            return self.refresh_dialogs()
+        return self.__my_all_dialogs__
+    
+    async def refresh_dialogs(self) -> typing.List[types.Dialog]:
+        self.__my_all_dialogs__ = []
+        async for current in self.iter_dialogs():
+            self.__my_all_dialogs__.append(current)
+        
+        return self.__my_all_dialogs__
 
     async def netcat(
         self,
@@ -273,7 +285,7 @@ class ScpClient(WotoClientBase):
     for x in _config.get('scp-5170', 'public_dumps').split():
         dump_usernames.append(x)
     
-
+    __my_all_dialogs__: typing.List[types.Dialog] = None
     the_bots: typing.List[WotoClientBase] = _get_scp_bots()
     are_bots_started: bool = False
 
