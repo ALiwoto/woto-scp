@@ -317,8 +317,9 @@ async def html_in_common(user: types.User, get_common: bool = False) -> str:
     return html_in_parantesis(await in_common_length(user))
 
 def get_name(user: types.User, name_limit: int = -1) -> str:
-    if not user:
-        return ""
+    if not isinstance(user, types.User): return "Not user"
+    
+    if user.is_deleted: return "Deleted account"
     
     if user.first_name and len(user.first_name) > 0:
         return user.first_name if name_limit == -1 else user.first_name[:name_limit]
