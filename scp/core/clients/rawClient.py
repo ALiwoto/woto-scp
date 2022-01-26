@@ -215,7 +215,7 @@ class ScpClient(WotoClientBase):
     
     async def get_my_dialogs(self) -> typing.List[types.Dialog]:
         if not self.__my_all_dialogs__ or len(self.__my_all_dialogs__) < 2:
-            return self.refresh_dialogs()
+            return await self.refresh_dialogs()
         return self.__my_all_dialogs__
     
     async def refresh_dialogs(self) -> typing.List[types.Dialog]:
