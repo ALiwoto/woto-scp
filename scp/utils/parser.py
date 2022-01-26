@@ -328,3 +328,5 @@ def get_name(user: types.User, name_limit: int = -1) -> str:
     
     if user.username and len(user.username) > 0:
         return user.username if name_limit == -1 else user.username[:name_limit]
+    
+    return "No name"

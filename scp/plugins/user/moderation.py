@@ -3,6 +3,7 @@ import typing
 from pyrogram.types import (
     Message,
     Chat,
+    User,
     ChatMember,
 )
 from pyrogram.methods.chats.get_chat_members import Filters
@@ -260,12 +261,10 @@ async def purge_handler(_, message: Message):
     # messages between first and current
     messages = [m for m in range(first, current + 1)]
 
-    try:
-        await user.delete_messages(
-            chat_id=message.chat.id,
-            message_ids=messages,
-        )
-    except Exception: pass
+    await user.delete_all_messages(
+        chat_id=message.chat.id,
+        message_ids=messages,
+    )
 
 
 @user.on_message(~user.filters.scheduled & 
@@ -288,9 +287,13 @@ async def purge_handler(_, message: Message):
     my_strs: list[str] = split_some(message.text, 1, ' ', '\n')
     flags = PurgeFlags(my_strs[1] if len(my_strs) > 1 else '')
     
-    the_messages = []
+    the_messages: typing.List[int] = []
 
-    async for current in user.iter_history(chat_id=message.chat.id, limit=limit, offset_id=current):
+    async for current in user.iter_history(
+        chat_id=message.chat.id, 
+        limit=limit, 
+        offset_id=current,
+    ):
         if not isinstance(current, Message):
             continue
         
@@ -299,9 +302,9 @@ async def purge_handler(_, message: Message):
 
     if not message.message_id in the_messages:
         the_messages.append(message.message_id)
-
+    
     try:
-        await user.delete_messages(
+        await user.delete_all_messages(
             chat_id=message.chat.id,
             message_ids=the_messages,
         )
@@ -378,8 +381,8 @@ async def members_handler(_, message: Message):
         await top_msg.edit_text(text=html_mono(ex))
         return
     
-    members: list[user.types.ChatMember] = []
-    bots: list[user.types.ChatMember] = []
+    members: typing.List[ChatMember] = []
+    bots: typing.List[ChatMember] = []
     for i in m:
         if i.status == 'member' and i.status != 'left' and i.status != 'kicked':
             if i.user.is_bot:
@@ -396,6 +399,8 @@ async def members_handler(_, message: Message):
         txt += html_bold("Members:", "\n")
         for member in members:
             u = member.user
+            if not isinstance(u, User):
+                continue
             txt += starter + mention_user_html(u, 16) + ": " + html_mono(u.id, "\n")
         txt += "\n"
     

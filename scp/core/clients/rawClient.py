@@ -190,6 +190,28 @@ class ScpClient(WotoClientBase):
             return await resp.json()
         except client_exceptions.ContentTypeError:
             return (await resp.read()).decode('utf-8')
+        
+    async def delete_all_messages(
+        self, 
+        chat_id: Union[int, str], 
+        message_ids: Union[int, typing.Iterable[int]], 
+        revoke: bool = True,
+    ) -> bool:
+        if len(message_ids) < 100:
+            return await self.delete_messages(
+                chat_id=chat_id,
+                message_ids=message_ids,
+                revoke=revoke
+            )
+        all_messages  = [message_ids[i:i + 100] for i in range(0, len(message_ids), 100)]
+        for current in all_messages:
+            try:
+                await self.delete_messages(
+                    chat_id=chat_id,
+                    message_ids=current,
+                )
+                await asyncio.sleep(3)
+            except Exception: pass
 
     async def netcat(
         self,
