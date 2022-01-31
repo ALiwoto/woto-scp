@@ -11,6 +11,9 @@ from pyrogram import(
     errors, 
 )
 from wotoplatform import WotoClient
+from wotoplatform.types.errors import (
+    ClientAlreadyInitializedException,
+)
 from scp.core.filters.Command import command
 from scp.utils import wfilters
 from scp.utils.sibylUtils import SibylClient
@@ -107,6 +110,11 @@ class ScpClient(WotoClientBase):
             self._sudo.append(me.id)
         if not me.id in self._owners:
             self._owners.append(me.id)
+        
+        try:
+            await self.wp.start()
+        except ClientAlreadyInitializedException: pass
+        except Exception as e: logging.warning(e)
         
         self.original_phone_number = me.phone_number
         logging.warning(
