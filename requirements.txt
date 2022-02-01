@@ -8,7 +8,7 @@ gpytranslate==1.4.0
 humanize==3.11.0
 kantex==0.2.0
 psutil==5.8.0
-Pyrogram==1.3.5
+Pyrogram==1.4.0
 pyromod==1.5
 pyzxing==1.0.1
 rich==10.15.2
