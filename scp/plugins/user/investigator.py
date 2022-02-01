@@ -11,6 +11,54 @@ from pyrogram.errors import(
     MediaCaptionTooLong,
 )
 
+@user.on_message(
+	~user.filters.forwarded &
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.sudo & 
+	user.filters.command(
+        ['ord'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def ord_handler(_, message: Message):
+    all_str = user.get_non_cmd(message)
+    if not all_str:
+        return
+    
+    txt = ''
+    for current in all_str:
+        txt += user.html_bold(f"'{current}: '") + user.html_mono(ord(current), "\n")
+    
+    await message.reply_text(txt)
+
+
+@user.on_message(
+	~user.filters.forwarded &
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.sudo & 
+	user.filters.command(
+        ['chr'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def chr_handler(_, message: Message):
+    all_str = user.get_non_cmd(message)
+    if not all_str:
+        return
+    my_int = 0
+    try:
+        my_int = int(all_str)
+    except Exception as e:
+        return await message.reply_text(user.html_mono(f'{e}'))
+
+    txt = user.html_bold(f"'{my_int}: '") + user.html_mono(chr(my_int), "\n")
+    
+    await message.reply_text(txt)
+
 
 @user.on_message(
 	~user.filters.forwarded &
