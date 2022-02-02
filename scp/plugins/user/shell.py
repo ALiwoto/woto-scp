@@ -144,7 +144,7 @@ async def shell_base(message: Message, command: str):
             reply.delete(),
             message.reply_document(
                 f,
-                caption=user.md.KanTeXDocument(sec),
+                caption=f'ExitCode: {returncode}',
                 quote=True,
             ),
         )
