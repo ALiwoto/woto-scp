@@ -73,7 +73,7 @@ async def chr_handler(_, message: Message):
 )
 async def send_fish_handler(_, message: Message):
     await user.send_message(message.chat.id, '/fish')
-    await user.read_all_mentions()
+    await user.read_all_mentions(message.chat.id)
 
 
 @user.on_message(
