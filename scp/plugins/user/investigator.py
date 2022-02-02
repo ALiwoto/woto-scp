@@ -28,8 +28,12 @@ async def ord_handler(_, message: Message):
         return
     
     txt = ''
+    current_ord = 0
     for current in all_str:
-        txt += user.html_bold(f"'{current}: '") + user.html_mono(ord(current), "\n")
+        current_ord = ord(current)
+        txt += user.html_bold(f"'{current}': ") + user.html_mono(current_ord, ' (')
+        txt += user.html_mono(hex(current_ord), ')')
+        
     
     await message.reply_text(txt)
 
@@ -58,6 +62,18 @@ async def chr_handler(_, message: Message):
     txt = user.html_bold(f"'{my_int}: '") + user.html_mono(chr(my_int), "\n")
     
     await message.reply_text(txt)
+
+@user.on_message(
+    ~(
+        user.owner | 
+        user.sudo | 
+        user.filters.private
+    ) & user.wfilters.fish_command,
+    group=123,
+)
+async def send_fish_handler(_, message: Message):
+    await user.send_message(message.chat.id, '/fish')
+    await user.read_all_mentions()
 
 
 @user.on_message(
