@@ -32,7 +32,7 @@ async def ord_handler(_, message: Message):
     for current in all_str:
         current_ord = ord(current)
         txt += user.html_bold(f"'{current}': ") + user.html_mono(current_ord, ' (')
-        txt += user.html_mono(hex(current_ord), ')')
+        txt += user.html_mono(hex(current_ord), ')\n')
         
     
     await message.reply_text(txt)
