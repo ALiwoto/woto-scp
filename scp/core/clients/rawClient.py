@@ -10,6 +10,7 @@ from pyrogram import(
     raw, 
     errors, 
 )
+from pyrogram.raw.functions.messages import ReadMentions
 from wotoplatform import WotoClient
 from wotoplatform.types.errors import (
     ClientAlreadyInitializedException,
@@ -225,6 +226,29 @@ class ScpClient(WotoClientBase):
         if not self.__my_all_dialogs__ or len(self.__my_all_dialogs__) < 2:
             return await self.refresh_dialogs()
         return self.__my_all_dialogs__
+    
+    async def get_dialog_by_id(self, chat_id: typing.Union[str, int]) -> types.Dialog:
+        my_all = await self.get_my_dialogs()
+        if not my_all:
+            return None
+        
+        for current in my_all:
+            if not current.chat:
+                continue
+            if current.chat.username == chat_id or current.chat.id == chat_id:
+                return current
+        return None
+
+    
+    async def read_all_mentions(self, chat_id: typing.Union[str, int]) -> None:
+        try:
+            await self.send(
+                ReadMentions(
+                    peer=await self.resolve_peer(chat_id),
+                ),
+            )
+        except Exception: pass
+        
     
     async def refresh_dialogs(self) -> typing.List[types.Dialog]:
         self.__my_all_dialogs__ = []
