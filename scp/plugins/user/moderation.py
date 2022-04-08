@@ -227,10 +227,10 @@ async def admins_handler(_, message: Message):
     await top_msg.edit_text(text=txt, parse_mode="html")
 
 
-@user.on_message(
-	~user.filters.edited &
-    user.wfilters.channel_in_group
-)
+#@user.on_message(
+#	~user.filters.edited &
+#    user.wfilters.channel_in_group
+#)
 async def by_channels_handler(_, message: Message):
     from_message: Message = None
     original_message: Message = None
@@ -242,6 +242,7 @@ async def by_channels_handler(_, message: Message):
     except Exception: pass
     if not original_message and from_message:
         await from_message.delete()
+
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
