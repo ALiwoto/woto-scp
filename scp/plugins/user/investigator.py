@@ -255,7 +255,7 @@ async def cBackup_handler(_, message: Message):
             )
 
             if current_user_message.service:
-                print('service')
+                #print('service')
                 continue
                 #log.warning(f"Service messages cannot be copied. "
                 #            f"chat_id: {self.chat.id}, message_id: {self.message_id}")
