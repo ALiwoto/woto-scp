@@ -233,20 +233,16 @@ async def toGif_handler(_, message: Message):
         progress=progress_callback, 
         progress_args=(reply, 'Downloading...', False),
     )
-    media = rfile.name
     output_to_gif = 'output-toGif.mp4'
     await shell_base(message, f'rm "{output_to_gif}" -f && ffmpeg -an -sn -i "{output_to_gif}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error')
     
-    file = os.path.expanduser(' '.join(output_to_gif))
-    if not file:
-        return
-    text = f'Uploading {html_mono(file)}...'
+    text = f'Uploading {html_mono(output_to_gif)}...'
     reply = await message.reply_text(text)
     
     try:
         await user.send_document(
             chat_id=message.chat.id, 
-            document=file, 
+            document=output_to_gif, 
             progress=progress_callback, 
             progress_args=(reply, text, True),
             reply_to_message_id=(
@@ -254,7 +250,7 @@ async def toGif_handler(_, message: Message):
                 else message.message_id
             ),
         )
-        os.remove(file)
+        os.remove(output_to_gif)
     except user.exceptions.MediaInvalid:
         await message.reply_text('Upload cancelled!')
     except Exception as e:
