@@ -323,6 +323,7 @@ class ScpClient(WotoClientBase):
         dump_usernames.append(x)
     
     __my_all_dialogs__: typing.List[types.Dialog] = None
+    cached_messages: typing.List[types.Message] = None
     the_bots: typing.List[WotoClientBase] = _get_scp_bots()
     are_bots_started: bool = False
 
