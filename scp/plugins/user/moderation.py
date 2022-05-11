@@ -1302,10 +1302,16 @@ async def cachedScan_handler(_, message: Message):
     
     the_reason = user.get_non_cmd(message)
     all_infos = typing.List[MultiBanInfo]
+    all_targets = typing.List[int]
+    
     for current in user.cached_messages:
         if not isinstance(current, Message):
             continue
         
+        if not current.from_user or current.from_user.id in all_targets:
+            continue
+        
+        all_targets.append(current.from_user.id)
         all_infos.append(MultiBanInfo(
             user_id=current.from_user.id,
             reason=the_reason,
