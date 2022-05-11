@@ -1182,7 +1182,6 @@ async def unban_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	~user.filters.edited & 
-    user.filters.reply &
 	user.sudo & 
 	user.filters.command(
         ['getLinks'],
@@ -1242,8 +1241,7 @@ async def getlinks_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	~user.filters.edited & 
-    user.filters.reply &
-	user.owner & 
+	user.sudo & 
 	user.filters.command(
         ['tCacheMessages'],
         prefixes=user.cmd_prefixes,
@@ -1289,7 +1287,6 @@ async def tCacheMessages_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	~user.filters.edited & 
-    user.filters.reply &
 	user.sudo & 
 	user.filters.command(
         ['cachedScan'],
