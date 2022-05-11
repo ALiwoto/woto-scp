@@ -228,7 +228,7 @@ async def toGif_handler(_, message: Message):
     rfile = tempfile.NamedTemporaryFile()
     reply = await message.reply_text('Downloading...')
     await user.download_media(
-        media, 
+        message.reply_to_message, 
         file_name=rfile.name,
         progress=progress_callback, 
         progress_args=(reply, 'Downloading...', False),
