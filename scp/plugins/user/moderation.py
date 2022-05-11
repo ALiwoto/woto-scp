@@ -1301,8 +1301,8 @@ async def cachedScan_handler(_, message: Message):
         return await message.reply_text(txt)
     
     the_reason = user.get_non_cmd(message)
-    all_infos = typing.List[MultiBanInfo]
-    all_targets = typing.List[int]
+    all_infos = typing.List[MultiBanInfo] = []
+    all_targets = typing.List[int] = []
     
     for current in user.cached_messages:
         if not isinstance(current, Message):
