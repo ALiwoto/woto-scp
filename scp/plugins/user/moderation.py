@@ -8,6 +8,7 @@ from pyrogram.types import (
     ChatMember,
 )
 from pyrogram.methods.chats.get_chat_members import Filters
+from SibylSystem.types import MultiBanInfo
 from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
 from scp import user
 from scp.utils.misc import can_member_match, remove_special_chars
@@ -1235,6 +1236,99 @@ async def getlinks_handler(_, message: Message):
     else:
         await reply.edit_text(final_txt)
 
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+    user.filters.reply &
+	user.sudo & 
+	user.filters.command(
+        ['tCacheMessages'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def tCacheMessages_handler(_, message: Message):
+    # .tGetMessages GROUP_ID MSG_ID1-MSG_ID2 <flags>
+    if message.text.find('') == -1:
+        txt = user.html_bold('Usage:', '\n')
+        txt += user.html_mono('\t.tGetMessages GROUP_ID MSG_ID1-MSG_ID2 <flags>\n')
+        txt += user.html_normal('(where MSG_ID2 > MSG_ID1)')
+        return await message.reply_text(txt)
     
+    reply = await message.reply_text(user.html_mono('fetching messages...'))
+    my_strs: list[str] = split_some(message.text, 3, ' ', '\n')
+    group_id = int(my_strs[1])
+    msg_ids = my_strs[2].split('-')
+    
+    first = int(msg_ids[0])
+    current = int(msg_ids[1])
+    limit = current - first
+
+    flags = BasicFlagsContainer(my_strs[3] if len(my_strs) > 3 else '')
+    
+    the_messages: typing.List[int] = []
+
+    async for current in user.iter_history(
+        chat_id=group_id, 
+        limit=limit, 
+        offset_id=current,
+    ):
+        if not isinstance(current, Message):
+            continue
+        
+        if flags.can_match(current):
+            the_messages.append(the_messages)
+        
+    user.cached_messages = the_messages
+    await reply.edit_text(user.html_mono(f'successfully cached {len(the_messages)} messages.'))
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+    user.filters.reply &
+	user.sudo & 
+	user.filters.command(
+        ['cachedScan'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def cachedScan_handler(_, message: Message):
+    # .tGetMessages GROUP_ID MSG_ID1-MSG_ID2 <flags>
+    if message.text.find('') == -1:
+        txt = user.html_bold('Usage:', '\n')
+        txt += user.html_mono('\t.cachedScan REASON\n')
+        return await message.reply_text(txt)
+    
+    the_reason = user.get_non_cmd(message)
+    all_infos = typing.List[MultiBanInfo]
+    for current in user.cached_messages:
+        if not isinstance(current, Message):
+            continue
+        
+        all_infos.append(MultiBanInfo(
+            user_id=current.from_user.id,
+            reason=the_reason,
+            message=current.link,
+            source=message.link,
+            source_group=str(current.chat.id)
+        ))
+    
+    my_msg = await message.reply_text('Sending cymatic scan request to sibyl system.')
+    try:
+        user.sibyl.multi_ban(all_infos)
+    except Exception as e:
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
+        return
+    
+    await my_msg.edit_text(
+        html_mono('Cymatic scan request has been sent to Sibyl.'), 
+        parse_mode="HTML",
+    )
+
+
 
 
