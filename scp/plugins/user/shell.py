@@ -151,6 +151,7 @@ async def shell_base(message: Message, command: str):
     else:
         await reply.edit_text(doc)
 
+user.shell_base = shell_base
 
 @user.on_message(
     ~user.filters.scheduled
@@ -158,7 +159,7 @@ async def shell_base(message: Message, command: str):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & ~user.filters.edited
-    & user.filters.me
+    & user.owner
     & user.filters.command(
         'cat',
         prefixes=user.cmd_prefixes,
@@ -203,4 +204,65 @@ async def cat(_, message: Message):
         if rfile:
             rfile.close()
 
+
+@user.on_message(
+    ~user.filters.scheduled
+    & ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.owner
+    & user.filters.command(
+        'toGif',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def toGif_handler(_, message: Message):
+    if not message.reply_to_message or not message.reply_to_message.sticker:
+        return
+    sticker = message.reply_to_message.sticker
+    if not sticker.is_video:
+        await message.reply_text('the sticker needs to be a video-sticker')
+        return
+    
+    rfile = tempfile.NamedTemporaryFile()
+    reply = await message.reply_text('Downloading...')
+    await user.download_media(
+        media, 
+        file_name=rfile.name,
+        progress=progress_callback, 
+        progress_args=(reply, 'Downloading...', False),
+    )
+    media = rfile.name
+    output_to_gif = 'output-toGif.mp4'
+    await shell_base(message, f'rm "{output_to_gif}" -f && ffmpeg -an -sn -i "{output_to_gif}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error')
+    
+    file = os.path.expanduser(' '.join(output_to_gif))
+    if not file:
+        return
+    text = f'Uploading {html_mono(file)}...'
+    reply = await message.reply_text(text)
+    
+    try:
+        await user.send_document(
+            chat_id=message.chat.id, 
+            document=file, 
+            progress=progress_callback, 
+            progress_args=(reply, text, True),
+            reply_to_message_id=(
+                None if message.chat.type in ('private', 'bot') 
+                else message.message_id
+            ),
+        )
+        os.remove(file)
+    except user.exceptions.MediaInvalid:
+        await message.reply_text('Upload cancelled!')
+    except Exception as e:
+        try:
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            return
+        except Exception: pass
+    else:
+        await reply.delete()
+    
 
