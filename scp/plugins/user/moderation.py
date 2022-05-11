@@ -1191,7 +1191,7 @@ async def unban_handler(_, message: Message):
 )
 async def getlinks_handler(_, message: Message):
     # .getlinks GROUP_ID MSG_ID1-MSG_ID2 <flags>
-    if message.text.find('') == -1:
+    if message.text.find(' ') == -1:
         txt = user.html_bold('Usage:', '\n')
         txt += user.html_mono('\t.getlinks GROUP_ID MSG_ID1-MSG_ID2 <flags>\n')
         txt += user.html_normal('(where MSG_ID2 > MSG_ID1)')
@@ -1251,9 +1251,9 @@ async def getlinks_handler(_, message: Message):
 )
 async def tCacheMessages_handler(_, message: Message):
     # .tGetMessages GROUP_ID MSG_ID1-MSG_ID2 <flags>
-    if message.text.find('') == -1:
+    if message.text.find(' ') == -1:
         txt = user.html_bold('Usage:', '\n')
-        txt += user.html_mono('\t.tGetMessages GROUP_ID MSG_ID1-MSG_ID2 <flags>\n')
+        txt += user.html_mono('\t.tCacheMessages GROUP_ID MSG_ID1-MSG_ID2 <flags>\n')
         txt += user.html_normal('(where MSG_ID2 > MSG_ID1)')
         return await message.reply_text(txt)
     
@@ -1298,7 +1298,7 @@ async def tCacheMessages_handler(_, message: Message):
 )
 async def cachedScan_handler(_, message: Message):
     # .tGetMessages GROUP_ID MSG_ID1-MSG_ID2 <flags>
-    if message.text.find('') == -1:
+    if message.text.find(' ') == -1:
         txt = user.html_bold('Usage:', '\n')
         txt += user.html_mono('\t.cachedScan REASON\n')
         return await message.reply_text(txt)
