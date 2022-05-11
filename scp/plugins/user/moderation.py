@@ -1243,7 +1243,7 @@ async def getlinks_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
     user.filters.reply &
-	user.sudo & 
+	user.owner & 
 	user.filters.command(
         ['tCacheMessages'],
         prefixes=user.cmd_prefixes,
