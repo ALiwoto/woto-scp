@@ -1198,7 +1198,7 @@ async def getlinks_handler(_, message: Message):
     
     reply = await message.reply_text(user.html_mono('fetching messages links...'))
     my_strs: list[str] = split_some(message.text, 3, ' ', '\n')
-    group_id = int(my_strs[1])
+    group_id = my_strs[1]
     msg_ids = my_strs[2].split('-')
     
     first = int(msg_ids[0])
@@ -1257,7 +1257,7 @@ async def tCacheMessages_handler(_, message: Message):
     
     reply = await message.reply_text(user.html_mono('fetching messages...'))
     my_strs: list[str] = split_some(message.text, 3, ' ', '\n')
-    group_id = int(my_strs[1])
+    group_id = my_strs[1]
     msg_ids = my_strs[2].split('-')
     
     first = int(msg_ids[0])
