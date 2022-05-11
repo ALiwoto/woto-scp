@@ -1,5 +1,6 @@
 import asyncio
 import typing
+from io import BytesIO
 from pyrogram.types import (
     Message,
     Chat,
@@ -11,7 +12,7 @@ from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
 from scp import user
 from scp.utils.misc import can_member_match, remove_special_chars
 from scp.utils.parser import (
-    PurgeFlags,
+    BasicFlagsContainer,
     html_bold,
     html_in_common,
     html_link,
@@ -280,13 +281,13 @@ async def purge_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def purge_handler(_, message: Message):
+async def tPurge_handler(_, message: Message):
     first = message.reply_to_message.message_id
     current = message.message_id
     limit = current - first
 
     my_strs: list[str] = split_some(message.text, 1, ' ', '\n')
-    flags = PurgeFlags(my_strs[1] if len(my_strs) > 1 else '')
+    flags = BasicFlagsContainer(my_strs[1] if len(my_strs) > 1 else '')
     
     the_messages: typing.List[int] = []
 
@@ -1171,5 +1172,69 @@ async def unban_handler(_, message: Message):
         await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
     except Exception: pass
 
+
+
+
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+    user.filters.reply &
+	user.sudo & 
+	user.filters.command(
+        ['getLinks'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def getlinks_handler(_, message: Message):
+    # .getlinks GROUP_ID MSG_ID1-MSG_ID2 <flags>
+    if message.text.find('') == -1:
+        txt = user.html_bold('Usage:', '\n')
+        txt += user.html_mono('\t.getlinks GROUP_ID MSG_ID1-MSG_ID2 <flags>\n')
+        txt += user.html_normal('(where MSG_ID2 > MSG_ID1)')
+        return await message.reply_text(txt)
+    
+    reply = await message.reply_text(user.html_mono('fetching messages links...'))
+    my_strs: list[str] = split_some(message.text, 3, ' ', '\n')
+    group_id = int(my_strs[1])
+    msg_ids = my_strs[2].split('-')
+    
+    first = int(msg_ids[0])
+    current = int(msg_ids[1])
+    limit = current - first
+
+    flags = BasicFlagsContainer(my_strs[3] if len(my_strs) > 3 else '')
+    
+    #the_messages: typing.List[int] = []
+    final_txt: str = ''
+
+    async for current in user.iter_history(
+        chat_id=group_id, 
+        limit=limit, 
+        offset_id=current,
+    ):
+        if not isinstance(current, Message):
+            continue
+        
+        if flags.can_match(current):
+            final_txt += user.html_normal(current.link + '\n')
+    
+    if len(final_txt) > 4096:
+        f = BytesIO(final_txt)
+        f.name = 'output.txt'
+        await asyncio.gather(
+            reply.delete(),
+            message.reply_document(
+                f,
+                caption=user.html_mono(f'matched links from {first} to {current} in {group_id}'),
+                quote=True,
+            ),
+        )
+    else:
+        await reply.edit_text(final_txt)
+
+    
 
 

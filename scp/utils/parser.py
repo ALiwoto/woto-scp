@@ -11,7 +11,7 @@ from pyrogram.types import (
     Chat,
 )
 
-class PurgeFlags:
+class BasicFlagsContainer:
     """A list of all flags that can be used in purge commands
 
     Possible flags:
