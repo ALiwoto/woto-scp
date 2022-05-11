@@ -1266,7 +1266,7 @@ async def tCacheMessages_handler(_, message: Message):
 
     flags = BasicFlagsContainer(my_strs[3] if len(my_strs) > 3 else '')
     
-    the_messages: typing.List[int] = []
+    the_messages: typing.List[Message] = []
 
     async for current in user.iter_history(
         chat_id=group_id, 
@@ -1277,7 +1277,7 @@ async def tCacheMessages_handler(_, message: Message):
             continue
         
         if flags.can_match(current):
-            the_messages.append(the_messages)
+            the_messages.append(current)
         
     user.cached_messages = the_messages
     await reply.edit_text(user.html_mono(f'successfully cached {len(the_messages)} messages.'))
