@@ -234,10 +234,11 @@ async def toGif_handler(_, message: Message):
         progress_args=(reply, 'Downloading...', False),
     )
     output_to_gif = 'output-toGif.mp4'
-    await shell_base(message, f'rm "{output_to_gif}" -f && ffmpeg -an -sn -i "{output_to_gif}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error')
+    await shell_base(message, f'rm "{output_to_gif}" -f && ffmpeg -an -sn -i "{rfile.name}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error')
     
     text = f'Uploading {html_mono(output_to_gif)}...'
     reply = await message.reply_text(text)
+    rfile.close()
     
     try:
         await user.send_document(
