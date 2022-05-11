@@ -79,7 +79,7 @@ return inspect.getsource({code})
 
     await eval_base(user, message, code)
 
-async def eval_base(client: user, message: Message, code: str):
+async def eval_base(client: user, message: Message, code: str, silent: bool = False):
     tree: TModule = None
     try:
         tree = ast.parse(code)
@@ -110,12 +110,14 @@ async def eval_base(client: user, message: Message, code: str):
             return await message.reply_text(txt, parse_mode='html')
         exx = _gf(o_body)
     rnd_id = '#' + str(ShortUUID().random(length=8))
-    reply = await message.reply_text(
-        html_bold('Executing task ') + html_mono(rnd_id, '...'),
-        quote=True,
-        disable_notification=True,
-        disable_web_page_preview=True,
-    )
+    reply: Message = None
+    if message != None and not silent:
+        reply = await message.reply_text(
+            html_bold('Executing task ') + html_mono(rnd_id, '...'),
+            quote=True,
+            disable_notification=True,
+            disable_web_page_preview=True,
+        )
     oasync_obj = exx(
         client,
         client,
@@ -191,6 +193,8 @@ async def eval_base(client: user, message: Message, code: str):
     if not output.strip():
         output = 'Success'
     
+    if silent or reply == None:
+        return
     output = output.replace(user.original_phone_number, '$PHONE_NUMBER')
 
     if len(output) > 4096:
@@ -210,6 +214,7 @@ async def eval_base(client: user, message: Message, code: str):
             disable_web_page_preview=True,
         )
 
+user.eval_base = eval_base
 
 @user.on_message(
     ~user.filters.forwarded

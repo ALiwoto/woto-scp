@@ -222,6 +222,11 @@ class ScpClient(WotoClientBase):
                 await asyncio.sleep(3)
             except Exception: pass
     
+    # async def eval_base(client: user, message: Message, code: str, silent: bool = False):
+    eval_base = None
+    # async def shell_base(message: Message, command: str):
+    shell_base = None
+    
     async def get_my_dialogs(self) -> typing.List[types.Dialog]:
         if not self.__my_all_dialogs__ or len(self.__my_all_dialogs__) < 2:
             return await self.refresh_dialogs()
