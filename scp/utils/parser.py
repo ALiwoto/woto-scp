@@ -22,6 +22,7 @@ class BasicFlagsContainer:
         gif (animation)
         file (document)
         service
+        added_member
         media
         bot
         via_bot
@@ -44,6 +45,7 @@ class BasicFlagsContainer:
     flag_gif: bool = False
     flag_file: bool = False
     flag_service: bool = False
+    flag_added_member: bool = False
     flag_media: bool = False
     flag_bot: bool = False
     flag_via_bot: bool = False
@@ -72,6 +74,7 @@ class BasicFlagsContainer:
         self.flag_gif = 'gif' in flags or 'animation' in flags
         self.flag_file = 'file' in flags or 'document' in flags
         self.flag_service = 'service' in flags
+        self.flag_added_member = 'added_member' in flags
         self.flag_media = 'media' in flags
         self.flag_bot = 'bot' in flags
         self.flag_via_bot = 'via_bot' in flags
@@ -102,6 +105,10 @@ class BasicFlagsContainer:
             return True
         elif self.flag_service and message.service:
             return True
+        elif self.flag_added_member and message.service == 'new_chat_members':
+            for current in message.new_chat_members:
+                if not current.is_bot: return True
+            return False
         elif self.flag_media and message.media:
             return True
         elif self.flag_bot and message.from_user.is_bot:
