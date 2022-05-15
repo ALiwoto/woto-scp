@@ -6,6 +6,8 @@ from pyrogram import Client
 from scp.utils.selfInfo import info
 from ...wotoConfig import the_config
 
+prefixes = the_config.prefixes
+
 def command(
     commands: str or List[str],
     prefixes: str or List[str] = the_config.prefixes,
