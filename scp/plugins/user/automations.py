@@ -3,7 +3,7 @@ from pyrogram.types import (
     Message,
 )
 
-__PLUGIN__ = 'autoread'
+__PLUGIN__ = 'automations'
 
 @user.on_message(
     ~(
@@ -28,7 +28,7 @@ async def auto_read_handler(_, message: Message):
 @user.on_message(
     user.owner & user.command('gautoread'),
 )
-async def sinfo_handler(_, message: Message):
+async def gautoread_handler(_, message: Message):
     if message.text.find('true') > 0:
         if user.auto_read_enabled:
             await message.reply_text('Auto read is already enabled.')
@@ -52,3 +52,20 @@ async def sinfo_handler(_, message: Message):
     else:
         await message.reply_text('Auto read is disabled.')
     return
+
+
+@user.on_message(
+    user.filters.me & 
+    user.filters.group &
+    user.wfilters.noisy_bluetext,
+    group=100,
+)
+async def auto_remove_bluetext_handler(_, message: Message):
+    if not user.auto_read_enabled:
+        return
+    try:
+        await message.delete()
+    except Exception:
+        return
+    return
+
