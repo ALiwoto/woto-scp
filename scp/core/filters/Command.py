@@ -3,9 +3,8 @@ from typing import List
 from pyrogram.filters import create
 from pyrogram.types import Message
 from pyrogram import Client
-from configparser import ConfigParser
 from scp.utils.selfInfo import info
-from wotoConfig import the_config
+from ...wotoConfig import the_config
 
 def command(
     commands: str or List[str],
