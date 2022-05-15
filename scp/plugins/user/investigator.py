@@ -63,18 +63,6 @@ async def chr_handler(_, message: Message):
     
     await message.reply_text(txt)
 
-@user.on_message(
-    ~(
-        user.owner | 
-        user.sudo | 
-        user.filters.private
-    ) & user.wfilters.fish_command,
-    group=123,
-)
-async def send_fish_handler(_, message: Message):
-    await user.send_message(message.chat.id, '/fish')
-    await user.read_all_mentions(message.chat.id)
-
 
 @user.on_message(
 	~user.filters.forwarded &
