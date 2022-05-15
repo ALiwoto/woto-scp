@@ -597,7 +597,7 @@ async def fmembers_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['fadmins', 'fadmins!'],
         prefixes=user.cmd_prefixes,
     ),
@@ -695,7 +695,7 @@ async def fadmins_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['remspec'],
         prefixes=user.cmd_prefixes,
     ),
@@ -721,7 +721,7 @@ async def remspec_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['ban'],
         prefixes=user.cmd_prefixes,
     ),
@@ -771,7 +771,7 @@ async def ban_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['mute'],
         prefixes=user.cmd_prefixes,
     ),
@@ -837,7 +837,7 @@ async def mute_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['unmute'],
         prefixes=user.cmd_prefixes,
     ),
@@ -903,7 +903,7 @@ async def mute_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['aban'],
         prefixes=user.cmd_prefixes,
     ),
@@ -947,7 +947,7 @@ async def aban_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['kick'],
         prefixes=user.cmd_prefixes,
     ),
@@ -998,7 +998,7 @@ async def kick_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['unban'],
         prefixes=user.cmd_prefixes,
     ),
@@ -1049,7 +1049,7 @@ async def unban_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['sban'],
         prefixes=user.cmd_prefixes,
     ),
@@ -1092,7 +1092,7 @@ async def sban_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['skick'],
         prefixes=user.cmd_prefixes,
     ),
@@ -1136,7 +1136,7 @@ async def kick_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['sunban'],
         prefixes=user.cmd_prefixes,
     ),
@@ -1183,7 +1183,7 @@ async def unban_handler(_, message: Message):
 	~user.filters.via_bot & 
 	~user.filters.edited & 
 	user.sudo & 
-	user.filters.command(
+	user.command(
         ['getLinks'],
         prefixes=user.cmd_prefixes,
     ),
@@ -1241,8 +1241,40 @@ async def getlinks_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	~user.filters.edited & 
+	user.owner & 
+	user.command(
+        ['replyTo'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def replyTo_handler(_, message: Message):
+    args = user.split_some(message.text, 2, ' ', '\n')
+    if not args or len(args) < 3:
+        await message.reply_text(
+            user.html_bold('usage:', '\n') +
+            user.html_mono('.replyTo message_link text')
+        )
+        return
+    
+    # format should be like this:
+    # .cBackup target_chat backup_channel_id from_id-to_id
+    
+    message_link = args[1]
+    try:
+        target_message = await user.get_message_by_link(message_link)
+        await target_message.reply_text(args[2])
+    except Exception as e:
+        return await user.reply_exception(message, e)
+    
+    pass
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
 	user.sudo & 
-	user.filters.command(
+	user.command(
         ['tCacheMessages'],
         prefixes=user.cmd_prefixes,
     ),
