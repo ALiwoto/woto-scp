@@ -66,6 +66,9 @@ class WotoClientBase(Client):
     def html_link(self, value, link: str, *argv) -> str:
         return html_link(value, link, *argv)
     
+    async def reply_exception(self, message: types.Message, e: Exception):
+        return await message.reply_text(self.html_bold('Error:') + self.html_mono(f'\n\t{e}'))
+    
     async def html_normal_chat_link(self, value, chat: types.Chat, *argv) -> str:
         return await html_normal_chat_link(value, chat, *argv)
 

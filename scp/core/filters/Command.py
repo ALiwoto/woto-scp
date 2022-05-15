@@ -5,15 +5,11 @@ from pyrogram.types import Message
 from pyrogram import Client
 from configparser import ConfigParser
 from scp.utils.selfInfo import info
-
-config = ConfigParser()
-config.read('config.ini')
-prefixes = config.get('scp-5170', 'prefixes').split()
-
+from wotoConfig import the_config
 
 def command(
     commands: str or List[str],
-    prefixes: str or List[str] = prefixes,
+    prefixes: str or List[str] = the_config.prefixes,
     case_sensitive: bool = False,
 ):
     """
