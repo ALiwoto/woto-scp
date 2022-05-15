@@ -22,13 +22,6 @@ async def stalk_filter(_, __, m: types.Message) -> bool:
 stalk_text = filters.create(stalk_filter)
 """Filter messages which contains stalk in them."""
 
-async def fish_filter(_, __, m: types.Message) -> bool:
-    return m and m.text and m.text == '/fish'
-
-fish_command = filters.create(fish_filter)
-"""Filter messages which contains fish in them."""
-
-
 async def channel_in_group_filter(_, __, m: types.Message) -> bool:
     if not m.sender_chat or m.service or not m.chat or not m.chat.title:
         return False
