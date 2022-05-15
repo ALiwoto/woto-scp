@@ -22,6 +22,25 @@ async def stalk_filter(_, __, m: types.Message) -> bool:
 stalk_text = filters.create(stalk_filter)
 """Filter messages which contains stalk in them."""
 
+async def bluetext_filter(_, __, m: types.Message) -> bool:
+    return m and m.text and m.text[0] == '/'
+
+bluetext = filters.create(bluetext_filter)
+"""Filter messages which are bot commands (starts with '/')."""
+
+async def noisy_bluetext_filter(_, __, m: types.Message) -> bool:
+    if not (m and m.text and m.text[0] == '/'): return False
+    
+    if m.text.startswith('/s'): # such as sban, skick, etc...
+        return True
+    elif m.text.startswith('/ec'): # such as echo, etc...
+        return True
+    
+    return False
+
+noisy_bluetext = filters.create(noisy_bluetext_filter)
+"""Filter messages which are considered as noisy bluetext."""
+
 async def channel_in_group_filter(_, __, m: types.Message) -> bool:
     if not m.sender_chat or m.service or not m.chat or not m.chat.title:
         return False
