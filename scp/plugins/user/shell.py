@@ -307,7 +307,7 @@ async def makeGif_handler(_, message: Message):
     scale_value = "scale='min(iw,1280)':'min(ih,720)'"
     times_value = f'-ss {start_t} -to {end_t}'
     sh_txt += f' & ffmpeg -sn -hide_banner -loglevel error -an {times_value} -i "{user_file_name}"'
-    sh_txt += f'-vf "{scale_value}" -pix_fmt yuv420p -c:v libx264 "output.mp4" '
+    sh_txt += f' -vf "{scale_value}" -pix_fmt yuv420p -c:v libx264 "{outfile}" '
     await shell_base(message, sh_txt)
     
     text = f'Uploading {html_mono(outfile)}...'
