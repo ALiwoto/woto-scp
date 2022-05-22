@@ -44,7 +44,7 @@ class WotoClientBase(Client):
     
     def get_non_cmd(self, message: types.Message) -> str:
         my_strs = split_some(message.text, 1, ' ', '\n')
-        if len(my_strs) < 1:
+        if len(my_strs) < 2:
             return ''
         return my_strs[1]
     
@@ -53,6 +53,9 @@ class WotoClientBase(Client):
     
     def split_message(self, message: types.Message, max_count: int = 0) -> typing.List[str]:
         return split_some(message.text, max_count, ' ', '\n')
+    
+    def split_timestamped_message(self, message: types.Message, max_count: int = 0) -> typing.List[str]:
+        return split_some(message.text, max_count,  ' -> ', ' ', '\n')
 
     def html_mono(self, value, *argv) -> str:
         return html_mono(value, *argv)

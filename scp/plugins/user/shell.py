@@ -263,3 +263,76 @@ async def toGif_handler(_, message: Message):
         await reply.delete()
     
 
+
+
+@user.on_message(
+    ~user.filters.scheduled
+    & ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.owner
+    & user.filters.command(
+        'makeGif',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def makeGif_handler(_, message: Message):
+    # command format is:
+    # .makeGif FILE_NAME 22:45.0 -> 22:49.0
+    my_strs = user.split_timestamped_message(message)
+    if not my_strs or len(my_strs) < 4:
+        txt = user.html_bold('Usage:\n\t')
+        txt += user.html_mono('.makeGif FILE_NAME 22:45.0 -> 22:49.0')
+        return await message.reply_text(txt)
+    
+    user_file_name = my_strs[1]
+    start_t = my_strs[2]
+    end_t = my_strs[3]
+    if not os.path.exists(user_file_name):
+        # download the file to the destination
+        if not message.reply_to_message:
+            return await message.reply_text(f'reply to a file to download it to {user_file_name}')
+        reply = await message.reply_text('Downloading...')
+        await user.download_media(
+            message.reply_to_message, 
+            file_name=user_file_name,
+            progress=progress_callback, 
+            progress_args=(reply, 'Downloading...', False),
+        )
+    
+    
+    outfile = 'aliwoto-output-cutGif.mp4'
+    sh_txt = f'rm "{outfile}" -f'
+    scale_value = "scale='min(iw,1280)':'min(ih,720)'"
+    times_value = f'-ss {start_t} -to {end_t}'
+    sh_txt += f' & ffmpeg -sn -hide_banner -loglevel error -an {times_value} -i "{user_file_name}"'
+    sh_txt += f'-vf "{scale_value}" -pix_fmt yuv420p -c:v libx264 "output.mp4" '
+    await shell_base(message, sh_txt)
+    
+    text = f'Uploading {html_mono(outfile)}...'
+    reply = await message.reply_text(text)
+    
+    try:
+        await user.send_document(
+            chat_id=message.chat.id, 
+            document=outfile, 
+            progress=progress_callback, 
+            progress_args=(reply, text, True),
+            reply_to_message_id=(
+                None if message.chat.type in ('private', 'bot') 
+                else message.message_id
+            ),
+        )
+        os.remove(outfile)
+    except user.exceptions.MediaInvalid:
+        await message.reply_text('Upload cancelled!')
+    except Exception as e:
+        try:
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            return
+        except Exception: pass
+    else:
+        await reply.delete()
+    
+
