@@ -36,7 +36,7 @@ async def noisy_bluetext_filter(_, __, m: types.Message) -> bool:
     elif m.text.startswith('/ec'): # such as echo, etc...
         return True
     
-    return False
+    return bool(m.chat.username)
 
 noisy_bluetext = filters.create(noisy_bluetext_filter)
 """Filter messages which are considered as noisy bluetext."""
