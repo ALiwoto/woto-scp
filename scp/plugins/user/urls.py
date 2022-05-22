@@ -319,3 +319,61 @@ async def html_cssworker(target_html: str):
             return None
 
 
+@user.on_message(
+    ~user.filters.scheduled
+    & ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & ~user.filters.edited
+    & user.sudo
+    & user.filters.command(
+        'webPre',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def webPre_handler(_, message: Message):
+    if not message.reply_to_message or not message.reply_to_message.web_page:
+        return
+    
+    web_page = message.reply_to_message.web_page
+
+    if not web_page.description:
+        web_page.description = ''
+
+    if web_page.document:
+        await user.send_document(
+            message.chat.id,
+            document=web_page.document.file_id,
+            caption=web_page.description,
+        )
+    elif web_page.audio:
+        await user.send_audio(
+            message.chat.id,
+            audio=web_page.audio.file_id,
+            caption=web_page.description,
+        )
+    elif web_page.video:
+        await user.send_video(
+            message.chat.id,
+            video=web_page.video.file_id,
+            caption=web_page.description,
+        )
+    elif web_page.photo:
+        await user.send_photo(
+            message.chat.id,
+            photo=web_page.photo.file_id,
+            caption=web_page.description,
+        )
+    elif web_page.animation:
+        await user.send_animation(
+            message.chat.id,
+            animation=web_page.animation.file_id,
+            caption=web_page.description,
+        )
+    elif web_page.description:
+        await user.send_message(
+            message.chat.id,
+            text=web_page.description,
+        )
+    else:
+        await message.reply_text('Invalid web-page type.')

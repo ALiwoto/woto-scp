@@ -271,7 +271,7 @@ async def toGif_handler(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & ~user.filters.edited
-    & user.owner
+    & user.sudo
     & user.filters.command(
         'makeGif',
         prefixes=user.cmd_prefixes,
