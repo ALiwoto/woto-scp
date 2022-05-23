@@ -397,7 +397,7 @@ async def investigate_user_handler(_, message: Message):
         txt = user.mention_user_html(target_user, 8) + user.html_normal("'s statistic in ")
         txt += await user.html_normal_chat_link(the_group.title, the_group, "\n\n")
         txt += user.html_bold('・Messages count: ') + user.html_mono(count, '\n')
-        txt += user.html_bold('・Sample Message: ')
+        txt += user.html_bold('・Last message: ')
         txt += user.html_link(f'>> {target_message.message_id}', target_message.link)
         return await message.reply_text(txt, disable_web_page_preview=True, parse_mode='html')
     except Exception as e:
