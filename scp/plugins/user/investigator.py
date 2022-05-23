@@ -399,6 +399,7 @@ async def investigate_user_handler(_, message: Message):
         txt += user.html_bold('・Messages count: ') + user.html_mono(count, '\n')
         txt += user.html_bold('・Sample Message: ')
         txt += user.html_link(f'>> {target_message.message_id}', target_message.link)
+        return await message.reply_text(txt)
     except Exception as e:
         return await user.reply_exception(message, e)
     
