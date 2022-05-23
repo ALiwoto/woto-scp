@@ -388,7 +388,7 @@ async def investigate_user_handler(_, message: Message):
             return await message.reply_text('this user has no messages in that chat.')
         
         target_message: Message = None
-        async for current in await user.search_messages(
+        async for current in user.search_messages(
             chat_id=chat_id,
             from_user=user_id,
         ):
