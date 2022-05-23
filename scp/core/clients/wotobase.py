@@ -30,6 +30,7 @@ from scp.utils.parser import(
     html_normal,
     html_mention, 
     html_normal_chat_link,
+    mention_user_html,
 )
 from scp.utils.unpack import unpackInlineMessage
 
@@ -74,6 +75,9 @@ class WotoClientBase(Client):
     
     async def html_normal_chat_link(self, value, chat: types.Chat, *argv) -> str:
         return await html_normal_chat_link(value, chat, *argv)
+    
+    def mention_user_html(self, user: types.User, name_limit: int = -1) -> str:
+        return mention_user_html(user, name_limit)
 
     async def html_mention(self, value: Union[types.User, int], name: str = None, *argv) -> str:
         return await html_mention(value, name, self, *argv)

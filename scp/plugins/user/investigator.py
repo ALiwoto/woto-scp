@@ -332,16 +332,16 @@ async def cBackup_handler(_, message: Message):
     await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
 
 
-@user.on_message(
-    ~(
-        user.owner | 
-        user.sudo | 
-        user.filters.private
-    ) & 
-    user.filters.animation &
-    user.wfilters.intemperate,
-    group=123,
-)
+# @user.on_message(
+    # ~(
+        # user.owner | 
+        # user.sudo | 
+        # user.filters.private
+    # ) & 
+    # user.filters.animation &
+    # user.wfilters.intemperate,
+    # group=123,
+# )
 async def send_stare_gif(_, message: Message):
     if message.animation.file_unique_id != 'AgADbgADz3-YRg':
         return
@@ -351,3 +351,55 @@ async def send_stare_gif(_, message: Message):
         reply_to_message_id=message.message_id,
     )
 
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	~user.filters.edited & 
+	user.owner & 
+	user.command(
+        ['iUser'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def investigate_user_handler(_, message: Message):
+    args = user.split_some(message.text, 2, ' ', '\n')
+    if not args or len(args) < 3:
+        await message.reply_text(
+            user.html_bold('usage:', '\n') +
+            user.html_mono('.iUser group-id user-id')
+        )
+        return
+    
+    # format should be like this:
+    # .iUser group-id user-id
+    
+    chat_id = args[1]
+    user_id = args[2]
+    try:
+        target_user = await user.get_users(user_id)
+        the_group = await user.get_chat(chat_id)
+        count = await user.search_messages_count(
+            chat_id=chat_id,
+            from_user=user_id,
+        )
+        if not count:
+            return await message.reply_text('this user has no messages in that chat.')
+        
+        target_message: Message = None
+        async for current in await user.search_messages(
+            chat_id=chat_id,
+            from_user=user_id,
+        ):
+            target_message = current
+            break
+        txt = user.mention_user_html(target_user, 8) + user.html_normal("'s statistic in ")
+        txt += await user.html_normal_chat_link(the_group.title, the_group, "\n\n")
+        txt += user.html_bold('・Messages count: ') + user.html_mono(count, '\n')
+        txt += user.html_bold('・Sample Message: ')
+        txt += user.html_link(f'>> {target_message.message_id}', target_message.link)
+    except Exception as e:
+        return await user.reply_exception(message, e)
+    
+    
