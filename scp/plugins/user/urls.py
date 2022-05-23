@@ -333,7 +333,7 @@ async def html_cssworker(target_html: str):
 )
 async def webPre_handler(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.web_page:
-        return
+        return await message.reply_text('reply to a message containing a web-page preview.')
     
     web_page = message.reply_to_message.web_page
 

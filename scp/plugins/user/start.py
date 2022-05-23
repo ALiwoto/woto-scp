@@ -38,7 +38,7 @@ async def _(_, query: bot.types.InlineQuery):
                 'version: {}'.format(
                     user.md.Link(
                         __version__,
-                        'https://github.com/pokurt/SCP-5170/commit/{}'.format(
+                        'https://github.com/ALiwoto/woto-scp/commit/{}'.format(
                             __longVersion__,
                         ),
                     ),

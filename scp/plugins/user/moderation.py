@@ -1257,7 +1257,7 @@ async def replyTo_handler(_, message: Message):
         return
     
     # format should be like this:
-    # .cBackup target_chat backup_channel_id from_id-to_id
+    # .replyTo message_link text
     
     message_link = args[1]
     try:
@@ -1266,7 +1266,6 @@ async def replyTo_handler(_, message: Message):
     except Exception as e:
         return await user.reply_exception(message, e)
     
-    pass
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
