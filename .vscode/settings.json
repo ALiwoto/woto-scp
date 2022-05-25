@@ -44,6 +44,7 @@
         "pydantic",
         "pyro",
         "pyrogram",
+        "pyromod",
         "qrcode",
         "Referer",
         "rfile",
@@ -61,4 +62,5 @@
         "XWSLLPX",
         "yimage"
     ],
+    "python.linting.enabled": false,
 }
