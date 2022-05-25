@@ -10,6 +10,12 @@ async def my_contacts_filter(_, __, m: types.Message) -> bool:
 my_contacts = filters.create(my_contacts_filter)
 """Filter messages sent by contact users."""
 
+async def wordle_bot_filter(_, __, m: types.Message) -> bool:
+    return m and m.from_user and m.from_user.id == 5017534897
+
+wordle_bot = filters.create(wordle_bot_filter)
+"""Filter messages sent by contact users."""
+
 async def intemperate_filter(_, __, m: types.Message) -> bool:
     return m and m.chat and m.chat.username == 'intemperate'
 
