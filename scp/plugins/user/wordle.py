@@ -103,7 +103,7 @@ async def wordle_bot_message_handler(_, message: Message):
         if not isinstance(chat_settings, WordleChatConfig) or not chat_settings.auto_reset:
             return
         if message.text.find('/new') != -1:
-            await asyncio.sleep(3)
+            await asyncio.sleep(6)
             await user.send_message(message.chat.id, '/new@hiwordlebot')
             chat_settings.reset_values()
             await asyncio.sleep(2)
@@ -111,7 +111,7 @@ async def wordle_bot_message_handler(_, message: Message):
         elif message.text.find('Not a valid') != -1:
             chat_settings.invalid_error_count += 1
             if not chat_settings.last_valid_text:
-                await asyncio.sleep(3)
+                await asyncio.sleep(6)
                 return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
             else:
                 message.text = chat_settings.last_valid_text
@@ -127,13 +127,13 @@ async def wordle_bot_message_handler(_, message: Message):
     
     if chat_settings.total_attempt >= MAX_ATTEMPT:
         chat_settings.reset_values()
-        await asyncio.sleep(3)
+        await asyncio.sleep(4)
         return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
     elif chat_settings.total_attempt == 0:
         # copy WORDS_LIST to guess_list
         chat_settings.current_guess_list = WORDS_LIST[:]
     
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
     chat_settings.total_attempt += 1
     my_strs = user.split_message(message)
     guess = my_strs[len(my_strs)-1]
@@ -147,7 +147,7 @@ async def wordle_bot_message_handler(_, message: Message):
             return
         chat_settings.reset_values()
         await user.send_message(message.chat.id, '/new@hiwordlebot')
-        await asyncio.sleep(2)
+        await asyncio.sleep(5)
         return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
 
     temp_tuple = tuple(chat_settings.current_guess_list)
@@ -192,7 +192,7 @@ async def wordle_bot_message_handler(_, message: Message):
         if chat_settings.invalid_error_count >= 5:
             await user.send_message(message.chat.id, '/new@hiwordlebot')
             chat_settings.reset_values()
-            await asyncio.sleep(2)
+            await asyncio.sleep(6)
             return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
         elif chat_settings.invalid_error_count >= 1:
             the_word = WORDS_LIST[message.message_id%len(WORDS_LIST)]
