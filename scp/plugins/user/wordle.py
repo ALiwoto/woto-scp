@@ -35,6 +35,12 @@ class WordleChatConfig:
 
 wordle_global_config: WordleGlobalConfig = None
 
+def starts_with_valid_emoji(text: str) -> bool:
+    for current in VALID_EMOJIS:
+        if text.startswith(current):
+            return True
+    
+    return False
 
 @user.on_message(
     user.wfilters.wordle_bot,
@@ -45,7 +51,7 @@ async def wordle_bot_message_handler(_, message: Message):
         return
     elif not wordle_global_config.is_enabled:
         return
-    elif not message.text[0] in VALID_EMOJIS:
+    elif not starts_with_valid_emoji(message.text):
         if message.text.find('/new') == -1:
             return
         chat_settings = wordle_global_config.registered_chats.get(message.chat.id, None)
