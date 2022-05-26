@@ -1,16 +1,19 @@
 import asyncio
+import threading
 from scp import user
 from pyrogram.types import (
     Message,
 )
+from typing import Callable
 
-MAX_ATTEMPT = 20
+MAX_ATTEMPT = 30
 YELLOW_COLOR = '🟨'
 RED_COLOR = '🟥'
 GREEN_COLOR = '🟩'
 WORDS_LIST = []
 VALID_EMOJIS = [YELLOW_COLOR, RED_COLOR, GREEN_COLOR]
-INVALID_TEXTS = ['Already solved', 'Joined Wordle', 'Created Wordle', 'Congrats on']
+INVALID_TEXTS = ['Joined Wordle', 'Created Wordle']
+CHAT_LOCKS = {}
 
 try:
     with open('scp/plugins/user/wordlist.txt') as f:
@@ -18,7 +21,6 @@ try:
             if not line or len(line) < 5: continue
             WORDS_LIST.append(line.strip())
 except FileNotFoundError: pass
-
 
 
 class WordleGlobalConfig:
@@ -32,11 +34,42 @@ class WordleChatConfig:
     auto_reset: bool = False
     last_valid_text: str = ''
     last_word: str = ''
+    invalid_error_count: int = 0
+    last_sent_index: int = -1
     
     def __init__(self, chat_id: int):
         self.chat_it = chat_id
+    
+    def reset_values(self):
+        self.total_attempt = 0
+        self.last_word = ''
+        self.last_valid_text = ''
+        self.current_guess_list = []
+        self.invalid_error_count = 0
 
 wordle_global_config: WordleGlobalConfig = None
+
+def wordle_lock(func: Callable) -> Callable:
+    async def decorator(
+        client, obj: Message, *args
+    ):
+        chat_id = obj.chat.id
+        the_lock = CHAT_LOCKS.get(chat_id, None)
+        if not the_lock:
+            the_lock = asyncio.Lock()
+            CHAT_LOCKS[chat_id] = the_lock
+        
+        #if obj.text.count(GREEN_COLOR * 5) == 1:
+        #    return
+        await the_lock.acquire()
+        try:
+            await func(client, obj, *args)
+        except Exception as e: 
+            print(e)
+        the_lock.release()
+            
+
+    return decorator
 
 def starts_with_valid_emoji(text: str) -> bool:
     for current in VALID_EMOJIS:
@@ -56,6 +89,7 @@ def starts_with_invalid_text(text: str) -> bool:
     user.wfilters.wordle_bot,
     group=143,
 )
+@wordle_lock
 async def wordle_bot_message_handler(_, message: Message):
     if not isinstance(wordle_global_config, WordleGlobalConfig):
         return
@@ -71,9 +105,11 @@ async def wordle_bot_message_handler(_, message: Message):
         if message.text.find('/new') != -1:
             await asyncio.sleep(3)
             await user.send_message(message.chat.id, '/new@hiwordlebot')
+            chat_settings.reset_values()
             await asyncio.sleep(2)
-            await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
+            return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
         elif message.text.find('Not a valid') != -1:
+            chat_settings.invalid_error_count += 1
             if not chat_settings.last_valid_text:
                 await asyncio.sleep(3)
                 return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
@@ -85,10 +121,14 @@ async def wordle_bot_message_handler(_, message: Message):
     if not isinstance(chat_settings, WordleChatConfig):
         return
     
-    chat_settings.last_valid_text = message.text
+    if chat_settings.last_valid_text != message.text:
+        chat_settings.last_valid_text = message.text
+        chat_settings.invalid_error_count = 0
     
     if chat_settings.total_attempt >= MAX_ATTEMPT:
-        return
+        chat_settings.reset_values()
+        await asyncio.sleep(3)
+        return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
     elif chat_settings.total_attempt == 0:
         # copy WORDS_LIST to guess_list
         chat_settings.current_guess_list = WORDS_LIST[:]
@@ -99,10 +139,18 @@ async def wordle_bot_message_handler(_, message: Message):
     guess = my_strs[len(my_strs)-1]
     feedback = my_strs[len(my_strs)-2]
     if feedback == (GREEN_COLOR * 5):
-        chat_settings.total_attempt = 0
+        chat_settings.reset_values()
         return
+    
+    if len(my_strs) >= MAX_ATTEMPT:
+        if not chat_settings.auto_reset:
+            return
+        chat_settings.reset_values()
+        await user.send_message(message.chat.id, '/new@hiwordlebot')
+        await asyncio.sleep(2)
+        return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
 
-    temp_tuple = tuple(WORDS_LIST)
+    temp_tuple = tuple(chat_settings.current_guess_list)
     for word in temp_tuple: # You can't iterate over a list you want to change, so using a tuple.
         for i in range(5):
             try:
@@ -124,15 +172,31 @@ async def wordle_bot_message_handler(_, message: Message):
 
     the_word = ''
     if len(chat_settings.current_guess_list) == 0:
-        chat_settings.total_attempt = 0
-        return
+        the_word = WORDS_LIST[message.message_id%len(WORDS_LIST)]
     elif len(chat_settings.current_guess_list) < 5:
-        the_word = chat_settings.current_guess_list[0]
+        if chat_settings.last_sent_index == -1:
+            chat_settings.last_sent_index = 0
+        elif len(chat_settings.current_guess_list) > chat_settings.last_sent_index + 1:
+            # preferably try another index, so we can avoid the same word
+            chat_settings.last_sent_index += 1
+        the_word = chat_settings.current_guess_list[chat_settings.last_sent_index%len(chat_settings.current_guess_list)]
     else:
-        the_word = chat_settings.current_guess_list[3]
+        if chat_settings.last_sent_index == -1:
+            chat_settings.last_sent_index = 3
+        elif len(chat_settings.current_guess_list) > chat_settings.last_sent_index + 1:
+            # preferably try another index, so we can avoid the same word
+            chat_settings.last_sent_index += 1
+        the_word = chat_settings.current_guess_list[chat_settings.last_sent_index%len(chat_settings.current_guess_list)]
     
     if len(chat_settings.last_word) > 0 and the_word == chat_settings.last_word:
-        return
+        if chat_settings.invalid_error_count >= 5:
+            await user.send_message(message.chat.id, '/new@hiwordlebot')
+            chat_settings.reset_values()
+            await asyncio.sleep(2)
+            return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
+        elif chat_settings.invalid_error_count >= 1:
+            the_word = WORDS_LIST[message.message_id%len(WORDS_LIST)]
+    
     chat_settings.last_word = the_word
     await user.send_message(message.chat.id, the_word)
 
