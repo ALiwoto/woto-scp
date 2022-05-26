@@ -228,9 +228,6 @@ async def enable_wordle_handler(_, message: Message):
     if not isinstance(chat_settings, WordleChatConfig):
         txt = 'wordle plugin is not enabled for this chat!'
         return await message.reply_text(txt)
-    else:
-        wordle_global_config.registered_chats.pop(chat.id, None)
-        txt = 'wordle disabled for the chat.'
     
     if not chat_settings.auto_reset:
         chat_settings.auto_reset = True
