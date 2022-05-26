@@ -313,6 +313,7 @@ class ScpClient(WotoClientBase):
 
     original_phone_number: str = ''
     is_scp_bot: bool = False
+    wordle_global_config = None
     the_bot: 'ScpClient'
     the_user: 'ScpClient'
     filters = filters
