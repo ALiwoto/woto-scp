@@ -11,7 +11,13 @@ my_contacts = filters.create(my_contacts_filter)
 """Filter messages sent by contact users."""
 
 async def wordle_bot_filter(_, __, m: types.Message) -> bool:
-    return m and m.from_user and m.from_user.id == 5017534897
+    if not (m and m.from_user and m.from_user.id == 5017534897):
+        return False
+    
+    if not m.reply_to_message or not m.reply_to_message.from_user or not m.text:
+        return False
+    
+    return m.reply_to_message.from_user.is_self
 
 wordle_bot = filters.create(wordle_bot_filter)
 """Filter messages sent by contact users."""
