@@ -10,6 +10,7 @@ RED_COLOR = '🟥'
 GREEN_COLOR = '🟩'
 WORDS_LIST = []
 VALID_EMOJIS = [YELLOW_COLOR, RED_COLOR, GREEN_COLOR]
+INVALID_TEXTS = ['Already solved', 'Joined Wordle', 'Created Wordle', 'Congrats on']
 
 try:
     with open('scp/plugins/user/wordlist.txt') as f:
@@ -29,6 +30,8 @@ class WordleChatConfig:
     total_attempt: int = 0
     current_guess_list = []
     auto_reset: bool = False
+    last_valid_text: str = ''
+    last_word: str = ''
     
     def __init__(self, chat_id: int):
         self.chat_it = chat_id
@@ -37,6 +40,13 @@ wordle_global_config: WordleGlobalConfig = None
 
 def starts_with_valid_emoji(text: str) -> bool:
     for current in VALID_EMOJIS:
+        if text.startswith(current):
+            return True
+    
+    return False
+
+def starts_with_invalid_text(text: str) -> bool:
+    for current in INVALID_TEXTS:
         if text.startswith(current):
             return True
     
@@ -52,20 +62,30 @@ async def wordle_bot_message_handler(_, message: Message):
     elif not wordle_global_config.is_enabled:
         return
     elif not starts_with_valid_emoji(message.text):
-        if message.text.find('/new') == -1:
+        if starts_with_invalid_text(message.text):
             return
+        
         chat_settings = wordle_global_config.registered_chats.get(message.chat.id, None)
         if not isinstance(chat_settings, WordleChatConfig) or not chat_settings.auto_reset:
             return
-        
-        await user.send_message(message.chat.id, '/new@hiwordlebot')
-        await asyncio.sleep(2)
-        await user.send_message(message.chat.id, WORDS_LIST[chat_settings.chat_it%len(WORDS_LIST)])
+        if message.text.find('/new') != -1:
+            await asyncio.sleep(3)
+            await user.send_message(message.chat.id, '/new@hiwordlebot')
+            await asyncio.sleep(2)
+            await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
+        elif message.text.find('Not a valid') != -1:
+            if not chat_settings.last_valid_text:
+                await asyncio.sleep(3)
+                return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
+            else:
+                message.text = chat_settings.last_valid_text
         
     
     chat_settings = wordle_global_config.registered_chats.get(message.chat.id, None)
     if not isinstance(chat_settings, WordleChatConfig):
         return
+    
+    chat_settings.last_valid_text = message.text
     
     if chat_settings.total_attempt >= MAX_ATTEMPT:
         return
@@ -111,6 +131,9 @@ async def wordle_bot_message_handler(_, message: Message):
     else:
         the_word = chat_settings.current_guess_list[3]
     
+    if len(chat_settings.last_word) > 0 and the_word == chat_settings.last_word:
+        return
+    chat_settings.last_word = the_word
     await user.send_message(message.chat.id, the_word)
 
 @user.on_message(
@@ -139,7 +162,6 @@ async def enable_wordle_handler(_, message: Message):
     
 
 @user.on_message(
-	~user.filters.forwarded &
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	~user.filters.edited & 
@@ -149,7 +171,7 @@ async def enable_wordle_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def enable_wordle_handler(_, message: Message):
+async def cWordle_handler(_, message: Message):
     if wordle_global_config == None:
         return await message.reply_text('wordle plugin is not enabled.')
     all_strs = message.text.split(' ')
@@ -186,9 +208,7 @@ async def enable_wordle_handler(_, message: Message):
     await message.reply_text(txt)
 
 
-
 @user.on_message(
-	~user.filters.forwarded &
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	~user.filters.edited & 
@@ -198,7 +218,7 @@ async def enable_wordle_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def enable_wordle_handler(_, message: Message):
+async def aWordle_handler(_, message: Message):
     if wordle_global_config == None:
         return await message.reply_text('wordle plugin is not enabled.')
     all_strs = message.text.split(' ')
