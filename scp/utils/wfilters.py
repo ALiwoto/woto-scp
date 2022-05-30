@@ -44,6 +44,8 @@ async def noisy_bluetext_filter(_, __, m: types.Message) -> bool:
     if not (m and m.text and m.text[0] == '/'): return False
     if not m.chat or not m.chat.username: return False
     
+    if m.text.startswith('/scan'): return False
+    
     if m.text.startswith('/s') and not m.text.endswith(chr(0x70)): # such as sban, skick, etc...
         return True
     elif m.text.startswith('/ec'): # such as echo, etc...
