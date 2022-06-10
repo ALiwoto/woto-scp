@@ -211,12 +211,17 @@ async def rScan_handler(_, message: Message):
         return await message.reply_text('message not found')
     
     target_user = target_message.from_user.id
+    the_final_link: str = message.link
+    if the_final_link and the_final_link.find('/c/') != -1:
+        t_link = target_message.link
+        if t_link and t_link.find('/c/') == -1:
+            the_final_link = t_link
 
     try:
         user.sibyl.ban(
             user_id=target_user,
             reason=the_reason,
-            source=message.link,
+            source=the_final_link,
             message=target_message.text,
         )
     except Exception as e:
