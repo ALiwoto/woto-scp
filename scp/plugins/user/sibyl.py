@@ -187,3 +187,46 @@ async def revert_handler(_, message: Message):
     )
 
 
+
+@user.on_message(
+    (user.owner | user.inspector) &
+    user.command(
+        ['rScan', 'rScan!'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def rScan_handler(_, message: Message):
+    if not message.reply_to_message: return # TODO
+    #cmd = message.command
+    #is_silent = user.is_silent(message)
+    reason_list = split_some(message.text, 2, ' ', '\n')
+    if len(reason_list) < 3:
+        return await message.reply_text('usage: .rScan LINK reason')
+    msg_link = reason_list[1]
+    the_reason = reason_list[2]
+
+    ptxt = "Sending cymatic scan request to Sibyl System."
+    my_msg = await message.reply_text(ptxt)
+    target_message = await user.get_message_by_link(msg_link)
+    if not target_message:
+        return await message.reply_text('message not found')
+    
+    target_user = target_message.from_user.id
+
+    try:
+        user.sibyl.ban(
+            user_id=target_user,
+            reason=the_reason,
+            source=message.link,
+            message=target_message.text,
+        )
+    except Exception as e:
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
+        return
+    
+    await my_msg.edit_text(
+        html_mono('Cymatic scan request has been sent to Sibyl.'), 
+        parse_mode="HTML",
+    )
+
+
