@@ -196,7 +196,6 @@ async def revert_handler(_, message: Message):
     ),
 )
 async def rScan_handler(_, message: Message):
-    if not message.reply_to_message: return # TODO
     #cmd = message.command
     #is_silent = user.is_silent(message)
     reason_list = split_some(message.text, 2, ' ', '\n')
