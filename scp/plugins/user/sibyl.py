@@ -93,6 +93,7 @@ async def sinfo_handler(_, message: Message):
             txt += html_bold(" • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
             txt += html_bold(" • Last update: ") + html_mono(the_info.date, "\n")
             txt += html_bold(" • Ban reason: ")+ html_mono(the_info.reason, "\n")
+            txt += html_bold(" • Ban source: ")+ html_mono(the_info.ban_source_url, "\n")
         else:
             txt += html_bold(" • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
             txt += html_bold(" • Last update: ") + html_mono(the_info.date, "\n")
