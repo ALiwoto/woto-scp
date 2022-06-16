@@ -1,3 +1,4 @@
+import asyncio
 from scp import user
 from pyrogram.types import (
     Message,
@@ -61,8 +62,9 @@ async def gautoread_handler(_, message: Message):
     group=100,
 )
 async def auto_remove_bluetext_handler(_, message: Message):
-    if not user.auto_read_enabled:
+    if not user.auto_read_enabled or message.chat.title.lower().find('test') != -1:
         return
+    elif message.text.find('@') != -1: await asyncio.sleep(1.2)
     try:
         await message.delete()
     except Exception:
