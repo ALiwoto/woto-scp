@@ -120,7 +120,7 @@ async def screen_handler(_, message: Message):
 async def curl_handler(_, message: Message):
     await shell_base(message, message.text[1:])
 
-async def shell_base(message: Message, command: str):
+async def shell_base(message: Message, command: str, silent_on_success: bool = False):
     reply = await message.reply_text('Executing...', quote=True)
     process = await asyncio.create_subprocess_shell(
         command,
@@ -149,7 +149,10 @@ async def shell_base(message: Message, command: str):
             ),
         )
     else:
-        await reply.edit_text(doc)
+        if silent_on_success and returncode == 0:
+            await reply.delete()
+        else:
+            await reply.edit_text(doc)
 
 user.shell_base = shell_base
 
@@ -226,26 +229,20 @@ async def toGif_handler(_, message: Message):
         return
     
     rfile = tempfile.NamedTemporaryFile()
-    reply = await message.reply_text('Downloading...')
-    await user.download_media(
-        message.reply_to_message, 
-        file_name=rfile.name,
-        progress=progress_callback, 
-        progress_args=(reply, 'Downloading...', False),
-    )
     output_to_gif = 'output-toGif.mp4'
-    await shell_base(message, f'rm "{output_to_gif}" -f && ffmpeg -an -sn -i "{rfile.name}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error')
+    the_command = f'rm "{output_to_gif}" -f && ffmpeg -an -sn -i "{rfile.name}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error'
+    await shell_base(message, the_command, silent_on_success=True)
     
-    text = f'Uploading {html_mono(output_to_gif)}...'
-    reply = await message.reply_text(text)
+    # text = f'Uploading {html_mono(output_to_gif)}...'
+    # reply = await message.reply_text(text)
     rfile.close()
     
     try:
         await user.send_document(
             chat_id=message.chat.id, 
             document=output_to_gif, 
-            progress=progress_callback, 
-            progress_args=(reply, text, True),
+            # progress=progress_callback, 
+            # progress_args=(reply, text, True),
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
                 else message.message_id
@@ -256,11 +253,9 @@ async def toGif_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            await message.reply_text(html_mono(str(e)[:4000]), parse_mode='html')
             return
         except Exception: pass
-    else:
-        await reply.delete()
     
 
 
