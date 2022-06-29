@@ -211,7 +211,7 @@ async def cat(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & ~user.filters.edited
-    & user.owner
+    & (user.owner | user.special_users)
     & user.filters.command(
         'toGif',
         prefixes=user.cmd_prefixes,
