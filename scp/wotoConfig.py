@@ -6,6 +6,7 @@ class WotoConfig:
     _the_config: ConfigParser = None
     _sudo_users: typing.List[int] = []
     _owner_users: typing.List[int] = []
+    _special_users: typing.List[int] = []
     prefixes: typing.List[str] = []
     log_channel: int = 0
     api_id: str = ''
@@ -21,7 +22,7 @@ class WotoConfig:
     private_logger:int =0
     wp_username: str = ''
     wp_password: str = ''
-    wp_host: str = 'wotoplatform.hakai.animekaizoku.com'
+    wp_host: str = 'wotoplatform.kaizoku.cyou'
     wp_port: int = 50100
 
     def __init__(self) -> None:
@@ -36,6 +37,9 @@ class WotoConfig:
         
         for x in self._the_config.get('scp-5170', 'SudoList').split():
             self._sudo_users.append(int(x))
+        
+        for x in self._the_config.get('scp-5170', 'special_users').split():
+            self._special_users.append(int(x))
         
         self.prefixes = (
             self._the_config.get('scp-5170', 'Prefixes').split() or ['!', '.']

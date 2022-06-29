@@ -356,26 +356,28 @@ class ScpClient(WotoClientBase):
     for x in _config.get('scp-5170', 'public_dumps').split():
         dump_usernames.append(x)
     
+    scp_config = the_config
     __my_all_dialogs__: typing.List[types.Dialog] = None
     cached_messages: typing.List[types.Message] = None
     the_bots: typing.List[WotoClientBase] = _get_scp_bots()
     are_bots_started: bool = False
 
-    sudo = (filters.me | filters.user(_sudo))
-    owner = (filters.me | filters.user(_owners))
-    enforcer = (filters.me | filters.user(_enforcers))
-    inspector = (filters.me | filters.user(_inspectors))
-    cmd_prefixes = _config.get('scp-5170', 'prefixes').split() or ['!', '.']
+    sudo = (filters.me | filters.user(the_config._sudo_users))
+    owner = (filters.me | filters.user(the_config._owner_users))
+    special_users = (filters.me | filters.user(the_config._special_users))
+    enforcer = (filters.me | filters.user(the_config._enforcers))
+    inspector = (filters.me | filters.user(the_config._inspectors))
+    cmd_prefixes = the_config.prefixes or ['!', '.']
     wp: WotoClient = __get_wp_client__()
     
-    log_channel = _config.getint('scp-5170', 'LogChannel')
-    private_resources = _config.getint('scp-5170', 'private_resources')
+    log_channel = the_config.log_channel
+    private_resources = the_config.private_resources
     # sibyl configuration stuff:
-    sibyl_token = _config.get('sibyl-system', 'token')
-    public_listener = _config.getint('sibyl-system', 'public_listener')
-    public_logger = _config.get('sibyl-system', 'public_logger')
-    private_listener = _config.get('sibyl-system', 'private_listener')
-    private_logger = _config.get('sibyl-system', 'private_logger')
+    sibyl_token = the_config.sibyl_token
+    public_listener = the_config.public_listener
+    public_logger = the_config.public_logger
+    private_listener = the_config.private_listener
+    private_logger = the_config.private_logger
     public_sibyl_filter = filters.chat(
         public_listener,
     )
