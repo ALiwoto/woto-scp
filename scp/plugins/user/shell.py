@@ -229,6 +229,12 @@ async def toGif_handler(_, message: Message):
         return
     
     rfile = tempfile.NamedTemporaryFile()
+    await user.download_media(
+        message.reply_to_message, 
+        file_name=rfile.name,
+        # progress=progress_callback, 
+        # progress_args=(reply, 'Downloading...', False),
+    )
     output_to_gif = 'output-toGif.mp4'
     the_command = f'rm "{output_to_gif}" -f && ffmpeg -an -sn -i "{rfile.name}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error'
     await shell_base(message, the_command, silent_on_success=True)
