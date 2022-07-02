@@ -22,6 +22,10 @@ from pyrogram import(
     types, 
     raw, 
 )
+from pyrogram.raw.functions.channels import GetFullChannel
+from pyrogram.raw.functions.phone import EditGroupCallTitle
+from pyrogram.raw.types.messages.chat_full import ChatFull
+from pyrogram.raw.types.channel_full import ChannelFull
 from scp.utils.parser import(
     html_mono,
     html_bold,
@@ -211,6 +215,15 @@ class WotoClientBase(Client):
                                 if hasattr(diff, 'chats'):
                                     chats.update({c.id: c for c in diff.chats})
 
+    async def set_group_call_title(self, chat_id: Union[str, int], title: str):
+        try:
+            peer = await self.resolve_peer(chat_id)
+            chat: ChatFull = await self.send(GetFullChannel(channel=peer))
+            if not isinstance(chat.full_chat, ChannelFull):
+                return
+            await self.send(EditGroupCallTitle(call=chat.full_chat.call, title=title))
+        except BaseException:
+            pass
     
     async def copy_message(
         self,
