@@ -2,13 +2,13 @@ aiofiles==0.8.0
 aiohttp==3.8.1
 aiopyston==1.2.1
 attrify==3.0
-Faker==8.11.0
+Faker==15.0.0
 GitPython==3.1.18
 gpytranslate==1.4.0
 humanize==3.11.0
 kantex==0.2.0
-psutil==5.8.0
-Pyrogram==1.4.12
+psutil==5.9.1
+Pyrogram==2.0.32
 pyromod==1.5
 pyzxing==1.0.1
 rich==10.15.2
