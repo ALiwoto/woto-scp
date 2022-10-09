@@ -2,10 +2,14 @@ from typing import (
     Union,
     Optional,
     List,
+    AsyncGenerator,
 )
+from datetime import datetime
+import logging
 import asyncio
 from pyrogram import(
     utils as pUtils,
+    enums,
     Client, 
     filters, 
     types, 
@@ -131,40 +135,74 @@ class WotoClientBase(Client):
     def unpack_inline_message_id(inline_message_id: str) -> Atr:
         return unpackInlineMessage(inline_message_id)
 
+    async def invoke(
+        self,
+        query: raw.core.TLObject,
+        retries: int = session.Session.MAX_RETRIES,
+        timeout: float = session.Session.WAIT_TIMEOUT,
+        sleep_threshold: float = None
+    ) -> raw.core.TLObject:
+        while True:
+            try:
+                return await super().invoke(
+                    query=query,
+                    retries=retries,
+                    timeout=timeout,
+                    sleep_threshold=sleep_threshold,
+                )
+            except (
+                errors.SlowmodeWait,
+                errors.FloodWait,
+                errors.exceptions.flood_420.FloodWait,
+                errors.exceptions.flood_420.Flood,
+                errors.exceptions.Flood,
+                errors.exceptions.ApiIdPublishedFlood,
+            ) as e:
+                logging.warning(f'Sleeping for - {e.value} | {e}')
+                await asyncio.sleep(e.value + 2)
+            except OSError:
+                # attempt to fix TimeoutError on slower internet connection
+                # await self.session.stop()
+                # await self.session.start()
+                ...
+                
     async def send(
         self,
         data: raw.core.TLObject,
         retries: int = session.Session.MAX_RETRIES,
         timeout: float = session.Session.WAIT_TIMEOUT,
         sleep_threshold: float = None
-    ):
-        try:
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
-        except (
-            errors.SlowmodeWait,
-            errors.FloodWait,
-            errors.exceptions.flood_420.FloodWait,
-            errors.exceptions.flood_420.Flood,
-            errors.exceptions.Flood,
-            errors.exceptions.ApiIdPublishedFlood,
-        ) as e:
-            await asyncio.sleep(e.x)
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
-        except (
-            TimeoutError, OSError,
-        ):
-            await self.stop()
-            await self.start()
+    ) -> raw.core.TLObject:
+        return await self.invoke(
+            query=data, retries=retries, 
+            timeout=timeout, 
+            sleep_threshold=sleep_threshold)
+    
+    async def iter_history(self, 
+                               chat_id: Union[int, str], 
+                               limit: int = 0, 
+                               offset: int = 0, 
+                               offset_id: int = 0, 
+                               offset_date: datetime = ...) -> Optional[AsyncGenerator["types.Message", None]]:
+        return await super().get_chat_history(chat_id, limit, offset, offset_id, offset_date)
+    
+    
+    async def iter_chat_members(
+        self, 
+        chat_id: Union[int, str], 
+        query: str = "", 
+        limit: int = 0, 
+        filter: "enums.ChatMembersFilter" = enums.ChatMembersFilter.SEARCH
+    ) -> Optional[AsyncGenerator["types.ChatMember", None]]:
+        return await super().get_chat_members(chat_id, query, limit, filter)
+    
+    
+    async def iter_dialogs(
+        self, 
+        limit: int = 0
+    ) -> Optional[AsyncGenerator["types.Dialog", None]]:
+        return await super().get_dialogs(limit)
+
     
     async def handle_updates_woto(self, updates):
         if isinstance(updates, (raw.types.Updates, raw.types.UpdatesCombined)):
