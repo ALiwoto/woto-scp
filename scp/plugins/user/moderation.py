@@ -10,7 +10,9 @@ from pyrogram.types import (
 from pyrogram.enums.chat_member_status import (
     ChatMemberStatus,
 )
-from pyrogram.methods.chats.get_chat_members import Filters
+from pyrogram.enums.chat_members_filter import (
+    ChatMembersFilter,
+)
 from SibylSystem.types import MultiBanInfo
 from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
 from scp import user
@@ -181,7 +183,7 @@ async def admins_handler(_, message: Message):
     common = user.is_silent(message)
     m = None
     try:
-        m = await user.get_chat_members(the_chat, filter=Filters.ADMINISTRATORS)
+        m = await user.get_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
     except Exception as ex:
         await top_msg.edit_text(text=html_mono(ex))
         return
@@ -631,7 +633,7 @@ async def fadmins_handler(_, message: Message):
     common = not user.is_silent(message)
     m = None
     try:
-        m = await user.get_chat_members(the_chat, filter=Filters.ADMINISTRATORS)
+        m = await user.get_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
     except Exception as ex:
         await top_msg.edit_text(text=html_mono(ex))
         return
