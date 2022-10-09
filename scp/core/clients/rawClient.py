@@ -12,6 +12,7 @@ from pyrogram import(
     types, 
     raw, 
     errors, 
+    utils as pUtils,
 )
 from pyrogram import enums
 from pyrogram.raw.functions.messages import ReadMentions
@@ -150,7 +151,7 @@ class ScpClient(WotoClientBase):
         self, 
         chat_id: Union[int, str], 
         user_id: Union[int, str], 
-        until_date: int = 0,
+        until_date: datetime = pUtils.zero_datetime(),
     ) -> Union["types.Message", bool]:
         return await super().ban_chat_member(chat_id, user_id, until_date=until_date)
     
@@ -158,7 +159,7 @@ class ScpClient(WotoClientBase):
         self, 
         chat_id: Union[int, str], 
         user_id: Union[int, str], 
-        until_date: int = 0,
+        until_date: datetime = pUtils.zero_datetime(),
     ) -> Union["types.Message", bool]:
         return await super().ban_chat_member(chat_id, user_id, until_date=until_date)
 
