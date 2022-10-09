@@ -14,8 +14,7 @@ from pyrogram.errors import(
 @user.on_message(
 	~user.filters.forwarded &
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.filters.command(
         ['ord'],
@@ -41,8 +40,7 @@ async def ord_handler(_, message: Message):
 @user.on_message(
 	~user.filters.forwarded &
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.filters.command(
         ['chr'],
@@ -68,7 +66,6 @@ async def chr_handler(_, message: Message):
 	~user.filters.forwarded &
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
-	~user.filters.edited & 
 	user.owner & 
 	user.filters.command(
         ['pirate'],
@@ -154,7 +151,6 @@ async def pirate_handler(_, message: Message):
 	~user.filters.forwarded &
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
-	~user.filters.edited & 
 	user.owner & 
 	user.filters.command(
         ['cBackup'],
@@ -355,8 +351,7 @@ async def send_stare_gif(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['iUser'],

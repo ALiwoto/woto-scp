@@ -36,8 +36,7 @@ STARTER = html_mono("• \u200D")
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['investigate'],
@@ -73,8 +72,7 @@ async def investigate_handler(_, message: Message):
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['stalkers'],
@@ -233,7 +231,6 @@ async def admins_handler(_, message: Message):
 
 
 #@user.on_message(
-#	~user.filters.edited &
 #    user.wfilters.channel_in_group
 #)
 async def by_channels_handler(_, message: Message):
@@ -252,8 +249,7 @@ async def by_channels_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
     user.filters.reply &
 	user.owner & 
 	user.filters.command(
@@ -276,8 +272,7 @@ async def purge_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
     user.filters.reply &
 	user.sudo & 
 	user.filters.command(
@@ -320,8 +315,7 @@ async def tPurge_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited &
+	~user.filters.via_bot &
 	user.sudo & 
 	user.filters.command(
         ['deadaccs'],
@@ -355,8 +349,7 @@ async def deadaccs_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['members'],
@@ -426,8 +419,7 @@ async def members_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo &
 	user.filters.command(
         ['bots'],
@@ -523,8 +515,7 @@ async def bots_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['fmembers'],
@@ -604,8 +595,7 @@ async def fmembers_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['fAdmins', 'fAdmins!'],
@@ -702,8 +692,7 @@ async def fadmins_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['remSpec'],
@@ -728,8 +717,7 @@ async def remSpec_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['ban'],
@@ -778,8 +766,7 @@ async def ban_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['mute'],
@@ -844,8 +831,7 @@ async def mute_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['unmute'],
@@ -910,8 +896,7 @@ async def mute_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['aban'],
@@ -954,8 +939,7 @@ async def aban_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['kick'],
@@ -1005,8 +989,7 @@ async def kick_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['unban'],
@@ -1056,8 +1039,7 @@ async def unban_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['sban'],
@@ -1099,8 +1081,7 @@ async def sban_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['skick'],
@@ -1143,8 +1124,7 @@ async def kick_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['sunban'],
@@ -1190,8 +1170,7 @@ async def unban_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.command(
         ['getLinks'],
@@ -1249,8 +1228,7 @@ async def getlinks_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['replyTo'],
@@ -1280,8 +1258,7 @@ async def replyTo_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.command(
         ['tCacheMessages'],
@@ -1326,8 +1303,7 @@ async def tCacheMessages_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.filters.command(
         ['cachedScan'],
