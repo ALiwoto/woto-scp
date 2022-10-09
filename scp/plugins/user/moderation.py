@@ -7,6 +7,9 @@ from pyrogram.types import (
     User,
     ChatMember,
 )
+from pyrogram.enums.chat_member_status import (
+    ChatMemberStatus,
+)
 from pyrogram.methods.chats.get_chat_members import Filters
 from SibylSystem.types import MultiBanInfo
 from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
@@ -41,7 +44,7 @@ STARTER = html_mono("• \u200D")
         prefixes=user.cmd_prefixes,
     ),
 )
-async def admins_handler(_, message: Message):
+async def investigate_handler(_, message: Message):
     all_strs = message.text.split(' ')
     if len(all_strs) < 2:
         the_chat = message.chat.id
@@ -83,7 +86,7 @@ async def stalkers_handler(_, message: Message):
     if len(commands) < 3:
         return
     
-    # commad should be sent like this:
+    # command should be sent like this:
     # .stalkers kick 2
     
     action: str = commands[1].lower()
@@ -101,11 +104,12 @@ async def stalkers_handler(_, message: Message):
 
         await asyncio.sleep(sleep_time)
 
-        if member.status == 'administrator' or member.status == 'creator':
+        if member.status == ChatMemberStatus.ADMINISTRATOR or member.status == ChatMemberStatus.OWNER:
             sleep_time = 13
             continue
-            
-        if member.is_anonymous or member.user.is_contact:
+        
+        
+        if member.privileges.is_anonymous or member.user.is_contact:
             sleep_time = 12
             continue
 
@@ -152,8 +156,7 @@ async def stalkers_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['admins', 'admins!'],
@@ -301,7 +304,7 @@ async def tPurge_handler(_, message: Message):
             continue
         
         if flags.can_match(current):
-            the_messages.append(current.message_id)
+            the_messages.append(current.id)
 
     if not message.message_id in the_messages:
         the_messages.append(message.message_id)
@@ -330,7 +333,7 @@ async def deadaccs_handler(_, message: Message):
     found_count = 0
     kicked_count = 0
     async for current in user.iter_chat_members(chat_id=message.chat.id):
-        if not isinstance(current, ChatMember) or current.status == 'left':
+        if not isinstance(current, ChatMember) or current.status == ChatMemberStatus.LEFT:
             continue
         if current.user.is_deleted:
             found_count += 1
@@ -463,21 +466,28 @@ async def bots_handler(_, message: Message):
         await top_msg.edit_text(text=html_mono(e))
         return
 
+    the_query = ''
+    if the_group.members_count >= 5000:
+        # for groups that has less than 5k members, we better don't use this
+        # 'bot' query thingy, since there might be a bot that doesn't have
+        # bot at the end of its username, and in small groups we will sacrifice this
+        # and iterate over to find all bots.
+        # bot groups with more than 5k members are just too big and we might hit
+        # lots of floodwait error, so we better use the query.
+        the_query = 'bot'
     admin_bots: list[ChatMember] = []
     member_bots: list[ChatMember] = []
-    async for current in user.iter_chat_members(the_chat):
+    async for current in user.iter_chat_members(chat_id=the_chat, query=the_query):
         if not isinstance(current, ChatMember) or not current.user.is_bot:
             continue
 
-        if current.status == 'administrator':
+        if current.status == ChatMemberStatus.ADMINISTRATOR:
             admin_bots.append(current)
             continue
 
-        if current.status != 'left' and current.status != 'kicked':
+        if current.status != ChatMemberStatus.LEFT and current.status != ChatMemberStatus.BANNED:
             member_bots.append(current)
             continue
-
-
 
     if  len(admin_bots) == 0 and len(member_bots) == 0:
         await top_msg.edit_text(text="Seems like this group doesn't have any bots...")
@@ -598,7 +608,7 @@ async def fmembers_handler(_, message: Message):
 	~user.filters.edited & 
 	user.owner & 
 	user.command(
-        ['fadmins', 'fadmins!'],
+        ['fAdmins', 'fAdmins!'],
         prefixes=user.cmd_prefixes,
     ),
 )
@@ -696,14 +706,14 @@ async def fadmins_handler(_, message: Message):
 	~user.filters.edited & 
 	user.owner & 
 	user.command(
-        ['remspec'],
+        ['remSpec'],
         prefixes=user.cmd_prefixes,
     ),
 )
-async def remspec_handler(_, message: Message):
+async def remSpec_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n', '\t')
     if len(all_strs) < 2: return
-    query = ' '.join(all_strs[1:])
+    query = user.get_non_cmd(message.text)
     result = ''
     try:
         result = remove_special_chars(query)

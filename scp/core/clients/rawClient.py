@@ -3,6 +3,8 @@ import json
 from typing import(
     NoReturn, 
     Union,
+    Optional,
+    List,
 )
 from pyrogram import(
     filters, 
@@ -264,6 +266,80 @@ class ScpClient(WotoClientBase):
         if not self.__my_all_dialogs__ or len(self.__my_all_dialogs__) < 2:
             return await self.refresh_dialogs()
         return self.__my_all_dialogs__
+    
+    
+    async def send_message(
+        self,
+        chat_id: Union[int, str],
+        text: str,
+        parse_mode: Optional[str] = object,
+        entities: List["types.MessageEntity"] = None,
+        disable_web_page_preview: bool = None,
+        disable_notification: bool = None,
+        reply_to_message_id: int = None,
+        schedule_date: int = None,
+        reply_markup: Union[
+            "types.InlineKeyboardMarkup",
+            "types.ReplyKeyboardMarkup",
+            "types.ReplyKeyboardRemove",
+            "types.ForceReply"
+        ] = None
+    ) -> "types.Message":
+        try:
+            return await super().send_message(
+                chat_id=chat_id,
+                text=text,
+                parse_mode=parse_mode,
+                entities=entities,
+                disable_web_page_preview=disable_web_page_preview,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id,
+                schedule_date=schedule_date,
+                reply_markup=reply_markup
+            )
+        except errors.SlowmodeWait as e:
+            await asyncio.sleep(e.x)
+            return await super().send_message(
+                chat_id=chat_id,
+                text=text,
+                parse_mode=parse_mode,
+                entities=entities,
+                disable_web_page_preview=disable_web_page_preview,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id,
+                schedule_date=schedule_date,
+                reply_markup=reply_markup
+            )
+
+    async def send_inline_bot_result(
+        self,
+        chat_id: Union[int, str],
+        query_id: int,
+        result_id: str,
+        disable_notification: bool = None,
+        reply_to_message_id: int = None,
+        hide_via: bool = None
+    ):
+        try:
+            return await super().send_inline_bot_result(
+                chat_id=chat_id,
+                query_id=query_id,
+                result_id=result_id,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id,
+                hide_via=hide_via
+            )
+        except errors.SlowmodeWait as e:
+            await asyncio.sleep(e.x)
+            return await super().send_inline_bot_result(
+                chat_id=chat_id,
+                query_id=query_id,
+                result_id=result_id,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id,
+                hide_via=hide_via
+            )
+
     
     async def get_dialog_by_id(self, chat_id: typing.Union[str, int]) -> types.Dialog:
         my_all = await self.get_my_dialogs()
