@@ -1,5 +1,6 @@
 import typing
 import json
+from datetime import datetime
 from typing import(
     NoReturn, 
     Union,
@@ -267,17 +268,17 @@ class ScpClient(WotoClientBase):
             return await self.refresh_dialogs()
         return self.__my_all_dialogs__
     
-    
     async def send_message(
         self,
         chat_id: Union[int, str],
         text: str,
-        parse_mode: Optional[str] = object,
+        parse_mode: Optional["enums.ParseMode"] = None,
         entities: List["types.MessageEntity"] = None,
         disable_web_page_preview: bool = None,
         disable_notification: bool = None,
         reply_to_message_id: int = None,
-        schedule_date: int = None,
+        schedule_date: datetime = None,
+        protect_content: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -295,6 +296,7 @@ class ScpClient(WotoClientBase):
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
                 schedule_date=schedule_date,
+                protect_content=protect_content,
                 reply_markup=reply_markup
             )
         except errors.SlowmodeWait as e:
@@ -308,6 +310,7 @@ class ScpClient(WotoClientBase):
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
                 schedule_date=schedule_date,
+                protect_content=protect_content,
                 reply_markup=reply_markup
             )
 
