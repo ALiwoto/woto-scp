@@ -262,18 +262,19 @@ class WotoClientBase(Client):
             await self.send(EditGroupCallTitle(call=chat.full_chat.call, title=title))
         except BaseException:
             pass
-    
+
     async def copy_message(
         self,
         chat_id: Union[int, str],
         from_chat_id: Union[int, str],
         message_id: int,
         caption: str = None,
-        parse_mode: Optional[str] = object,
+        parse_mode: Optional["enums.ParseMode"] = None,
         caption_entities: List["types.MessageEntity"] = None,
         disable_notification: bool = None,
         reply_to_message_id: int = None,
-        schedule_date: int = None,
+        schedule_date: datetime = None,
+        protect_content: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -305,12 +306,9 @@ class WotoClientBase(Client):
                 If not specified, the original caption is kept.
                 Pass "" (empty string) to remove the caption.
 
-            parse_mode (``str``, *optional*):
+            parse_mode (:obj:`~pyrogram.enums.ParseMode`, *optional*):
                 By default, texts are parsed using both Markdown and HTML styles.
                 You can combine both syntaxes together.
-                Pass "markdown" or "md" to enable Markdown-style parsing only.
-                Pass "html" to enable HTML-style parsing only.
-                Pass None to completely disable style parsing.
 
             caption_entities (List of :obj:`~pyrogram.types.MessageEntity`):
                 List of special entities that appear in the new caption, which can be specified instead of *parse_mode*.
@@ -322,8 +320,11 @@ class WotoClientBase(Client):
             reply_to_message_id (``int``, *optional*):
                 If the message is a reply, ID of the original message.
 
-            schedule_date (``int``, *optional*):
-                Date when the message will be automatically sent. Unix time.
+            schedule_date (:py:obj:`~datetime.datetime`, *optional*):
+                Date when the message will be automatically sent.
+
+            protect_content (``bool``, *optional*):
+                Protects the contents of the sent message from forwarding and saving.
 
             reply_markup (:obj:`~pyrogram.types.InlineKeyboardMarkup` | :obj:`~pyrogram.types.ReplyKeyboardMarkup` | :obj:`~pyrogram.types.ReplyKeyboardRemove` | :obj:`~pyrogram.types.ForceReply`, *optional*):
                 Additional interface options. An object for an inline keyboard, custom reply keyboard,
@@ -336,7 +337,7 @@ class WotoClientBase(Client):
             .. code-block:: python
 
                 # Copy a message
-                app.copy_message("me", "pyrogram", 20)
+                await app.copy_message(to_chat, from_chat, 123)
 
         """
         message: types.Message = await self.get_messages(from_chat_id, message_id)
@@ -351,7 +352,7 @@ class WotoClientBase(Client):
         elif message.empty:
             return None
             #log.warning(f"Empty messages cannot be copied. ")
-
+        
         return await message.copy(
             chat_id=chat_id,
             caption=caption,
@@ -360,6 +361,7 @@ class WotoClientBase(Client):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             schedule_date=schedule_date,
+            protect_content=protect_content,
             reply_markup=reply_markup
         )
 

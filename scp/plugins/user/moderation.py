@@ -7,12 +7,9 @@ from pyrogram.types import (
     User,
     ChatMember,
 )
-from pyrogram.enums.chat_member_status import (
-    ChatMemberStatus,
-)
-from pyrogram.enums.chat_members_filter import (
-    ChatMembersFilter,
-)
+from pyrogram.enums.parse_mode import ParseMode
+from pyrogram.enums.chat_member_status import ChatMemberStatus
+from pyrogram.enums.chat_members_filter import ChatMembersFilter
 from SibylSystem.types import MultiBanInfo
 from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
 from scp import user
@@ -66,7 +63,7 @@ async def investigate_handler(_, message: Message):
     await message.reply_text(
         f"investigated {done} members in {the_chat}",
         quote=True,
-        parse_mode="html",
+        parse_mode=ParseMode.HTML,
     )
 
 
@@ -229,7 +226,7 @@ async def admins_handler(_, message: Message):
         await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
-    await top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(text=txt, parse_mode=ParseMode.HTML)
 
 
 #@user.on_message(
@@ -343,7 +340,7 @@ async def deadaccs_handler(_, message: Message):
                 except Exception: pass
     await message.reply_text(
         text=html_mono(f'found {found_count} deleted accounts, kicked {kicked_count}.'),
-        parse_mode="html",
+        parse_mode=ParseMode.HTML,
         quote=True,
     )
     
@@ -416,7 +413,7 @@ async def members_handler(_, message: Message):
         await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
-    await top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(text=txt, parse_mode=ParseMode.HTML)
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -509,7 +506,7 @@ async def bots_handler(_, message: Message):
 
     await top_msg.edit_text(
         text=txt, 
-        parse_mode="html",
+        parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
     )
 
@@ -591,7 +588,7 @@ async def fmembers_handler(_, message: Message):
         await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
-    await top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(text=txt, parse_mode=ParseMode.HTML)
 
 
 @user.on_message(~user.filters.scheduled & 
@@ -688,7 +685,7 @@ async def fadmins_handler(_, message: Message):
         await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
-    await top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(text=txt, parse_mode=ParseMode.HTML)
 
 
 @user.on_message(~user.filters.scheduled & 
@@ -712,7 +709,7 @@ async def remSpec_handler(_, message: Message):
         result = f'{e}'
     await message.reply_text(
         f"Result for query '{html_mono(query)}':\n{html_bold(result)}",
-        parse_mode="html",
+        parse_mode=ParseMode.HTML,
     )
 
 
@@ -1343,12 +1340,12 @@ async def cachedScan_handler(_, message: Message):
     try:
         user.sibyl.multi_ban(all_infos)
     except Exception as e:
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
         return
     
     await my_msg.edit_text(
         html_mono('Cymatic scan request has been sent to Sibyl.'), 
-        parse_mode="HTML",
+        parse_mode=ParseMode.HTML,
     )
 
 

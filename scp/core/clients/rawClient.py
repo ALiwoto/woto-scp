@@ -13,6 +13,7 @@ from pyrogram import(
     raw, 
     errors, 
 )
+from pyrogram import enums
 from pyrogram.raw.functions.messages import ReadMentions
 from wotoplatform import WotoClient
 from wotoplatform.types.errors import (
