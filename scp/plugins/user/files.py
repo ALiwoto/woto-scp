@@ -8,6 +8,7 @@ import traceback
 from pyrogram.types import (
     Message,
 )
+from pyrogram.enums.parse_mode import ParseMode
 from scp.utils import progress_callback
 from scp import user
 from scp.utils.parser import (
@@ -86,7 +87,7 @@ async def gitpull(_, message: Message):
     is_forced = contains_str(message.text, 'restart', 'force')
     res = await process.communicate()
     output = res[0].decode()
-    await r.edit_text(html_mono(str(output)[:4000]), parse_mode='html')
+    await r.edit_text(html_mono(str(output)[:4000]), parse_mode=ParseMode.HTML)
     if output.count('Already up to date') > 0 and not is_forced:
         return
     
@@ -94,7 +95,7 @@ async def gitpull(_, message: Message):
         r = await user.send_message(chat_id=message.chat.id, text="Restarting...")
         await user.restart_scp()
     except Exception as e:
-        await r.edit(html_mono(str(e)[:4000]), parse_mode='html')
+        await r.edit(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
         raise e
 
 
@@ -136,10 +137,10 @@ async def upload_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
         except Exception: pass
-        await message.reply_text(html_mono(str(e)[:4000]), parse_mode='html')
+        await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
     else:
         await reply.delete()
 
@@ -182,10 +183,10 @@ async def uld_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
         except Exception: pass
-        await message.reply_text(html_mono(str(e)[:4000]), parse_mode='html')
+        await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
     else:
         await reply.delete()
 
