@@ -33,7 +33,6 @@ exec_tasks = {}
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         'eval',
@@ -55,7 +54,6 @@ async def eval_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         'getsrc',
@@ -220,7 +218,6 @@ user.eval_base = eval_base
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         'exit',

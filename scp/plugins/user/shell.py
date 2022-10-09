@@ -24,7 +24,6 @@ BACKUP_SHELL_SCRIPT = (
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'sBackup',
@@ -43,7 +42,6 @@ async def sBackup_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         ['shell', 'sh'],
@@ -62,7 +60,6 @@ async def shell(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'neo',
@@ -78,7 +75,6 @@ async def neo_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'git',
@@ -93,7 +89,6 @@ async def git_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'screen',
@@ -110,7 +105,6 @@ async def screen_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'curl',
@@ -161,7 +155,6 @@ user.shell_base = shell_base
     & ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         'cat',
@@ -213,7 +206,6 @@ async def cat(_, message: Message):
     & ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & (user.owner | user.special_users)
     & user.filters.command(
         'toGif',
@@ -271,7 +263,6 @@ async def toGif_handler(_, message: Message):
     & ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.sudo
     & user.filters.command(
         'makeGif',

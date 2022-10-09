@@ -23,7 +23,6 @@ from pyrogram.types import Sticker
     ~user.filters.forwarded & 
     ~user.filters.sticker & 
     ~user.filters.via_bot & 
-    ~user.filters.edited & 
     user.sudo & 
     user.filters.command(
         ['anilist', 'al', 'alc', 'alchar', 'alcharacter', 'anilistc', 'anilistchar', 'anilistcharacter'], 
@@ -79,8 +78,7 @@ async def anilist(_, message: Message):
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['trace', 'tracemoe', 'whatanime', 'wa', 'wait'],

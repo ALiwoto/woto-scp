@@ -203,8 +203,7 @@ async def wordle_bot_message_handler(_, message: Message):
 @user.on_message(
 	~user.filters.forwarded &
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['wordle'],
@@ -227,8 +226,7 @@ async def enable_wordle_handler(_, message: Message):
 
 @user.on_message(
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['cWordle'],
@@ -274,8 +272,7 @@ async def cWordle_handler(_, message: Message):
 
 @user.on_message(
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['aWordle'],
