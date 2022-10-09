@@ -67,7 +67,7 @@ def _get_scp_bots() -> typing.List[WotoClientBase]:
                 continue
             try:
                 current_client = WotoClientBase(
-                    session_name=':memory:',
+                    in_memory=True,
                     bot_token=current,
                     api_id=the_config.api_id,
                     api_hash=the_config.api_hash,
@@ -89,10 +89,10 @@ class ScpClient(WotoClientBase):
     ):
         self.name = name
         super().__init__(
-            session_name=name,
+            name=name,
             api_id=the_config.api_id,
             api_hash=the_config.api_hash,
-            workers=8,
+            workers=16,
             device_model='kaizoku',
             app_version='woto-scp',
             no_updates=False,
