@@ -1,6 +1,7 @@
 from scp import user
-from scp.utils.similarwords import get_similar_words_async
+from scp.utils.similarWords import get_similar_words_async
 from scp.utils.mdparser import escapeAny
+from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import (
     Message,
 )
@@ -65,7 +66,7 @@ async def ud_handler(_, message: Message):
             for similar in similarities:
                 num += 1
                 text += escapeAny(f'\n{num}- ') + '__' + escapeAny(similar) + '__ '
-        return await message.reply_text(text, parse_mode="markdown")
+        return await message.reply_text(text, parse_mode=ParseMode.HTML)
     else:    
         text = user.md.KanTeXDocument(
             user.md.Section(
