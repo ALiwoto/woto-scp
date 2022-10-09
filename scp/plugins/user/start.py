@@ -32,7 +32,7 @@ async def _(_, query: bot.types.InlineQuery):
         ).fetchall()
     text = user.md.KanTeXDocument(
         user.md.Section(
-            'SCP-5170',
+            'woto-scp',
             user.md.SubSection(
                 'version: {}'.format(
                     user.md.Link(
@@ -68,7 +68,7 @@ async def _(_, query: bot.types.InlineQuery):
     await query.answer(
         results=[
             bot.types.InlineQueryResultArticle(
-                title='SCP-5170',
+                title='woto-scp',
                 description=__version__,
                 input_message_content=bot.types.InputTextMessageContent(
                     text,

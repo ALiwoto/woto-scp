@@ -32,19 +32,19 @@ class WotoConfig:
         self.api_id = self._the_config.get('pyrogram', 'api_id')
         self.api_hash = self._the_config.get('pyrogram', 'api_hash')
 
-        for x in self._the_config.get('scp-5170', 'OwnerList').split():
+        for x in self._the_config.get('woto-scp', 'OwnerList').split():
             self._owner_users.append(int(x))
         
-        for x in self._the_config.get('scp-5170', 'SudoList').split():
+        for x in self._the_config.get('woto-scp', 'SudoList').split():
             self._sudo_users.append(int(x))
         
-        for x in self._the_config.get('scp-5170', 'special_users').split():
+        for x in self._the_config.get('woto-scp', 'special_users').split():
             self._special_users.append(int(x))
         
         self.prefixes = (
-            self._the_config.get('scp-5170', 'Prefixes').split() or ['!', '.']
+            self._the_config.get('woto-scp', 'Prefixes').split() or ['!', '.']
         )
-        self.log_channel = self._the_config.getint('scp-5170', 'LogChannel')
+        self.log_channel = self._the_config.getint('woto-scp', 'LogChannel')
 
         try:
             for x in self._the_config.get('sibyl-system', 'enforcers').split():
@@ -58,10 +58,10 @@ class WotoConfig:
         except Exception as e:
             print(e)
         
-        for x in self._the_config.get('scp-5170', 'public_dumps').split():
+        for x in self._the_config.get('woto-scp', 'public_dumps').split():
             self.dump_usernames.append(x)
 
-        self.private_resources = self._the_config.getint('scp-5170', 'private_resources')
+        self.private_resources = self._the_config.getint('woto-scp', 'private_resources')
         # sibyl configuration stuff:
         self.sibyl_token = self._the_config.get('sibyl-system', 'token')
         self.public_listener = self._the_config.getint('sibyl-system', 'public_listener')

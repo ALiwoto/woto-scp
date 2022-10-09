@@ -410,11 +410,11 @@ class ScpClient(WotoClientBase):
     _enforcers = []
     _inspectors = []
     dump_usernames = []
-    for x in _config.get('scp-5170', 'SudoList').split():
+    for x in _config.get('woto-scp', 'SudoList').split():
         _sudo.append(int(x))
     
     try:
-        for x in _config.get('scp-5170', 'OwnerList').split():
+        for x in _config.get('woto-scp', 'OwnerList').split():
             the_id = int(x)
             if not x in _sudo:
                 _sudo.append(the_id)
@@ -434,7 +434,7 @@ class ScpClient(WotoClientBase):
     except Exception as e:
         logging.warning(f'{e}')
     
-    for x in _config.get('scp-5170', 'public_dumps').split():
+    for x in _config.get('woto-scp', 'public_dumps').split():
         dump_usernames.append(x)
     
     scp_config = the_config
