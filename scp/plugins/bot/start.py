@@ -14,7 +14,7 @@ async def _(_, message: bot.types.Message):
     userbot_stat = 'Stopped' if not me else 'Running'
     text = user.md.KanTeXDocument(
         user.md.Section(
-            'SCP-5170',
+            'woto-scp',
             user.md.KeyValueItem(
                 user.md.Bold('Userbot Status'), user.md.Code(userbot_stat),
             ),
@@ -22,7 +22,7 @@ async def _(_, message: bot.types.Message):
                 user.md.Bold('Version'),
                 user.md.Link(
                     __version__,
-                    'https://github.com/pokurt/SCP-5170/commit/{}'.format(
+                    'https://github.com/pokurt/woto-scp/commit/{}'.format(
                         __longVersion__,
                     ),
                 ),
