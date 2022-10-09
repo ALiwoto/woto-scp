@@ -1045,7 +1045,7 @@ async def unban_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def sban_handler(_, message: Message):
+async def sBan_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n')
     target_user = 0
     target_chat = 0
@@ -1074,7 +1074,9 @@ async def sban_handler(_, message: Message):
     except Exception: pass
 
     try:
-        await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        message = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        if isinstance(message, Message):
+            await message.delete()
     except Exception: pass
 
 @user.on_message(~user.filters.scheduled & 
@@ -1087,7 +1089,7 @@ async def sban_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def kick_handler(_, message: Message):
+async def skick_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n')
     target_user = 0
     target_chat = 0
@@ -1116,7 +1118,9 @@ async def kick_handler(_, message: Message):
     except Exception: pass
     
     try:
-        await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        message = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        if isinstance(message, Message):
+            await message.delete()
         await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
     except Exception: pass
 
