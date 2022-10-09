@@ -4,6 +4,7 @@ import asyncio
 import os
 import tempfile
 from io import BytesIO
+from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import (
     Message,
 )
@@ -243,7 +244,7 @@ async def toGif_handler(_, message: Message):
             # progress_args=(reply, text, True),
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
-                else message.message_id
+                else message.id
             ),
         )
         os.remove(output_to_gif)
@@ -251,7 +252,7 @@ async def toGif_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await message.reply_text(html_mono(str(e)[:4000]), parse_mode='html')
+            await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
         except Exception: pass
     
@@ -321,7 +322,7 @@ async def makeGif_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
         except Exception: pass
     else:

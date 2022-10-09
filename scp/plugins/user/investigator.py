@@ -4,6 +4,7 @@ from pyrogram.types import (
     Message,
     Chat,
 )
+from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.errors import(
     MessageIdInvalid,
     MessageTooLong,
@@ -145,7 +146,7 @@ async def pirate_handler(_, message: Message):
     text += user.html_normal(f'{the_chat.title} [') + user.html_mono(f'{target_chat}', '].\n')
     text += user.html_mono(done, ' messages were pirated successfully.\n')
     text += user.html_mono(failed, ' messages were not pirated.')
-    await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
+    await message.reply_text(text, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
 
 @user.on_message(
 	~user.filters.forwarded &
@@ -325,7 +326,7 @@ async def cBackup_handler(_, message: Message):
     text += user.html_normal(f'{the_chat.title} [') + user.html_mono(f'{target_chat}', '].\n')
     text += user.html_mono(done, ' messages were backed up successfully.\n')
     text += user.html_mono(failed, ' messages were not backed up.')
-    await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
+    await message.reply_text(text, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
 
 
 # @user.on_message(
@@ -394,7 +395,7 @@ async def investigate_user_handler(_, message: Message):
         txt += user.html_bold('・Messages count: ') + user.html_mono(count, '\n')
         txt += user.html_bold('・Last message: ')
         txt += user.html_link(f'>> {target_message.message_id}', target_message.link)
-        return await message.reply_text(txt, disable_web_page_preview=True, parse_mode='html')
+        return await message.reply_text(txt, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
     except Exception as e:
         return await user.reply_exception(message, e)
     

@@ -70,4 +70,5 @@
         "yimage"
     ],
     "python.linting.enabled": false,
+    "python.analysis.typeCheckingMode": "off",
 }
