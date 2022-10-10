@@ -367,6 +367,9 @@ class WotoClientBase(Client):
             return None
             #log.warning(f"Empty messages cannot be copied. ")
         
+        if not reply_markup and message.reply_markup:
+            reply_markup = message.reply_markup
+        
         return await message.copy(
             chat_id=chat_id,
             caption=caption,

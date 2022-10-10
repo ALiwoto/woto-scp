@@ -75,7 +75,7 @@ async def chr_handler(_, message: Message):
 )
 async def pirate_handler(_, message: Message):
     if not user.the_bots or len(user.the_bots) < 1:
-        await message.reply_text('bot lists is empty.')
+        await message.reply_text('bots list is empty.')
         return
     
     if not user.are_bots_started:
