@@ -70,6 +70,7 @@ def _get_scp_bots() -> typing.List[WotoClientBase]:
                 continue
             try:
                 current_client = WotoClientBase(
+                    name=current.split(':')[0],
                     in_memory=True,
                     bot_token=current,
                     api_id=the_config.api_id,
