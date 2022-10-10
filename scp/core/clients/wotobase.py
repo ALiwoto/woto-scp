@@ -203,6 +203,21 @@ class WotoClientBase(Client):
     ) -> Optional[AsyncGenerator["types.Dialog", None]]:
         return await super().get_dialogs(limit)
         
+    
+    async def get_history(
+        self, 
+        chat_id: Union[int, str], 
+        limit: int = 0, 
+        offset: int = 0, 
+        offset_id: int = 0, 
+        offset_date: datetime = ...
+    ) -> List["types.Message"]:
+        all_messages = []
+        async for current in self.get_chat_history(chat_id, limit, offset, offset_id, offset_date):
+            all_messages.append(current)
+        
+        return all_messages
+
 
     async def handle_updates_woto(self, updates):
         if isinstance(updates, (raw.types.Updates, raw.types.UpdatesCombined)):
