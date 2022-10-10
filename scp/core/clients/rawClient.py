@@ -76,7 +76,7 @@ def _get_scp_bots() -> typing.List[WotoClientBase]:
                     api_hash=the_config.api_hash,
                 )
                 my_bots.append(current_client)
-            except Exception: continue
+            except Exception as ex: logging.warn(f'failed to load bots: {ex}')
         
         __scp__helper__bots__ = my_bots
         return my_bots
