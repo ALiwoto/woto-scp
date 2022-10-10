@@ -250,6 +250,9 @@ def html_bold(value, *argv) -> str:
     return f"<b>{html.escape(str(value))}</b>" + get_html_normal(*argv)
 
 
+def html_italic(value, *argv) -> str:
+    return f"<i>{html.escape(str(value))}</i>" + get_html_normal(*argv)
+
 def html_link(value, link: str, *argv) -> str:
     if not isinstance(link, str) or len(link) == 0:
         return html_mono(value, *argv)

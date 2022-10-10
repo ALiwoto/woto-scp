@@ -32,6 +32,7 @@ from pyrogram.raw.types.channel_full import ChannelFull
 from scp.utils.parser import(
     html_mono,
     html_bold,
+    html_italic,
     html_link, 
     split_some,
     html_normal,
@@ -73,6 +74,9 @@ class WotoClientBase(Client):
     
     def html_bold(self, value, *argv) -> str:
         return html_bold(value, *argv)
+    
+    def html_italic(self, value, *argv) -> str:
+        return html_italic(value, *argv)
     
     def html_link(self, value, link: str, *argv) -> str:
         return html_link(value, link, *argv)
