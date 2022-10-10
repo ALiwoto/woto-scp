@@ -7,7 +7,9 @@ from pyrogram.types import (
     User,
     ChatMember,
 )
-from pyrogram.methods.chats.get_chat_members import Filters
+from pyrogram.enums.parse_mode import ParseMode
+from pyrogram.enums.chat_member_status import ChatMemberStatus
+from pyrogram.enums.chat_members_filter import ChatMembersFilter
 from SibylSystem.types import MultiBanInfo
 from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
 from scp import user
@@ -33,15 +35,14 @@ STARTER = html_mono("• \u200D")
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['investigate'],
         prefixes=user.cmd_prefixes,
     ),
 )
-async def admins_handler(_, message: Message):
+async def investigate_handler(_, message: Message):
     all_strs = message.text.split(' ')
     if len(all_strs) < 2:
         the_chat = message.chat.id
@@ -62,7 +63,7 @@ async def admins_handler(_, message: Message):
     await message.reply_text(
         f"investigated {done} members in {the_chat}",
         quote=True,
-        parse_mode="html",
+        parse_mode=ParseMode.HTML,
     )
 
 
@@ -70,8 +71,7 @@ async def admins_handler(_, message: Message):
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['stalkers'],
@@ -83,7 +83,7 @@ async def stalkers_handler(_, message: Message):
     if len(commands) < 3:
         return
     
-    # commad should be sent like this:
+    # command should be sent like this:
     # .stalkers kick 2
     
     action: str = commands[1].lower()
@@ -101,11 +101,12 @@ async def stalkers_handler(_, message: Message):
 
         await asyncio.sleep(sleep_time)
 
-        if member.status == 'administrator' or member.status == 'creator':
+        if member.status == ChatMemberStatus.ADMINISTRATOR or member.status == ChatMemberStatus.OWNER:
             sleep_time = 13
             continue
-            
-        if member.is_anonymous or member.user.is_contact:
+        
+        
+        if member.privileges.is_anonymous or member.user.is_contact:
             sleep_time = 12
             continue
 
@@ -152,8 +153,7 @@ async def stalkers_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['admins', 'admins!'],
@@ -180,7 +180,7 @@ async def admins_handler(_, message: Message):
     common = user.is_silent(message)
     m = None
     try:
-        m = await user.get_chat_members(the_chat, filter=Filters.ADMINISTRATORS)
+        m = await user.get_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
     except Exception as ex:
         await top_msg.edit_text(text=html_mono(ex))
         return
@@ -226,11 +226,10 @@ async def admins_handler(_, message: Message):
         await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
-    await top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(text=txt, parse_mode=ParseMode.HTML)
 
 
 #@user.on_message(
-#	~user.filters.edited &
 #    user.wfilters.channel_in_group
 #)
 async def by_channels_handler(_, message: Message):
@@ -249,8 +248,7 @@ async def by_channels_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
     user.filters.reply &
 	user.owner & 
 	user.filters.command(
@@ -259,8 +257,8 @@ async def by_channels_handler(_, message: Message):
     ),
 )
 async def purge_handler(_, message: Message):
-    first = message.reply_to_message.message_id
-    current = message.message_id
+    first = message.reply_to_message.id
+    current = message.id
     # messages between first and current
     messages = [m for m in range(first, current + 1)]
 
@@ -273,8 +271,7 @@ async def purge_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
     user.filters.reply &
 	user.sudo & 
 	user.filters.command(
@@ -283,8 +280,8 @@ async def purge_handler(_, message: Message):
     ),
 )
 async def tPurge_handler(_, message: Message):
-    first = message.reply_to_message.message_id
-    current = message.message_id
+    first = message.reply_to_message.id
+    current = message.id
     limit = current - first
 
     my_strs: list[str] = split_some(message.text, 1, ' ', '\n')
@@ -301,10 +298,10 @@ async def tPurge_handler(_, message: Message):
             continue
         
         if flags.can_match(current):
-            the_messages.append(current.message_id)
+            the_messages.append(current.id)
 
-    if not message.message_id in the_messages:
-        the_messages.append(message.message_id)
+    if not message.id in the_messages:
+        the_messages.append(message.id)
     
     try:
         await user.delete_all_messages(
@@ -317,8 +314,7 @@ async def tPurge_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited &
+	~user.filters.via_bot &
 	user.sudo & 
 	user.filters.command(
         ['deadaccs'],
@@ -330,7 +326,7 @@ async def deadaccs_handler(_, message: Message):
     found_count = 0
     kicked_count = 0
     async for current in user.iter_chat_members(chat_id=message.chat.id):
-        if not isinstance(current, ChatMember) or current.status == 'left':
+        if not isinstance(current, ChatMember) or current.status == ChatMemberStatus.LEFT:
             continue
         if current.user.is_deleted:
             found_count += 1
@@ -344,7 +340,7 @@ async def deadaccs_handler(_, message: Message):
                 except Exception: pass
     await message.reply_text(
         text=html_mono(f'found {found_count} deleted accounts, kicked {kicked_count}.'),
-        parse_mode="html",
+        parse_mode=ParseMode.HTML,
         quote=True,
     )
     
@@ -352,8 +348,7 @@ async def deadaccs_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['members'],
@@ -418,13 +413,12 @@ async def members_handler(_, message: Message):
         await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
-    await top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(text=txt, parse_mode=ParseMode.HTML)
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo &
 	user.filters.command(
         ['bots'],
@@ -463,21 +457,28 @@ async def bots_handler(_, message: Message):
         await top_msg.edit_text(text=html_mono(e))
         return
 
+    the_query = ''
+    if the_group.members_count >= 5000:
+        # for groups that has less than 5k members, we better don't use this
+        # 'bot' query thingy, since there might be a bot that doesn't have
+        # bot at the end of its username, and in small groups we will sacrifice this
+        # and iterate over to find all bots.
+        # bot groups with more than 5k members are just too big and we might hit
+        # lots of floodwait error, so we better use the query.
+        the_query = 'bot'
     admin_bots: list[ChatMember] = []
     member_bots: list[ChatMember] = []
-    async for current in user.iter_chat_members(the_chat):
+    async for current in user.iter_chat_members(chat_id=the_chat, query=the_query):
         if not isinstance(current, ChatMember) or not current.user.is_bot:
             continue
 
-        if current.status == 'administrator':
+        if current.status == ChatMemberStatus.ADMINISTRATOR:
             admin_bots.append(current)
             continue
 
-        if current.status != 'left' and current.status != 'kicked':
+        if current.status != ChatMemberStatus.LEFT and current.status != ChatMemberStatus.BANNED:
             member_bots.append(current)
             continue
-
-
 
     if  len(admin_bots) == 0 and len(member_bots) == 0:
         await top_msg.edit_text(text="Seems like this group doesn't have any bots...")
@@ -505,7 +506,7 @@ async def bots_handler(_, message: Message):
 
     await top_msg.edit_text(
         text=txt, 
-        parse_mode="html",
+        parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
     )
 
@@ -513,8 +514,7 @@ async def bots_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['fmembers'],
@@ -588,17 +588,16 @@ async def fmembers_handler(_, message: Message):
         await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
-    await top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(text=txt, parse_mode=ParseMode.HTML)
 
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
-        ['fadmins', 'fadmins!'],
+        ['fAdmins', 'fAdmins!'],
         prefixes=user.cmd_prefixes,
     ),
 )
@@ -631,7 +630,7 @@ async def fadmins_handler(_, message: Message):
     common = not user.is_silent(message)
     m = None
     try:
-        m = await user.get_chat_members(the_chat, filter=Filters.ADMINISTRATORS)
+        m = await user.get_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
     except Exception as ex:
         await top_msg.edit_text(text=html_mono(ex))
         return
@@ -686,24 +685,23 @@ async def fadmins_handler(_, message: Message):
         await asyncio.gather(top_msg.delete(), message.reply_document(to_output_file(txt)))
         return
 
-    await top_msg.edit_text(text=txt, parse_mode="html")
+    await top_msg.edit_text(text=txt, parse_mode=ParseMode.HTML)
 
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
-        ['remspec'],
+        ['remSpec'],
         prefixes=user.cmd_prefixes,
     ),
 )
-async def remspec_handler(_, message: Message):
+async def remSpec_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n', '\t')
     if len(all_strs) < 2: return
-    query = ' '.join(all_strs[1:])
+    query = user.get_non_cmd(message.text)
     result = ''
     try:
         result = remove_special_chars(query)
@@ -711,15 +709,14 @@ async def remspec_handler(_, message: Message):
         result = f'{e}'
     await message.reply_text(
         f"Result for query '{html_mono(query)}':\n{html_bold(result)}",
-        parse_mode="html",
+        parse_mode=ParseMode.HTML,
     )
 
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['ban'],
@@ -768,8 +765,7 @@ async def ban_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['mute'],
@@ -834,8 +830,7 @@ async def mute_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['unmute'],
@@ -900,8 +895,7 @@ async def mute_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['aban'],
@@ -944,8 +938,7 @@ async def aban_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['kick'],
@@ -995,8 +988,7 @@ async def kick_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['unban'],
@@ -1046,15 +1038,14 @@ async def unban_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['sban'],
         prefixes=user.cmd_prefixes,
     ),
 )
-async def sban_handler(_, message: Message):
+async def sBan_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n')
     target_user = 0
     target_chat = 0
@@ -1083,21 +1074,22 @@ async def sban_handler(_, message: Message):
     except Exception: pass
 
     try:
-        await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        message = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        if isinstance(message, Message):
+            await message.delete()
     except Exception: pass
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['skick'],
         prefixes=user.cmd_prefixes,
     ),
 )
-async def kick_handler(_, message: Message):
+async def skick_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n')
     target_user = 0
     target_chat = 0
@@ -1126,15 +1118,16 @@ async def kick_handler(_, message: Message):
     except Exception: pass
     
     try:
-        await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        message = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        if isinstance(message, Message):
+            await message.delete()
         await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
     except Exception: pass
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['sunban'],
@@ -1180,8 +1173,7 @@ async def unban_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.command(
         ['getLinks'],
@@ -1239,8 +1231,7 @@ async def getlinks_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['replyTo'],
@@ -1270,8 +1261,7 @@ async def replyTo_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.command(
         ['tCacheMessages'],
@@ -1316,8 +1306,7 @@ async def tCacheMessages_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.filters.command(
         ['cachedScan'],
@@ -1355,12 +1344,12 @@ async def cachedScan_handler(_, message: Message):
     try:
         user.sibyl.multi_ban(all_infos)
     except Exception as e:
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
         return
     
     await my_msg.edit_text(
         html_mono('Cymatic scan request has been sent to Sibyl.'), 
-        parse_mode="HTML",
+        parse_mode=ParseMode.HTML,
     )
 
 

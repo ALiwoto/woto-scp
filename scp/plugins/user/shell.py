@@ -4,6 +4,7 @@ import asyncio
 import os
 import tempfile
 from io import BytesIO
+from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import (
     Message,
 )
@@ -24,7 +25,6 @@ BACKUP_SHELL_SCRIPT = (
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'sBackup',
@@ -43,7 +43,6 @@ async def sBackup_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         ['shell', 'sh'],
@@ -62,7 +61,6 @@ async def shell(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'neo',
@@ -78,7 +76,6 @@ async def neo_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'git',
@@ -93,7 +90,6 @@ async def git_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'screen',
@@ -110,7 +106,6 @@ async def screen_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.filters.me
     & user.filters.command(
         'curl',
@@ -161,7 +156,6 @@ user.shell_base = shell_base
     & ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         'cat',
@@ -213,7 +207,6 @@ async def cat(_, message: Message):
     & ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & (user.owner | user.special_users)
     & user.filters.command(
         'toGif',
@@ -251,7 +244,7 @@ async def toGif_handler(_, message: Message):
             # progress_args=(reply, text, True),
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
-                else message.message_id
+                else message.id
             ),
         )
         os.remove(output_to_gif)
@@ -259,7 +252,7 @@ async def toGif_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await message.reply_text(html_mono(str(e)[:4000]), parse_mode='html')
+            await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
         except Exception: pass
     
@@ -271,7 +264,6 @@ async def toGif_handler(_, message: Message):
     & ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.sudo
     & user.filters.command(
         'makeGif',
@@ -322,7 +314,7 @@ async def makeGif_handler(_, message: Message):
             progress_args=(reply, text, True),
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
-                else message.message_id
+                else message.id
             ),
         )
         os.remove(outfile)
@@ -330,7 +322,7 @@ async def makeGif_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
         except Exception: pass
     else:

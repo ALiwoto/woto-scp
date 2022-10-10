@@ -8,6 +8,7 @@ import traceback
 from pyrogram.types import (
     Message,
 )
+from pyrogram.enums.parse_mode import ParseMode
 from scp.utils import progress_callback
 from scp import user
 from scp.utils.parser import (
@@ -19,8 +20,7 @@ from scp.utils.parser import (
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['ls', 'hls', 'hiddenls'],
@@ -52,8 +52,7 @@ async def ls_handler(_, message: Message):
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['pwd', 'dir'],
@@ -69,8 +68,7 @@ async def pwd_handler(_, message: Message):
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['gitpull', 'restart'],
@@ -89,7 +87,7 @@ async def gitpull(_, message: Message):
     is_forced = contains_str(message.text, 'restart', 'force')
     res = await process.communicate()
     output = res[0].decode()
-    await r.edit_text(html_mono(str(output)[:4000]), parse_mode='html')
+    await r.edit_text(html_mono(str(output)[:4000]), parse_mode=ParseMode.HTML)
     if output.count('Already up to date') > 0 and not is_forced:
         return
     
@@ -97,7 +95,7 @@ async def gitpull(_, message: Message):
         r = await user.send_message(chat_id=message.chat.id, text="Restarting...")
         await user.restart_scp()
     except Exception as e:
-        await r.edit(html_mono(str(e)[:4000]), parse_mode='html')
+        await r.edit(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
         raise e
 
 
@@ -105,8 +103,7 @@ async def gitpull(_, message: Message):
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['ul', 'upload'],
@@ -133,17 +130,17 @@ async def upload_handler(_, message: Message):
             force_document=True, 
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
-                else message.message_id
+                else message.id
             ),
         )
     except user.exceptions.MediaInvalid:
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
         except Exception: pass
-        await message.reply_text(html_mono(str(e)[:4000]), parse_mode='html')
+        await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
     else:
         await reply.delete()
 
@@ -152,8 +149,7 @@ async def upload_handler(_, message: Message):
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['uld'],
@@ -179,7 +175,7 @@ async def uld_handler(_, message: Message):
             progress_args=(reply, text, True),
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
-                else message.message_id
+                else message.id
             ),
         )
         os.remove(file)
@@ -187,10 +183,10 @@ async def uld_handler(_, message: Message):
         await message.reply_text('Upload cancelled!')
     except Exception as e:
         try:
-            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode='html')
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
         except Exception: pass
-        await message.reply_text(html_mono(str(e)[:4000]), parse_mode='html')
+        await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
     else:
         await reply.delete()
 
@@ -199,8 +195,7 @@ async def uld_handler(_, message: Message):
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['dl', 'download'],

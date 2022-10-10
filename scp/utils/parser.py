@@ -250,6 +250,9 @@ def html_bold(value, *argv) -> str:
     return f"<b>{html.escape(str(value))}</b>" + get_html_normal(*argv)
 
 
+def html_italic(value, *argv) -> str:
+    return f"<i>{html.escape(str(value))}</i>" + get_html_normal(*argv)
+
 def html_link(value, link: str, *argv) -> str:
     if not isinstance(link, str) or len(link) == 0:
         return html_mono(value, *argv)
@@ -262,12 +265,12 @@ async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
     if not isinstance(chat.username, str) or len(chat.username) == 0:
         count = 1
         if chat._client:
-            messages = await chat._client.get_history(
+            messages = await chat._client.get_chat_history(
                 chat_id=chat.id,
                 limit=1,
             )
             if messages:
-                count = messages[0].message_id
+                count = messages[0].id
         link = f'https://t.me/c/{str(chat.id)[4:]}/{count}'
     else:
         link = f'https://t.me/{chat.username}'

@@ -4,7 +4,7 @@ from pyrogram.types import (
     Message,
 )
 from pyrogram.types.user_and_chats.user import User
-
+from pyrogram.enums.parse_mode import ParseMode
 from scp import user
 from SibylSystem.types import GeneralInfo
 
@@ -105,11 +105,11 @@ async def sinfo_handler(_, message: Message):
                     " registered at PSB " + (f"division {div}." if div else "."),
                 )
         
-        await my_msg.edit_text(txt, parse_mode="HTML", disable_web_page_preview=True)
+        await my_msg.edit_text(txt, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
     except Exception as e:
         #print(e)
         #logging.exception("some errors found")
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
         return
 
 
@@ -142,12 +142,12 @@ async def fScan_handler(_, message: Message):
             message=replied.text,
         )
     except Exception as e:
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
         return
     
     await my_msg.edit_text(
         html_mono('Cymatic scan request has been sent to Sibyl.'), 
-        parse_mode="HTML",
+        parse_mode=ParseMode.HTML,
     )
 
 
@@ -179,12 +179,12 @@ async def revert_handler(_, message: Message):
     try:
         user.sibyl.revert(target_user)
     except Exception as e:
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
         return
     
     await my_msg.edit_text(
         html_mono('Cymatic scan request has been sent to Sibyl.'), 
-        parse_mode="HTML",
+        parse_mode=ParseMode.HTML,
     )
 
 
@@ -226,12 +226,12 @@ async def rScan_handler(_, message: Message):
             message=target_message.text,
         )
     except Exception as e:
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode="HTML")
+        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
         return
     
     await my_msg.edit_text(
         html_mono('Cymatic scan request has been sent to Sibyl.'), 
-        parse_mode="HTML",
+        parse_mode=ParseMode.HTML,
     )
 
 

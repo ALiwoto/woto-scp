@@ -25,15 +25,14 @@ async def _(_, query: bot.types.InlineQuery):
     await m.delete()
     with user.storage.lock, user.storage.conn:
         groups = user.storage.conn.execute(
-            'SELECT id FROM peers WHERE type in '
-            '("group", "supergroup", "channel")',
+            'SELECT COUNT(id) FROM peers WHERE type in ("group", "supergroup", "channel")',
         ).fetchall()
         users = user.storage.conn.execute(
-            'SELECT id FROM peers WHERE type in ("user", "bot")',
+            'SELECT COUNT(id) FROM peers WHERE type in ("user", "bot")',
         ).fetchall()
     text = user.md.KanTeXDocument(
         user.md.Section(
-            'SCP-5170',
+            'woto-scp',
             user.md.SubSection(
                 'version: {}'.format(
                     user.md.Link(
@@ -69,7 +68,7 @@ async def _(_, query: bot.types.InlineQuery):
     await query.answer(
         results=[
             bot.types.InlineQueryResultArticle(
-                title='SCP-5170',
+                title='woto-scp',
                 description=__version__,
                 input_message_content=bot.types.InputTextMessageContent(
                     text,
@@ -78,7 +77,7 @@ async def _(_, query: bot.types.InlineQuery):
                 reply_markup=bot.types.InlineKeyboardMarkup(
                     [[
                         bot.types.InlineKeyboardButton(
-                            'Source', url='https://github.com/pokurt/SCP-5170',
+                            'Source', url='https://github.com/aliwoto/woto-scp',
                         ),
                         bot.types.InlineKeyboardButton(
                             'close', callback_data='close_message',

@@ -107,12 +107,12 @@ async def wordle_bot_message_handler(_, message: Message):
             await user.send_message(message.chat.id, '/new@hiwordlebot')
             chat_settings.reset_values()
             await asyncio.sleep(2)
-            return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
+            return await user.send_message(message.chat.id, WORDS_LIST[message.id%len(WORDS_LIST)])
         elif message.text.find('Not a valid') != -1:
             chat_settings.invalid_error_count += 1
             if not chat_settings.last_valid_text:
                 await asyncio.sleep(6)
-                return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
+                return await user.send_message(message.chat.id, WORDS_LIST[message.id%len(WORDS_LIST)])
             else:
                 message.text = chat_settings.last_valid_text
         
@@ -128,7 +128,7 @@ async def wordle_bot_message_handler(_, message: Message):
     if chat_settings.total_attempt >= MAX_ATTEMPT:
         chat_settings.reset_values()
         await asyncio.sleep(4)
-        return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
+        return await user.send_message(message.chat.id, WORDS_LIST[message.id%len(WORDS_LIST)])
     elif chat_settings.total_attempt == 0:
         # copy WORDS_LIST to guess_list
         chat_settings.current_guess_list = WORDS_LIST[:]
@@ -148,7 +148,7 @@ async def wordle_bot_message_handler(_, message: Message):
         chat_settings.reset_values()
         await user.send_message(message.chat.id, '/new@hiwordlebot')
         await asyncio.sleep(5)
-        return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
+        return await user.send_message(message.chat.id, WORDS_LIST[message.id%len(WORDS_LIST)])
 
     temp_tuple = tuple(chat_settings.current_guess_list)
     for word in temp_tuple: # You can't iterate over a list you want to change, so using a tuple.
@@ -172,7 +172,7 @@ async def wordle_bot_message_handler(_, message: Message):
 
     the_word = ''
     if len(chat_settings.current_guess_list) == 0:
-        the_word = WORDS_LIST[message.message_id%len(WORDS_LIST)]
+        the_word = WORDS_LIST[message.id%len(WORDS_LIST)]
     elif len(chat_settings.current_guess_list) < 5:
         if chat_settings.last_sent_index == -1:
             chat_settings.last_sent_index = 0
@@ -193,9 +193,9 @@ async def wordle_bot_message_handler(_, message: Message):
             await user.send_message(message.chat.id, '/new@hiwordlebot')
             chat_settings.reset_values()
             await asyncio.sleep(6)
-            return await user.send_message(message.chat.id, WORDS_LIST[message.message_id%len(WORDS_LIST)])
+            return await user.send_message(message.chat.id, WORDS_LIST[message.id%len(WORDS_LIST)])
         elif chat_settings.invalid_error_count >= 1:
-            the_word = WORDS_LIST[message.message_id%len(WORDS_LIST)]
+            the_word = WORDS_LIST[message.id%len(WORDS_LIST)]
     
     chat_settings.last_word = the_word
     await user.send_message(message.chat.id, the_word)
@@ -203,8 +203,7 @@ async def wordle_bot_message_handler(_, message: Message):
 @user.on_message(
 	~user.filters.forwarded &
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['wordle'],
@@ -227,8 +226,7 @@ async def enable_wordle_handler(_, message: Message):
 
 @user.on_message(
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['cWordle'],
@@ -274,8 +272,7 @@ async def cWordle_handler(_, message: Message):
 
 @user.on_message(
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.filters.command(
         ['aWordle'],

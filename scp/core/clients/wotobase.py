@@ -2,12 +2,15 @@ from typing import (
     Union,
     Optional,
     List,
+    AsyncGenerator,
 )
+from datetime import datetime
+import logging
 import asyncio
 from pyrogram import(
     utils as pUtils,
-    Client, 
-    filters, 
+    enums,
+    Client,
     types, 
     raw, 
     errors, 
@@ -29,6 +32,7 @@ from pyrogram.raw.types.channel_full import ChannelFull
 from scp.utils.parser import(
     html_mono,
     html_bold,
+    html_italic,
     html_link, 
     split_some,
     html_normal,
@@ -70,6 +74,9 @@ class WotoClientBase(Client):
     
     def html_bold(self, value, *argv) -> str:
         return html_bold(value, *argv)
+    
+    def html_italic(self, value, *argv) -> str:
+        return html_italic(value, *argv)
     
     def html_link(self, value, link: str, *argv) -> str:
         return html_link(value, link, *argv)
@@ -131,41 +138,94 @@ class WotoClientBase(Client):
     def unpack_inline_message_id(inline_message_id: str) -> Atr:
         return unpackInlineMessage(inline_message_id)
 
+    async def invoke(
+        self,
+        query: raw.core.TLObject,
+        retries: int = session.Session.MAX_RETRIES,
+        timeout: float = session.Session.WAIT_TIMEOUT,
+        sleep_threshold: float = None
+    ) -> raw.core.TLObject:
+        while True:
+            try:
+                return await super().invoke(
+                    query=query,
+                    retries=retries,
+                    timeout=timeout,
+                    sleep_threshold=sleep_threshold,
+                )
+            except (
+                errors.SlowmodeWait,
+                errors.FloodWait,
+                errors.exceptions.flood_420.FloodWait,
+                errors.exceptions.flood_420.Flood,
+                errors.exceptions.Flood,
+                errors.exceptions.ApiIdPublishedFlood,
+            ) as e:
+                logging.warning(f'Sleeping for - {e.value} | {e}')
+                await asyncio.sleep(e.value + 2)
+            except OSError:
+                # attempt to fix TimeoutError on slower internet connection
+                # await self.session.stop()
+                # await self.session.start()
+                ...
+                
     async def send(
         self,
         data: raw.core.TLObject,
         retries: int = session.Session.MAX_RETRIES,
         timeout: float = session.Session.WAIT_TIMEOUT,
         sleep_threshold: float = None
-    ):
-        try:
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
-        except (
-            errors.SlowmodeWait,
-            errors.FloodWait,
-            errors.exceptions.flood_420.FloodWait,
-            errors.exceptions.flood_420.Flood,
-            errors.exceptions.Flood,
-            errors.exceptions.ApiIdPublishedFlood,
-        ) as e:
-            await asyncio.sleep(e.x)
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
-        except (
-            TimeoutError, OSError,
-        ):
-            await self.stop()
-            await self.start()
+    ) -> raw.core.TLObject:
+        return await self.invoke(
+            query=data, 
+            retries=retries, 
+            timeout=timeout, 
+            sleep_threshold=sleep_threshold
+        )
     
+    async def iter_history(
+        self, 
+        chat_id: Union[int, str], 
+        limit: int = 0, 
+        offset: int = 0, 
+        offset_id: int = 0, 
+        offset_date: datetime = pUtils.zero_datetime()
+    ) -> Optional[AsyncGenerator["types.Message", None]]:
+        return await super().get_chat_history(chat_id, limit, offset, offset_id, offset_date)
+    
+    
+    async def iter_chat_members(
+        self, 
+        chat_id: Union[int, str], 
+        query: str = "", 
+        limit: int = 0, 
+        filter: "enums.ChatMembersFilter" = enums.ChatMembersFilter.SEARCH
+    ) -> Optional[AsyncGenerator["types.ChatMember", None]]:
+        return await super().get_chat_members(chat_id, query, limit, filter)
+    
+    
+    async def iter_dialogs(
+        self, 
+        limit: int = 0
+    ) -> Optional[AsyncGenerator["types.Dialog", None]]:
+        return await super().get_dialogs(limit)
+        
+    
+    async def get_history(
+        self, 
+        chat_id: Union[int, str], 
+        limit: int = 0, 
+        offset: int = 0, 
+        offset_id: int = 0, 
+        offset_date: datetime = pUtils.zero_datetime()
+    ) -> List["types.Message"]:
+        all_messages = []
+        async for current in self.get_chat_history(chat_id, limit, offset, offset_id, offset_date):
+            all_messages.append(current)
+        
+        return all_messages
+
+
     async def handle_updates_woto(self, updates):
         if isinstance(updates, (raw.types.Updates, raw.types.UpdatesCombined)):
             is_min = (await self.fetch_peers(updates.users)) or (await self.fetch_peers(updates.chats))
@@ -224,18 +284,19 @@ class WotoClientBase(Client):
             await self.send(EditGroupCallTitle(call=chat.full_chat.call, title=title))
         except BaseException:
             pass
-    
+
     async def copy_message(
         self,
         chat_id: Union[int, str],
         from_chat_id: Union[int, str],
         message_id: int,
         caption: str = None,
-        parse_mode: Optional[str] = object,
+        parse_mode: Optional["enums.ParseMode"] = None,
         caption_entities: List["types.MessageEntity"] = None,
         disable_notification: bool = None,
         reply_to_message_id: int = None,
-        schedule_date: int = None,
+        schedule_date: datetime = None,
+        protect_content: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -267,12 +328,9 @@ class WotoClientBase(Client):
                 If not specified, the original caption is kept.
                 Pass "" (empty string) to remove the caption.
 
-            parse_mode (``str``, *optional*):
+            parse_mode (:obj:`~pyrogram.enums.ParseMode`, *optional*):
                 By default, texts are parsed using both Markdown and HTML styles.
                 You can combine both syntaxes together.
-                Pass "markdown" or "md" to enable Markdown-style parsing only.
-                Pass "html" to enable HTML-style parsing only.
-                Pass None to completely disable style parsing.
 
             caption_entities (List of :obj:`~pyrogram.types.MessageEntity`):
                 List of special entities that appear in the new caption, which can be specified instead of *parse_mode*.
@@ -284,8 +342,11 @@ class WotoClientBase(Client):
             reply_to_message_id (``int``, *optional*):
                 If the message is a reply, ID of the original message.
 
-            schedule_date (``int``, *optional*):
-                Date when the message will be automatically sent. Unix time.
+            schedule_date (:py:obj:`~datetime.datetime`, *optional*):
+                Date when the message will be automatically sent.
+
+            protect_content (``bool``, *optional*):
+                Protects the contents of the sent message from forwarding and saving.
 
             reply_markup (:obj:`~pyrogram.types.InlineKeyboardMarkup` | :obj:`~pyrogram.types.ReplyKeyboardMarkup` | :obj:`~pyrogram.types.ReplyKeyboardRemove` | :obj:`~pyrogram.types.ForceReply`, *optional*):
                 Additional interface options. An object for an inline keyboard, custom reply keyboard,
@@ -298,7 +359,7 @@ class WotoClientBase(Client):
             .. code-block:: python
 
                 # Copy a message
-                app.copy_message("me", "pyrogram", 20)
+                await app.copy_message(to_chat, from_chat, 123)
 
         """
         message: types.Message = await self.get_messages(from_chat_id, message_id)
@@ -313,7 +374,10 @@ class WotoClientBase(Client):
         elif message.empty:
             return None
             #log.warning(f"Empty messages cannot be copied. ")
-
+        
+        if not reply_markup and message.reply_markup:
+            reply_markup = message.reply_markup
+        
         return await message.copy(
             chat_id=chat_id,
             caption=caption,
@@ -322,6 +386,7 @@ class WotoClientBase(Client):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             schedule_date=schedule_date,
+            protect_content=protect_content,
             reply_markup=reply_markup
         )
 

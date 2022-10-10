@@ -40,7 +40,7 @@ def calculate_eta(current, total, start_time):
 
 progress_callback_data = dict()
 async def progress_callback(current: int, total: int, reply: Message, text: str, upload: bool):
-    message_identifier = (reply.chat.id, reply.message_id)
+    message_identifier = (reply.chat.id, reply.id)
     last_edit_time, prevtext, start_time = progress_callback_data.get(message_identifier, (0, None, time.time()))
     if current == total:
         try:

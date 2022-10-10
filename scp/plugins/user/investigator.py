@@ -4,6 +4,7 @@ from pyrogram.types import (
     Message,
     Chat,
 )
+from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.errors import(
     MessageIdInvalid,
     MessageTooLong,
@@ -14,8 +15,7 @@ from pyrogram.errors import(
 @user.on_message(
 	~user.filters.forwarded &
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.filters.command(
         ['ord'],
@@ -41,8 +41,7 @@ async def ord_handler(_, message: Message):
 @user.on_message(
 	~user.filters.forwarded &
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.sudo & 
 	user.filters.command(
         ['chr'],
@@ -68,7 +67,6 @@ async def chr_handler(_, message: Message):
 	~user.filters.forwarded &
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
-	~user.filters.edited & 
 	user.owner & 
 	user.filters.command(
         ['pirate'],
@@ -77,7 +75,7 @@ async def chr_handler(_, message: Message):
 )
 async def pirate_handler(_, message: Message):
     if not user.the_bots or len(user.the_bots) < 1:
-        await message.reply_text('bot lists is empty.')
+        await message.reply_text('bots list is empty.')
         return
     
     if not user.are_bots_started:
@@ -88,7 +86,11 @@ async def pirate_handler(_, message: Message):
 
     args = user.split_message(message)
     if not args or len(args) < 2:
-        return
+        txt = user.html_bold("Pirate: \n\t\t")
+        txt += user.html_italic("Pirates messages from another chat to the defined private_resources chat.\n\n\t\t")
+        txt += user.html_bold("Usage:\n")
+        txt += user.html_mono(".pirate target_chat from_id-to_id")
+        return await message.reply_text(text=txt, parse_mode=ParseMode.HTML)
     
     target_chat = args[1]
     the_chat: Chat = None
@@ -110,7 +112,7 @@ async def pirate_handler(_, message: Message):
                 limit=1,
             )
             if messages:
-                to_id = messages[0].message_id
+                to_id = messages[0].id
     except Exception as e:
         return await message.reply_text(user.html_mono(e))
 
@@ -148,13 +150,12 @@ async def pirate_handler(_, message: Message):
     text += user.html_normal(f'{the_chat.title} [') + user.html_mono(f'{target_chat}', '].\n')
     text += user.html_mono(done, ' messages were pirated successfully.\n')
     text += user.html_mono(failed, ' messages were not pirated.')
-    await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
+    await message.reply_text(text, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
 
 @user.on_message(
 	~user.filters.forwarded &
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
-	~user.filters.edited & 
 	user.owner & 
 	user.filters.command(
         ['cBackup'],
@@ -238,7 +239,7 @@ async def cBackup_handler(_, message: Message):
 
             current_user_message = await user.the_bots[current_bot_index].send_message(
                 chat_id=user.private_resources,
-                text=tg_link_first+str(current_user_message.message_id),
+                text=tg_link_first+str(current_user_message.id),
                 disable_web_page_preview=False,
             )
 
@@ -263,7 +264,7 @@ async def cBackup_handler(_, message: Message):
                     counter += 1
                     current_user_message = await user.get_messages(
                         chat_id=current_user_message.chat.id,
-                        message_ids=current_user_message.message_id,
+                        message_ids=current_user_message.id,
                     )
                     if current_user_message.web_page or counter > 6:
                         break
@@ -329,7 +330,7 @@ async def cBackup_handler(_, message: Message):
     text += user.html_normal(f'{the_chat.title} [') + user.html_mono(f'{target_chat}', '].\n')
     text += user.html_mono(done, ' messages were backed up successfully.\n')
     text += user.html_mono(failed, ' messages were not backed up.')
-    await message.reply_text(text, disable_web_page_preview=True, parse_mode='html')
+    await message.reply_text(text, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
 
 
 # @user.on_message(
@@ -348,15 +349,14 @@ async def send_stare_gif(_, message: Message):
     await user.send_animation(
         message.chat.id, 
         message.animation.file_id, 
-        reply_to_message_id=message.message_id,
+        reply_to_message_id=message.id,
     )
 
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
-	~user.filters.via_bot & 
-	~user.filters.edited & 
+	~user.filters.via_bot &
 	user.owner & 
 	user.command(
         ['iUser'],
@@ -398,8 +398,8 @@ async def investigate_user_handler(_, message: Message):
         txt += await user.html_normal_chat_link(the_group.title, the_group, "\n\n")
         txt += user.html_bold('・Messages count: ') + user.html_mono(count, '\n')
         txt += user.html_bold('・Last message: ')
-        txt += user.html_link(f'>> {target_message.message_id}', target_message.link)
-        return await message.reply_text(txt, disable_web_page_preview=True, parse_mode='html')
+        txt += user.html_link(f'>> {target_message.id}', target_message.link)
+        return await message.reply_text(txt, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
     except Exception as e:
         return await user.reply_exception(message, e)
     

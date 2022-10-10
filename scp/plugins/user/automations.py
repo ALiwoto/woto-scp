@@ -18,10 +18,10 @@ __PLUGIN__ = 'automations'
     group=100,
 )
 async def auto_read_handler(_, message: Message):
-    if not user.auto_read_enabled:
+    if not user.auto_read_enabled or message.id % 2 != 0:
         return
     try:
-        await user.read_history(message.chat.id)
+        await user.read_chat_history(message.chat.id)
     except Exception:
         return
     return

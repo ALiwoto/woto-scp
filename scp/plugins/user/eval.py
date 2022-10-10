@@ -17,6 +17,7 @@ from scp.utils.parser import(
     html_mono, 
     to_output_file,
 )
+from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import (
     Message,
     InlineQuery,
@@ -33,7 +34,6 @@ exec_tasks = {}
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         'eval',
@@ -55,7 +55,6 @@ async def eval_handler(_, message: Message):
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         'getsrc',
@@ -91,7 +90,7 @@ async def eval_base(client: user, message: Message, code: str, silent: bool = Fa
         txt = html_mono(str_err)
         return await message.reply_text(
             txt, 
-            parse_mode='html', 
+            parse_mode=ParseMode.HTML, 
             quote=True,
         )
     
@@ -107,7 +106,7 @@ async def eval_base(client: user, message: Message, code: str, silent: bool = Fa
                 await message.reply_document(to_output_file(str_err))
                 return
             txt = html_mono(str_err)
-            return await message.reply_text(txt, parse_mode='html')
+            return await message.reply_text(txt, parse_mode=ParseMode.HTML)
         exx = _gf(o_body)
     rnd_id = '#' + str(ShortUUID().random(length=8))
     reply: Message = None
@@ -175,7 +174,7 @@ async def eval_base(client: user, message: Message, code: str, silent: bool = Fa
         txt += html_mono(f' {str(e)} ')
         return await reply.edit_text(
             text=txt,
-            parse_mode='html',
+            parse_mode=ParseMode.HTML,
             quote=True,
             disable_web_page_preview=True,
         )
@@ -210,7 +209,7 @@ async def eval_base(client: user, message: Message, code: str, silent: bool = Fa
         txt += html_mono(output)
         await reply.edit_text(
             txt, 
-            parse_mode='html', 
+            parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
         )
 
@@ -220,7 +219,6 @@ user.eval_base = eval_base
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & ~user.filters.edited
     & user.owner
     & user.filters.command(
         'exit',
