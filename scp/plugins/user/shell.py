@@ -314,7 +314,7 @@ async def makeGif_handler(_, message: Message):
             progress_args=(reply, text, True),
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
-                else message.message_id
+                else message.id
             ),
         )
         os.remove(outfile)
