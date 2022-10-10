@@ -177,16 +177,20 @@ class WotoClientBase(Client):
         sleep_threshold: float = None
     ) -> raw.core.TLObject:
         return await self.invoke(
-            query=data, retries=retries, 
+            query=data, 
+            retries=retries, 
             timeout=timeout, 
-            sleep_threshold=sleep_threshold)
+            sleep_threshold=sleep_threshold
+        )
     
-    async def iter_history(self, 
-                               chat_id: Union[int, str], 
-                               limit: int = 0, 
-                               offset: int = 0, 
-                               offset_id: int = 0, 
-                               offset_date: datetime = ...) -> Optional[AsyncGenerator["types.Message", None]]:
+    async def iter_history(
+        self, 
+        chat_id: Union[int, str], 
+        limit: int = 0, 
+        offset: int = 0, 
+        offset_id: int = 0, 
+        offset_date: datetime = pUtils.zero_datetime()
+    ) -> Optional[AsyncGenerator["types.Message", None]]:
         return await super().get_chat_history(chat_id, limit, offset, offset_id, offset_date)
     
     
