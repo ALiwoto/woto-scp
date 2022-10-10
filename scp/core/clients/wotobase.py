@@ -10,8 +10,7 @@ import asyncio
 from pyrogram import(
     utils as pUtils,
     enums,
-    Client, 
-    filters, 
+    Client,
     types, 
     raw, 
     errors, 
