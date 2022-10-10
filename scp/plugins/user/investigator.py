@@ -88,7 +88,7 @@ async def pirate_handler(_, message: Message):
     if not args or len(args) < 2:
         txt = user.html_bold("Pirate: \n\t\t")
         txt += user.html_italic("Pirates messages from another chat to the defined private_resources chat.\n\n\t\t")
-        txt += user.html_bold("Usage:")
+        txt += user.html_bold("Usage:\n")
         txt += user.html_mono(".pirate target_chat from_id-to_id")
         return await message.reply_text(text=txt, parse_mode=ParseMode.HTML)
     
