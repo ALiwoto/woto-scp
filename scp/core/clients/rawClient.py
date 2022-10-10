@@ -112,20 +112,20 @@ class ScpClient(WotoClientBase):
 
     async def start(self):
         await super().start()
-        me = await super().get_me()
-        if not me.id in self._sudo:
-            self._sudo.append(me.id)
-        if not me.id in self._owners:
-            self._owners.append(me.id)
+        # me = await super().get_me()
+        if not self.me.id in self._sudo:
+            self._sudo.append(self.me.id)
+        if not self.me.id in self._owners:
+            self._owners.append(self.me.id)
         
         try:
             await self.wp.start()
         except ClientAlreadyInitializedException: pass
         except Exception as e: logging.warning(e)
         
-        self.original_phone_number = me.phone_number
+        self.original_phone_number = self.me.phone_number
         logging.warning(
-            f'logged in as {me.first_name}.',
+            f'logged in as {self.me.first_name}.',
         )
 
     async def start_all_bots(self):
@@ -141,7 +141,7 @@ class ScpClient(WotoClientBase):
 
     async def stop(self, block: bool = True):
         logging.warning(
-            f'logged out from {(await super().get_me()).first_name}.',
+            f'logged out from {self.me.first_name}.',
         )
         await super().stop(block)
 
