@@ -21,7 +21,7 @@ async def auto_read_handler(_, message: Message):
     if not user.auto_read_enabled:
         return
     try:
-        await user.read_history(message.chat.id)
+        await user.read_chat_history(message.chat.id)
     except Exception:
         return
     return
