@@ -209,7 +209,7 @@ class WotoClientBase(Client):
         limit: int = 0, 
         offset: int = 0, 
         offset_id: int = 0, 
-        offset_date: datetime = ...
+        offset_date: datetime = pUtils.zero_datetime()
     ) -> List["types.Message"]:
         all_messages = []
         async for current in self.get_chat_history(chat_id, limit, offset, offset_id, offset_date):
