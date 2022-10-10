@@ -257,8 +257,8 @@ async def by_channels_handler(_, message: Message):
     ),
 )
 async def purge_handler(_, message: Message):
-    first = message.reply_to_message.message_id
-    current = message.message_id
+    first = message.reply_to_message.id
+    current = message.id
     # messages between first and current
     messages = [m for m in range(first, current + 1)]
 
@@ -280,8 +280,8 @@ async def purge_handler(_, message: Message):
     ),
 )
 async def tPurge_handler(_, message: Message):
-    first = message.reply_to_message.message_id
-    current = message.message_id
+    first = message.reply_to_message.id
+    current = message.id
     limit = current - first
 
     my_strs: list[str] = split_some(message.text, 1, ' ', '\n')
@@ -300,8 +300,8 @@ async def tPurge_handler(_, message: Message):
         if flags.can_match(current):
             the_messages.append(current.id)
 
-    if not message.message_id in the_messages:
-        the_messages.append(message.message_id)
+    if not message.id in the_messages:
+        the_messages.append(message.id)
     
     try:
         await user.delete_all_messages(

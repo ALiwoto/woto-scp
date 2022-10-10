@@ -108,7 +108,7 @@ async def pirate_handler(_, message: Message):
                 limit=1,
             )
             if messages:
-                to_id = messages[0].message_id
+                to_id = messages[0].id
     except Exception as e:
         return await message.reply_text(user.html_mono(e))
 
@@ -235,7 +235,7 @@ async def cBackup_handler(_, message: Message):
 
             current_user_message = await user.the_bots[current_bot_index].send_message(
                 chat_id=user.private_resources,
-                text=tg_link_first+str(current_user_message.message_id),
+                text=tg_link_first+str(current_user_message.id),
                 disable_web_page_preview=False,
             )
 
@@ -260,7 +260,7 @@ async def cBackup_handler(_, message: Message):
                     counter += 1
                     current_user_message = await user.get_messages(
                         chat_id=current_user_message.chat.id,
-                        message_ids=current_user_message.message_id,
+                        message_ids=current_user_message.id,
                     )
                     if current_user_message.web_page or counter > 6:
                         break
@@ -345,7 +345,7 @@ async def send_stare_gif(_, message: Message):
     await user.send_animation(
         message.chat.id, 
         message.animation.file_id, 
-        reply_to_message_id=message.message_id,
+        reply_to_message_id=message.id,
     )
 
 
@@ -394,7 +394,7 @@ async def investigate_user_handler(_, message: Message):
         txt += await user.html_normal_chat_link(the_group.title, the_group, "\n\n")
         txt += user.html_bold('・Messages count: ') + user.html_mono(count, '\n')
         txt += user.html_bold('・Last message: ')
-        txt += user.html_link(f'>> {target_message.message_id}', target_message.link)
+        txt += user.html_link(f'>> {target_message.id}', target_message.link)
         return await message.reply_text(txt, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
     except Exception as e:
         return await user.reply_exception(message, e)

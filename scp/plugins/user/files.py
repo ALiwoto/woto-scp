@@ -130,7 +130,7 @@ async def upload_handler(_, message: Message):
             force_document=True, 
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
-                else message.message_id
+                else message.id
             ),
         )
     except user.exceptions.MediaInvalid:
@@ -175,7 +175,7 @@ async def uld_handler(_, message: Message):
             progress_args=(reply, text, True),
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
-                else message.message_id
+                else message.id
             ),
         )
         os.remove(file)

@@ -27,7 +27,7 @@ _chats = {}
 async def _(_, message: user.types.Message):
     for x, y in _chats.items():
         if x == message.chat.id:
-            await user.forward_messages(y, x, message.message_id)
+            await user.forward_messages(y, x, message.id)
 
 
 @user.on_message(user.sudo & user.command('pipeChat'))
