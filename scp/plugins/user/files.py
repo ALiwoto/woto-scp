@@ -13,6 +13,7 @@ from scp.utils import progress_callback
 from scp import user
 from scp.utils.parser import (
     contains_str,
+    html_bold,
     html_mono,
 )
 
@@ -86,7 +87,7 @@ async def gitpull(_, message: Message):
     
     is_forced = contains_str(message.text, 'restart', 'force')
     res = await process.communicate()
-    output = res[0].decode()
+    output = res[0].decode() + '\n\n' + res[1].decode()
     await r.edit_text(html_mono(str(output)[:4000]), parse_mode=ParseMode.HTML)
     if output.count('Already up to date') > 0 and not is_forced:
         return
