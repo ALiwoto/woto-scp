@@ -101,7 +101,7 @@ class ScpClient(WotoClientBase):
             app_version='woto-scp',
             no_updates=False,
         )
-        self.aioclient:ClientSession = ClientSession()
+        self.aioclient: ClientSession = ClientSession()
         self.is_scp_bot = is_scp_bot
         if is_scp_bot:
             self.the_bot = self
