@@ -95,7 +95,7 @@ async def gitpull(_, message: Message):
     elif not stdout:
         txt = html_bold('looks like something went wrong...\n')
         txt += "Make sure your git configurations are all correct and try again."
-        return await user.send_message(chat_id=message.chat.id, text="Restarting...")
+        return await user.send_message(chat_id=message.chat.id, text=txt)
     
     try:
         r = await user.send_message(chat_id=message.chat.id, text="Restarting...")
