@@ -87,16 +87,21 @@ async def gitpull(_, message: Message):
     
     is_forced = contains_str(message.text, 'restart', 'force')
     res = await process.communicate()
-    output = res[0].decode() + '\n\n' + res[1].decode()
+    stdout = res[0].decode()
+    output = (stdout + '\n\n' if stdout else '') + res[1].decode()
     await r.edit_text(html_mono(str(output)[:4000]), parse_mode=ParseMode.HTML)
     if output.count('Already up to date') > 0 and not is_forced:
         return
+    elif not stdout:
+        txt = html_bold('looks like something went wrong...\n')
+        txt += "Make sure your git configurations are all correct and try again."
+        return await user.send_message(chat_id=message.chat.id, text="Restarting...")
     
     try:
         r = await user.send_message(chat_id=message.chat.id, text="Restarting...")
         await user.restart_scp()
     except Exception as e:
-        await r.edit(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
+        await r.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
         raise e
 
 
