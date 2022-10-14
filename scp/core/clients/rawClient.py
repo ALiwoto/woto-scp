@@ -323,8 +323,7 @@ class ScpClient(WotoClientBase):
         query_id: int,
         result_id: str,
         disable_notification: bool = None,
-        reply_to_message_id: int = None,
-        hide_via: bool = None
+        reply_to_message_id: int = None
     ):
         try:
             return await super().send_inline_bot_result(
@@ -332,8 +331,7 @@ class ScpClient(WotoClientBase):
                 query_id=query_id,
                 result_id=result_id,
                 disable_notification=disable_notification,
-                reply_to_message_id=reply_to_message_id,
-                hide_via=hide_via
+                reply_to_message_id=reply_to_message_id
             )
         except errors.SlowmodeWait as e:
             await asyncio.sleep(e.x)
@@ -342,8 +340,7 @@ class ScpClient(WotoClientBase):
                 query_id=query_id,
                 result_id=result_id,
                 disable_notification=disable_notification,
-                reply_to_message_id=reply_to_message_id,
-                hide_via=hide_via
+                reply_to_message_id=reply_to_message_id
             )
 
     
