@@ -11,11 +11,11 @@ psutil==5.9.1
 Pyrogram==2.0.32
 pyromod==1.5
 pyzxing==1.0.1
-rich==10.15.2
+rich==12.6.0
 shortuuid==1.0.1
 TgCrypto==1.2.3
 ujson==4.3.0
 yarl==1.6.3
 httpx==0.21.0
 git+https://github.com/MinistryOfWelfare/SibylSystem-Py
-git+https://github.com/AnimeKaizoku/wotoplatform-py
+wotoplatform==0.0.20
