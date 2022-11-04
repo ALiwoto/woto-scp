@@ -241,7 +241,7 @@ def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
 def html_mono(value, *argv) -> str:
     return f"<code>{html.escape(str(value))}</code>" +  get_html_normal(*argv)
 
-def html_in_parantesis(value) -> str:
+def html_in_parenthesis(value) -> str:
     if not value:
         return ": "
     return f" ({ html.escape(str(value))}): "
@@ -323,8 +323,8 @@ async def in_common_length(user: types.User) -> int:
 
 async def html_in_common(user: types.User, get_common: bool = False) -> str:
     if user.is_self or get_common:
-        return html_in_parantesis(None)
-    return html_in_parantesis(await in_common_length(user))
+        return html_in_parenthesis(None)
+    return html_in_parenthesis(await in_common_length(user))
 
 def get_name(user: types.User, name_limit: int = -1) -> str:
     if not isinstance(user, types.User): return "Not user"

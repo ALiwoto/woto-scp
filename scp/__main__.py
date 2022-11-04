@@ -16,8 +16,6 @@ from scp.utils.interpreter import shell
 
 HELP_COMMANDS = {}
 
-loop = asyncio.get_event_loop()
-
 
 async def start_bot():
     await bot.start()
@@ -34,4 +32,4 @@ async def start_bot():
 
 
 if __name__ == '__main__':
-    loop.run_until_complete(start_bot())
+    asyncio.run(start_bot())
