@@ -27,9 +27,9 @@ async def start_bot():
         loadBotPlugins(),
         loadUserPlugins(),
         loadPrivatePlugins(),
-        idle(),
+        idle()
     )
-
-
+    
 if __name__ == '__main__':
-    asyncio.run(start_bot())
+    from . import loop
+    loop.run_until_complete(start_bot())
