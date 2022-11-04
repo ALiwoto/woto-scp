@@ -118,11 +118,12 @@ class ScpClient(WotoClientBase):
         if not self.me.id in self._owners:
             self._owners.append(self.me.id)
         
-        try:
-            await self.wp.start()
-        except ClientAlreadyInitializedException: pass
-        except Exception as e: logging.warning(e)
-        
+        if not self.is_scp_bot:
+            try:
+                await self.wp.start()
+            except ClientAlreadyInitializedException: pass
+            except Exception as e: logging.warning(e)
+            
         self.original_phone_number = self.me.phone_number
         logging.warning(
             f'logged in as {self.me.first_name}.',
