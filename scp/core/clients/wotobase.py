@@ -183,7 +183,7 @@ class WotoClientBase(Client):
             sleep_threshold=sleep_threshold
         )
     
-    async def iter_history(
+    def iter_history(
         self, 
         chat_id: Union[int, str], 
         limit: int = 0, 
@@ -191,24 +191,24 @@ class WotoClientBase(Client):
         offset_id: int = 0, 
         offset_date: datetime = pUtils.zero_datetime()
     ) -> Optional[AsyncGenerator["types.Message", None]]:
-        return await super().get_chat_history(chat_id, limit, offset, offset_id, offset_date)
+        return super().get_chat_history(chat_id, limit, offset, offset_id, offset_date)
     
     
-    async def iter_chat_members(
+    def iter_chat_members(
         self, 
         chat_id: Union[int, str], 
         query: str = "", 
         limit: int = 0, 
         filter: "enums.ChatMembersFilter" = enums.ChatMembersFilter.SEARCH
     ) -> Optional[AsyncGenerator["types.ChatMember", None]]:
-        return await super().get_chat_members(chat_id, query, limit, filter)
+        return super().get_chat_members(chat_id, query, limit, filter)
     
     
-    async def iter_dialogs(
+    def iter_dialogs(
         self, 
         limit: int = 0
     ) -> Optional[AsyncGenerator["types.Dialog", None]]:
-        return await super().get_dialogs(limit)
+        return super().get_dialogs(limit)
         
     
     async def get_history(
