@@ -41,7 +41,7 @@ bluetext = filters.create(bluetext_filter)
 """Filter messages which are bot commands (starts with '/')."""
 
 async def noisy_bluetext_filter(_, __, m: types.Message) -> bool:
-    if not (m and m.text and m.text[0] == '/'): return False
+    if not (m and m.text and m.text.startswith('/')): return False
     if not m.chat or not m.chat.username: return False
     
     if m.text.startswith('/scan'): return False
