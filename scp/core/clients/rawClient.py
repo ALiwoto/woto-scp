@@ -160,10 +160,35 @@ class ScpClient(WotoClientBase):
     async def kick_chat_member(
         self, 
         chat_id: Union[int, str], 
-        user_id: Union[int, str], 
+        user_id: Union[int, str],
+        ignore_error: bool = True, 
+        tries: int = 5,
         until_date: datetime = pUtils.zero_datetime(),
     ) -> Union["types.Message", bool]:
-        return await super().ban_chat_member(chat_id, user_id, until_date=until_date)
+        ret_message: types.Message = None
+        try:
+            ret_message = await super().ban_chat_member(chat_id, user_id, until_date=until_date)
+        except Exception: pass
+        
+        done = False
+        if not tries: tries = 5
+        current_tries = 0
+        while not done and current_tries <= tries:
+            current_tries += 1
+            try:
+                await self.unban_chat_member(
+                    chat_id=chat_id,
+                    user_id=user_id
+                )
+                done = await self.unban_chat_member(
+                    chat_id=chat_id,
+                    user_id=user_id
+                )
+            except Exception:
+                if not ignore_error:
+                    raise
+        
+        return ret_message
 
     # from Kantek
     async def resolve_url(self, url: str) -> str:
