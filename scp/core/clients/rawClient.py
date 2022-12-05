@@ -23,6 +23,7 @@ from wotoplatform.types.errors import (
 from scp.core.filters.Command import command
 from scp.utils import wfilters
 from scp.utils.sibylUtils import SibylClient
+from scp.database.database_client import DatabaseClient
 from scp.utils.misc import restart_scp as restart_woto_scp
 from configparser import ConfigParser
 from kantex import md as Markdown
@@ -125,6 +126,7 @@ class ScpClient(WotoClientBase):
             except Exception as e: logging.warning(e)
             
         self.original_phone_number = self.me.phone_number
+        self.db = DatabaseClient(self.storage.conn)
         logging.warning(
             f'logged in as {self.me.first_name}.',
         )
@@ -474,7 +476,7 @@ class ScpClient(WotoClientBase):
     inspector = (filters.me | filters.user(the_config._inspectors))
     cmd_prefixes = the_config.prefixes or ['!', '.']
     wp: WotoClient = __get_wp_client__()
-    
+    db: DatabaseClient = None
     log_channel = the_config.log_channel
     private_resources = the_config.private_resources
     # sibyl configuration stuff:
