@@ -46,10 +46,12 @@ async def sql_table(_, message: Message):
         for current_result in results:
             all_tables.append(current_result[1])
         
-        txt = user.html_bold('Please specify a table name to see query of that table.\n')
+        txt = user.html_bold('Please specify a table name to see query of that table.\n\n')
         txt += user.html_normal(f'there are currently {3} custom table(s) created:')
+        current_index = 1
         for current_name in all_tables:
-            txt += user.html_bold('\n1- ') + user.html_mono(current_name)
+            txt += user.html_bold(f'\n{current_index}- ') + user.html_mono(current_name)
+            current_index += 1
         
         return await message.reply_text(txt)
     
