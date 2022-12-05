@@ -9,6 +9,6 @@ class DatabaseClient:
         
     
     
-    def execute(self, sql: str, parameters = ...) -> sqlite3.Cursor:
+    def execute(self, sql: str, parameters = None) -> sqlite3.Cursor:
         return self._connection.execute(sql, parameters)
     
