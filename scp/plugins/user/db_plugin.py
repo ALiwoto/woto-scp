@@ -1,7 +1,7 @@
 
 from scp import user
 from pyrogram.types import Message
-import ujson
+import json
 
 @user.on_message(
 	user.filters.me &
@@ -22,6 +22,6 @@ async def sql_exec(_, message: Message):
     if not results:
         return await message.reply_text('No output.')
 
-    txt = user.html_mono(ujson.dump(results, indent=4, ensure_ascii=False))
+    txt = user.html_mono(json.dump(results, indent=4, ensure_ascii=False))
     return await message.reply_text(txt)
 
