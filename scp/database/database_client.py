@@ -9,9 +9,9 @@ class DatabaseClient:
         
     
     
-    def execute(self, sql: str, parameters = None) -> sqlite3.Cursor:
+    def execute(self, sql: str, parameters = None) -> list:
         if not parameters:
-            return self._connection.execute(sql)
+            return self._connection.execute(sql).fetchall()
         
-        return self._connection.execute(sql, parameters)
+        return self._connection.execute(sql, parameters).fetchall()
     
