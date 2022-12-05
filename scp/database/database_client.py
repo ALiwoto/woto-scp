@@ -11,7 +11,7 @@ class DatabaseClient:
     
     def execute(self, sql: str, parameters = None) -> sqlite3.Cursor:
         if not parameters:
-            return self._connection.execute(sql, parameters)
+            return self._connection.execute(sql)
         
         return self._connection.execute(sql, parameters)
     
