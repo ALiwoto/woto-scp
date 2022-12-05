@@ -13,7 +13,12 @@ import ujson
 async def sql_exec(_, message: Message):
     message.__str__
     sql_raw = user.get_non_cmd(message)
-    results = user.db.execute(sql_raw)
+    try:
+        results = user.db.execute(sql_raw)
+    except Exception as e:
+        txt = user.html_bold('Error:\n') + user.html_mono(f"{e}")
+        return await message.reply_text(txt)
+    
     if not results:
         return await message.reply_text('No output.')
 
