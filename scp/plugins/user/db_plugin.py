@@ -12,7 +12,6 @@ import ujson
     ),
 )
 async def sql_exec(_, message: Message):
-    message.__str__
     sql_raw = user.get_non_cmd(message)
     try:
         results = user.db.execute(sql_raw)
