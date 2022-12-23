@@ -265,7 +265,7 @@ async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
     if not isinstance(chat.username, str) or len(chat.username) == 0:
         count = 1
         if chat._client:
-            messages = await chat._client.get_chat_history(
+            messages = await chat._client.get_history(
                 chat_id=chat.id,
                 limit=1,
             )
