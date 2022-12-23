@@ -7,6 +7,7 @@ from typing import (
 from datetime import datetime
 import logging
 import asyncio
+from traceback import format_exception
 from pyrogram import(
     utils as pUtils,
     enums,
@@ -82,7 +83,9 @@ class WotoClientBase(Client):
         return html_link(value, link, *argv)
     
     async def reply_exception(self, message: types.Message, e: Exception):
-        return await message.reply_text(self.html_bold('Error:') + self.html_mono(f'\n\t{e}'))
+        ex_str = "".join(format_exception(e, limit = 3, chain=True))
+        return await message.reply_text(self.html_bold('Error:') + 
+                                        self.html_mono(f'\n\t{ex_str}'))
     
     async def html_normal_chat_link(self, value, chat: types.Chat, *argv) -> str:
         return await html_normal_chat_link(value, chat, *argv)
