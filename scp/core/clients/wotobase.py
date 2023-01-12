@@ -228,6 +228,8 @@ class WotoClientBase(Client):
         
         return all_messages
 
+    async def get_profile_photos_count(self, chat_id: Union[int, str]) -> int:
+        return await super().get_chat_photos_count(chat_id)
 
     async def handle_updates_woto(self, updates):
         if isinstance(updates, (raw.types.Updates, raw.types.UpdatesCombined)):
