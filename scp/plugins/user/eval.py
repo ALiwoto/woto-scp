@@ -12,7 +12,7 @@ from asyncio.tasks import Task as AsyncTask
 from scp import user, bot
 from scp.utils.selfInfo import info
 from scp.utils.parser import(
-    getMediaAttr, 
+    get_media_attr, 
     html_bold, 
     html_mono, 
     to_output_file,
@@ -314,7 +314,7 @@ async def cancelexec(_, query: CallbackQuery):
 )
 async def get_id_handler(_, message: Message):
     message = message.reply_to_message or message
-    media = getMediaAttr(
+    media = get_media_attr(
         message,
         [
             'audio',

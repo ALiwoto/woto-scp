@@ -75,7 +75,7 @@ async def create_handler(_, message: Message):
                 ),
                 quote=True,
             )
-        validate, token = parser.checkToken(ans.text)
+        validate, token = parser.check_bot_token(ans.text)
         if validate:
             return await message.reply(
                 user.md.KanTeXDocument(

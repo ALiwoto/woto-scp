@@ -167,13 +167,13 @@ def HumanizeTime(seconds: int) -> str:
     return ping_time
 
 
-def getMediaAttr(message: Message, Attr: list):
+def get_media_attr(message: Message, Attr: list):
     for attribute in Attr:
         attr = getattr(message, attribute)
         if attr:
             return attr
 
-def checkToken(token: str) -> bool:
+def check_bot_token(token: str) -> bool:
     token = re.findall(
         r'[0-9]{10}:[a-zA-Z0-9_-]{35}',
         token,
