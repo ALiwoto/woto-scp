@@ -4,7 +4,6 @@ import ast
 from _ast import Module as TModule
 import sys
 import inspect
-
 import asyncio
 from shortuuid import ShortUUID
 from io import StringIO, BytesIO
@@ -85,8 +84,7 @@ async def eval_base(client: user, message: Message, code: str, silent: bool = Fa
     except Exception as ex:
         str_err = str(ex)
         if len(str_err) > 4096:
-            await message.reply_document(to_output_file(str_err))
-            return
+            return await message.reply_document(to_output_file(str_err))
         txt = html_mono(str_err)
         return await message.reply_text(
             txt, 
@@ -146,24 +144,14 @@ async def eval_base(client: user, message: Message, code: str, silent: bool = Fa
         try:
             returned = await task
         except Exception as err:
-            returned = err
-            return await reply.edit_text(
-                user.md.KanTeXDocument(
-                    user.md.Section('Error:', user.md.Code(err)),
-                ),
-            )
+            return user.reply_exception(message, err)
     except asyncio.CancelledError:
         sys.stdout = stdout
         sys.stderr = stderr
         exec_tasks.pop(rnd_id, None)
-        return await reply.edit_text(
-            user.md.KanTeXDocument(
-                user.md.Section(
-                    'Task Cancelled:',
-                    user.md.Code(f'{rnd_id} has been canceled.'),
-                ),
-            ),
-        )
+        txt = user.html_bold('Task Cancelled: \n')
+        txt += user.html_normal(f'{rnd_id} has been canceled.')
+        return await reply.edit_text(text=txt, parse_mode=ParseMode.HTML)
     except Exception as e:
         str_err = str(e)
         if len(str_err) > 4096:
