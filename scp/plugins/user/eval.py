@@ -78,19 +78,12 @@ return inspect.getsource({code})
     await eval_base(user, message, code)
 
 async def eval_base(client: user, message: Message, code: str, silent: bool = False):
+    is_private: bool = code.find("SEND_PRIVATE") != -1
     tree: TModule = None
     try:
         tree = ast.parse(code)
     except Exception as ex:
-        str_err = str(ex)
-        if len(str_err) > 4096:
-            return await message.reply_document(to_output_file(str_err))
-        txt = html_mono(str_err)
-        return await message.reply_text(
-            txt, 
-            parse_mode=ParseMode.HTML, 
-            quote=True,
-        )
+        return await user.reply_exception(message=message, e=ex, is_private=is_private)
     
     o_body = tree.body
     body = o_body.copy()
@@ -144,7 +137,7 @@ async def eval_base(client: user, message: Message, code: str, silent: bool = Fa
         try:
             returned = await task
         except Exception as err:
-            return user.reply_exception(message, err)
+            return await user.reply_exception(message=message, e=err, is_private=is_private)
     except asyncio.CancelledError:
         sys.stdout = stdout
         sys.stderr = stderr

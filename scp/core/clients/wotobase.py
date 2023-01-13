@@ -8,7 +8,7 @@ from datetime import datetime
 import logging
 import asyncio
 from traceback import format_exception
-
+from io import BytesIO
 from typing import Union
 import typing
 from attrify import Attrify as Atr
@@ -39,6 +39,7 @@ from scp.utils.parser import(
     html_mention, 
     html_normal_chat_link,
     mention_user_html,
+    to_output_file,
 )
 from scp.utils.unpack import unpackInlineMessage
 
@@ -83,11 +84,26 @@ class WotoClientBase(Client):
     
     async def reply_exception(self, message: types.Message, e: Exception, limit: int = 4, is_private: bool = False):
         ex_str = "".join(format_exception(e, limit = limit, chain=True))
-        txt = self.html_bold('Error:') + self.html_mono(f'\n\t{ex_str}')
-        
+        err_str = f"\n\t{ex_str}"
+        txt: str = ''
+        target_id = message.chat.id
+        reply_id = message.id
         if is_private:
-            return await self.send_message(chat_id='me', text=txt)
-        return await message.reply_text(text=txt, parse_mode=ParseMode.HTML)
+            target_id = 'me'
+            reply_id = None
+        
+        if len(err_str) >= 4000:
+            txt = f'Error: {err_str}'
+            return await self.send_document(
+                chat_id=target_id, 
+                reply_to_message_id=reply_id, 
+                document=to_output_file(txt))
+
+        txt = self.html_bold('Error:') + self.html_mono(f'\n\t{ex_str}')        
+        return await self.send_message(
+            chat_id=target_id, text=txt, reply_to_message_id=reply_id, 
+            parse_mode=ParseMode.HTML
+        )
     
     async def html_normal_chat_link(self, value, chat: types.Chat, *argv) -> str:
         return await html_normal_chat_link(value, chat, *argv)
@@ -142,6 +158,9 @@ class WotoClientBase(Client):
     
     def unpack_inline_message_id(inline_message_id: str) -> Atr:
         return unpackInlineMessage(inline_message_id)
+    
+    def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
+        return to_output_file(value=value, file_name=file_name)
 
     async def invoke(
         self,
