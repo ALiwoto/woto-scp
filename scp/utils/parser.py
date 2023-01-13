@@ -4,15 +4,15 @@ from pyrogram import types
 import html
 import re
 from pyrogram.client import Client
-
+from pyrogram.enums.message_service_type import MessageServiceType
 from pyrogram.types import (
     User,
     Message,
     Chat,
 )
 
-class BasicFlagsContainer:
-    """A list of all flags that can be used in purge commands
+class BasicFlagContainer:
+    """A list of all flags that can be used in different commands.
 
     Possible flags:
         all
@@ -93,56 +93,76 @@ class BasicFlagsContainer:
     def can_match(self, message: Message) -> bool:
         if self.flag_all:
             return True
-        elif self.flag_me and message.outgoing:
+        
+        if self.flag_me and message.outgoing:
             return True
-        elif self.flag_text and message.text:
+        
+        if self.flag_text and message.text:
             return True
-        elif self.flag_sticker and message.sticker:
+        
+        if self.flag_sticker and message.sticker:
             return True
-        elif self.flag_gif and message.animation:
+        
+        if self.flag_gif and message.animation:
             return True
-        elif self.flag_file and message.document:
+        
+        if self.flag_file and message.document:
             return True
-        elif self.flag_service and message.service:
+        
+        if self.flag_service and message.service:
             return True
-        elif self.flag_added_member and message.service == 'new_chat_members':
+        
+        if self.flag_added_member and message.service == MessageServiceType.NEW_CHAT_MEMBERS:
             for current in message.new_chat_members:
                 if not current.is_bot: return True
-            return False
-        elif self.flag_media and message.media:
+        
+        if self.flag_media and message.media:
             return True
-        elif self.flag_bot and message.from_user.is_bot:
+        
+        if self.flag_bot and message.from_user.is_bot:
             return True
-        elif self.flag_via_bot and message.via_bot:
+        
+        if self.flag_via_bot and message.via_bot:
             return True
-        elif self.flag_join and message.new_chat_members:
+        
+        if self.flag_join and message.new_chat_members:
             return True
-        elif self.flag_left and message.left_chat_member:
+        
+        if self.flag_left and message.left_chat_member:
             return True
-        elif self.flag_new_title and message.new_chat_title:
+        
+        if self.flag_new_title and message.new_chat_title:
             return True
-        elif self.flag_new_photo and message.new_chat_photo:
+        
+        if self.flag_new_photo and message.new_chat_photo:
             return True
-        elif self.flag_del_photo and message.delete_chat_photo:
+        
+        if self.flag_del_photo and message.delete_chat_photo:
             return True
-        elif self.flag_group_created and message.group_chat_created:
+        
+        if self.flag_group_created and message.group_chat_created:
             return True
-        elif self.flag_supergroup_created and message.supergroup_chat_created:
+        
+        if self.flag_supergroup_created and message.supergroup_chat_created:
             return True
-        elif self.flag_channel_created and message.channel_chat_created:
+        
+        if self.flag_channel_created and message.channel_chat_created:
             return True
-        elif self.flag_migrated_to and message.migrate_to_chat_id:
+        
+        if self.flag_migrated_to and message.migrate_to_chat_id:
             return True
-        elif self.flag_migrated_from and message.migrate_from_chat_id:
+        
+        if self.flag_migrated_from and message.migrate_from_chat_id:
             return True
-        elif self.flag_pinned and message.pinned_message:
+        
+        if self.flag_pinned and message.pinned_message:
             return True
     
 
 
 
 
-def HumanizeTime(seconds: int) -> str:
+def humanize_time(seconds: int) -> str:
     count = 0
     ping_time = ''
     time_list = []

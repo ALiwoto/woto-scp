@@ -15,7 +15,7 @@ from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
 from scp import user
 from scp.utils.misc import can_member_match, remove_special_chars
 from scp.utils.parser import (
-    BasicFlagsContainer,
+    BasicFlagContainer,
     html_bold,
     html_in_common,
     html_link,
@@ -285,7 +285,7 @@ async def tPurge_handler(_, message: Message):
     limit = current - first
 
     my_strs: list[str] = split_some(message.text, 1, ' ', '\n')
-    flags = BasicFlagsContainer(my_strs[1] if len(my_strs) > 1 else '')
+    flags = BasicFlagContainer(my_strs[1] if len(my_strs) > 1 else '')
     
     the_messages: typing.List[int] = []
 
@@ -1197,7 +1197,7 @@ async def getlinks_handler(_, message: Message):
     current = int(msg_ids[1])
     limit = current - first
 
-    flags = BasicFlagsContainer(my_strs[3] if len(my_strs) > 3 else '')
+    flags = BasicFlagContainer(my_strs[3] if len(my_strs) > 3 else '')
     
     #the_messages: typing.List[int] = []
     final_txt: str = ''
@@ -1285,7 +1285,7 @@ async def tCacheMessages_handler(_, message: Message):
     current = int(msg_ids[1])
     limit = current - first
 
-    flags = BasicFlagsContainer(my_strs[3] if len(my_strs) > 3 else '')
+    flags = BasicFlagContainer(my_strs[3] if len(my_strs) > 3 else '')
     
     the_messages: typing.List[Message] = []
 
