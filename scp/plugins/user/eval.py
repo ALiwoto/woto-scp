@@ -196,7 +196,8 @@ async def eval_base(client: pClient, message: Message, code: str, silent: bool =
             disable_web_page_preview=True,
         )
 
-user.eval_base = std_types.MethodType(eval_base)
+user.eval_base = std_types.MethodType(eval_base, user)
+user.the_bot.eval_base = std_types.MethodType(eval_base, user.the_bot)
 
 @user.on_message(
     ~user.filters.forwarded
