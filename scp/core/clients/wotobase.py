@@ -8,7 +8,14 @@ from datetime import datetime
 import logging
 import asyncio
 from traceback import format_exception
+
+from typing import Union
+import typing
+from attrify import Attrify as Atr
 from pyrogram import(
+    Client, 
+    types, 
+    raw, 
     utils as pUtils,
     enums,
     Client,
@@ -17,19 +24,11 @@ from pyrogram import(
     errors, 
     session,
 )
-from typing import Union
-import typing
-from attrify import Attrify as Atr
-from pyrogram import(
-    client as pyroClient,
-    Client, 
-    types, 
-    raw, 
-)
 from pyrogram.raw.functions.channels import GetFullChannel
 from pyrogram.raw.functions.phone import EditGroupCallTitle
 from pyrogram.raw.types.messages.chat_full import ChatFull
 from pyrogram.raw.types.channel_full import ChannelFull
+from pyrogram.enums.parse_mode import ParseMode
 from scp.utils.parser import(
     html_mono,
     html_bold,
@@ -82,10 +81,13 @@ class WotoClientBase(Client):
     def html_link(self, value, link: str, *argv) -> str:
         return html_link(value, link, *argv)
     
-    async def reply_exception(self, message: types.Message, e: Exception):
-        ex_str = "".join(format_exception(e, limit = 3, chain=True))
-        return await message.reply_text(self.html_bold('Error:') + 
-                                        self.html_mono(f'\n\t{ex_str}'))
+    async def reply_exception(self, message: types.Message, e: Exception, limit: int = 4, is_private: bool = False):
+        ex_str = "".join(format_exception(e, limit = limit, chain=True))
+        txt = self.html_bold('Error:') + self.html_mono(f'\n\t{ex_str}')
+        
+        if is_private:
+            return await self.send_message(chat_id='me', text=txt)
+        return await message.reply_text(text=txt, parse_mode=ParseMode.HTML)
     
     async def html_normal_chat_link(self, value, chat: types.Chat, *argv) -> str:
         return await html_normal_chat_link(value, chat, *argv)
@@ -230,55 +232,6 @@ class WotoClientBase(Client):
 
     async def get_profile_photos_count(self, chat_id: Union[int, str]) -> int:
         return await super().get_chat_photos_count(chat_id)
-
-    async def handle_updates_woto(self, updates):
-        if isinstance(updates, (raw.types.Updates, raw.types.UpdatesCombined)):
-            is_min = (await self.fetch_peers(updates.users)) or (await self.fetch_peers(updates.chats))
-
-            users = {u.id: u for u in updates.users}
-            chats = {c.id: c for c in updates.chats}
-
-            for update in updates.updates:
-                channel_id = getattr(
-                    getattr(
-                        getattr(
-                            update, "message", None
-                        ), "peer_id", None
-                    ), "channel_id", None
-                ) or getattr(update, "channel_id", None)
-
-                pts = getattr(update, "pts", None)
-                pts_count = getattr(update, "pts_count", None)
-
-                if isinstance(update, raw.types.UpdateChannelTooLong):
-                    pyroClient.log.warning(update)
-
-                if isinstance(update, raw.types.UpdateNewChannelMessage) and is_min:
-                    message = update.message
-
-                    if not isinstance(message, raw.types.MessageEmpty):
-                        try:
-                            diff = await self.send(
-                                raw.functions.updates.GetChannelDifference(
-                                    channel=await self.resolve_peer(pUtils.get_channel_id(channel_id)),
-                                    filter=raw.types.ChannelMessagesFilter(
-                                        ranges=[raw.types.MessageRange(
-                                            min_id=update.message.id,
-                                            max_id=update.message.id
-                                        )]
-                                    ),
-                                    pts=pts - pts_count,
-                                    limit=pts
-                                )
-                            )
-                        except errors.ChannelPrivate:
-                            pass
-                        else:
-                            if not isinstance(diff, raw.types.updates.ChannelDifferenceEmpty):
-                                if hasattr(diff, 'users'):
-                                    users.update({u.id: u for u in diff.users})
-                                if hasattr(diff, 'chats'):
-                                    chats.update({c.id: c for c in diff.chats})
 
     async def set_group_call_title(self, chat_id: Union[str, int], title: str):
         try:
