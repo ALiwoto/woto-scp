@@ -3,6 +3,7 @@
 import ast
 from _ast import Module as TModule
 import sys
+import types as std_types
 import inspect
 import asyncio
 from shortuuid import ShortUUID
@@ -16,6 +17,7 @@ from scp.utils.parser import(
     html_mono, 
     to_output_file,
 )
+from pyrogram.client import Client as pClient
 from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import (
     Message,
@@ -77,7 +79,7 @@ return inspect.getsource({code})
 
     await eval_base(user, message, code)
 
-async def eval_base(client: user, message: Message, code: str, silent: bool = False):
+async def eval_base(client: pClient, message: Message, code: str, silent: bool = False):
     is_private: bool = code.find("SEND_PRIVATE") != -1
     tree: TModule = None
     try:
@@ -194,7 +196,7 @@ async def eval_base(client: user, message: Message, code: str, silent: bool = Fa
             disable_web_page_preview=True,
         )
 
-user.eval_base = eval_base
+user.eval_base = std_types.MethodType(eval_base)
 
 @user.on_message(
     ~user.filters.forwarded
@@ -206,7 +208,7 @@ user.eval_base = eval_base
         prefixes=user.cmd_prefixes,
     ),
 )
-async def exitexec(_, message: Message):
+async def exit_exec(_, message: Message):
     if message.reply_to_message:
         return
     exit(0)
