@@ -1,6 +1,6 @@
 from scp import user, __version__, bot, RUNTIME, __longVersion__
 import time
-from scp.utils.parser import HumanizeTime
+from scp.utils.parser import humanize_time
 from scp.utils.selfInfo import info
 from scp.utils.unpack import unpackInlineMessage
 
@@ -60,7 +60,7 @@ async def _(_, query: bot.types.InlineQuery):
                 ),
                 user.md.KeyValueItem(
                     user.md.Bold('scp_uptime'),
-                    user.md.Code(HumanizeTime(time.time() - RUNTIME)),
+                    user.md.Code(humanize_time(time.time() - RUNTIME)),
                 ),
             ),
         ),

@@ -3,7 +3,7 @@ import os
 from scp import user
 import aiofiles
 import time
-from scp.utils.parser import HumanizeTime
+from scp.utils.parser import humanize_time
 
 
 __PLUGIN__ = 'piston'
@@ -73,7 +73,7 @@ async def _(_, message: user.types.Message):
             ),
             user.md.SubSection(
                 'TimeTaken',
-                user.md.Code(HumanizeTime(end - start)),
+                user.md.Code(humanize_time(end - start)),
             ),
 
         ),
