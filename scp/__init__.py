@@ -16,7 +16,7 @@ if not type(listen):
 
 RUNTIME = time.time()
 
-__longVersion__, __version__ = getVersion()
+__long_version__, __version__ = getVersion()
 
 if sys.version_info[0] < 3 or sys.version_info[1] < 8:
     logging.error('Python version Lower than 3.8! Abort!')

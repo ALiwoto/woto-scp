@@ -1,11 +1,13 @@
 import typing
 import json
+import uuid
 from datetime import datetime
 from typing import(
     NoReturn, 
     Union,
     Optional,
     List,
+    Callable
 )
 from pyrogram import(
     filters, 
@@ -14,6 +16,7 @@ from pyrogram import(
     errors, 
     utils as pUtils,
 )
+from pyrogram.raw.types.messages.bot_results import BotResults
 from pyrogram import enums
 from pyrogram.raw.functions.messages import ReadMentions
 from wotoplatform import WotoClient
@@ -22,6 +25,11 @@ from wotoplatform.types.errors import (
 )
 from scp.core.filters.Command import command
 from scp.utils import wfilters
+from scp.utils.auto_inline import (
+    auto_inline_dict,
+    AutoInlineContainer,
+    AutoInlineType
+)
 from scp.utils.sibylUtils import SibylClient
 from scp.database.database_client import DatabaseClient
 from scp.utils.misc import restart_scp as restart_woto_scp
@@ -29,7 +37,7 @@ from configparser import ConfigParser
 from kantex import md as Markdown
 from aiohttp import ClientSession, client_exceptions
 from .woto_base import WotoClientBase
-from ...wotoConfig import the_config
+from ...woto_config import the_config
 import asyncio
 import logging
 
@@ -299,51 +307,125 @@ class ScpClient(WotoClientBase):
             return await self.refresh_dialogs()
         return self.__my_all_dialogs__
     
+    
+    
     async def send_message(
         self,
-        chat_id: Union[int, str],
-        text: str,
-        parse_mode: Optional["enums.ParseMode"] = None,
-        entities: List["types.MessageEntity"] = None,
-        disable_web_page_preview: bool = None,
-        disable_notification: bool = None,
-        reply_to_message_id: int = None,
-        schedule_date: datetime = None,
-        protect_content: bool = None,
-        reply_markup: Union[
-            "types.InlineKeyboardMarkup",
-            "types.ReplyKeyboardMarkup",
-            "types.ReplyKeyboardRemove",
-            "types.ForceReply"
-        ] = None
+        chat_id: typing.Union[int, str], 
+        text: str, parse_mode: typing.Optional["enums.ParseMode"] = None, 
+        entities: typing.List["types.MessageEntity"] = None, 
+        disable_web_page_preview: bool = None, 
+        disable_notification: bool = None, 
+        reply_to_message_id: int = None, 
+        schedule_date: datetime = None, 
+        protect_content: bool = None, 
+        reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup", "types.ReplyKeyboardRemove", "types.ForceReply"] = None
     ) -> "types.Message":
-        try:
+        if self.me.is_bot or not isinstance(reply_markup, (types.InlineKeyboardMarkup, dict, list)):
             return await super().send_message(
-                chat_id=chat_id,
-                text=text,
-                parse_mode=parse_mode,
-                entities=entities,
-                disable_web_page_preview=disable_web_page_preview,
-                disable_notification=disable_notification,
-                reply_to_message_id=reply_to_message_id,
-                schedule_date=schedule_date,
-                protect_content=protect_content,
-                reply_markup=reply_markup
+                chat_id, 
+                text, 
+                parse_mode, 
+                entities, 
+                disable_web_page_preview, 
+                disable_notification, 
+                reply_to_message_id, 
+                schedule_date, 
+                protect_content, 
+                reply_markup
             )
-        except errors.SlowmodeWait as e:
-            await asyncio.sleep(e.x)
-            return await super().send_message(
+        
+        # if this is a user and is trying to send a message with keyboard buttons, automate
+        # sending it with using inline through bot.
+        if isinstance(reply_markup, (dict, list)):
+            reply_markup = self._parse_inline_reply_markup(reply_markup)
+        container = AutoInlineContainer(
+            unique_id="auIn" + str(uuid.uuid4()),
+            message_type=AutoInlineType.TEXT,
+            text=text,
+            keyboard=reply_markup,
+        )
+        auto_inline_dict[container.unique_id] = container
+        inline_response: BotResults = await self.get_inline_bot_results(
+            self.the_bot.me.username,
+            container.unique_id,
+        )
+        for current_result in inline_response.results:
+            await self.send_inline_bot_result(
                 chat_id=chat_id,
-                text=text,
-                parse_mode=parse_mode,
-                entities=entities,
-                disable_web_page_preview=disable_web_page_preview,
+                query_id=inline_response.query_id,
+                result_id=current_result.id,
                 disable_notification=disable_notification,
-                reply_to_message_id=reply_to_message_id,
-                schedule_date=schedule_date,
-                protect_content=protect_content,
-                reply_markup=reply_markup
+                reply_to_message_id=reply_to_message_id
             )
+        
+    async def send_photo(
+        self, 
+        chat_id: typing.Union[int, str], 
+        photo: typing.Union[str, typing.BinaryIO], 
+        caption: str = "", 
+        parse_mode: typing.Optional["enums.ParseMode"] = None, 
+        caption_entities: typing.List["types.MessageEntity"] = None, 
+        ttl_seconds: int = None, 
+        disable_notification: bool = None, 
+        reply_to_message_id: int = None, 
+        schedule_date: datetime = None, 
+        protect_content: bool = None, 
+        reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup", "types.ReplyKeyboardRemove", "types.ForceReply"] = None, 
+        progress: Callable = None, 
+        progress_args: tuple = ()
+    ) -> typing.Optional["types.Message"]:
+        if self.me.is_bot or not isinstance(reply_markup, (types.InlineKeyboardMarkup, dict, list)) or not the_config.shared_channel:
+            return await super().send_photo(
+                chat_id, 
+                photo, 
+                caption, 
+                parse_mode, 
+                caption_entities, 
+                ttl_seconds, 
+                disable_notification, 
+                reply_to_message_id, 
+                schedule_date, 
+                protect_content, 
+                reply_markup, 
+                progress, 
+                progress_args
+            )
+        
+        
+        # if this is a user and is trying to send a message with keyboard buttons, automate
+        # sending it with using inline through bot.
+        
+        sent_message = await super().send_photo(
+            chat_id=the_config.shared_channel, 
+            photo=photo,
+        )
+        if isinstance(reply_markup, (dict, list)):
+            reply_markup = self._parse_inline_reply_markup(reply_markup)
+        container = AutoInlineContainer(
+            unique_id="auIn" + str(uuid.uuid4()),
+            message_type=AutoInlineType.PHOTO,
+            text=caption,
+            media_chat_id=sent_message.chat.id,
+            media_message_id=sent_message.id,
+            keyboard=reply_markup,
+        )
+        auto_inline_dict[container.unique_id] = container
+        inline_response: BotResults = await self.get_inline_bot_results(
+            self.the_bot.me.username,
+            container.unique_id,
+        )
+        
+        for current_result in inline_response.results:
+            await self.send_inline_bot_result(
+                chat_id=chat_id,
+                query_id=inline_response.query_id,
+                result_id=current_result.id,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id
+            )
+        
+    
 
     async def send_inline_bot_result(
         self,

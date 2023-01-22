@@ -15,6 +15,7 @@ class WotoConfig:
     _inspectors = []
     dump_usernames = []
     private_resources: int = 0
+    shared_channel: int = 0
     sibyl_token: int = 0
     public_listener: int = 0
     public_logger: int = 0
@@ -62,6 +63,7 @@ class WotoConfig:
             self.dump_usernames.append(x)
 
         self.private_resources = self._the_config.getint('woto-scp', 'private_resources')
+        self.shared_channel = self._the_config.getint('woto-scp', 'shared_channel')
         # sibyl configuration stuff:
         self.sibyl_token = self._the_config.get('sibyl-system', 'token')
         self.public_listener = self._the_config.getint('sibyl-system', 'public_listener')
@@ -75,7 +77,7 @@ class WotoConfig:
         self.wp_host = self._the_config.get(
             'woto-platform', 
             'host', 
-            fallback='wotoplatform.hakai.animekaizoku.com'
+            fallback='wotoplatform.kaizoku.cyou'
         )
         self.wp_port = self._the_config.getint('woto-platform', 'port', fallback=50100)
     

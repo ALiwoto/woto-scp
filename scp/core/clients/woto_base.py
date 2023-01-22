@@ -1,3 +1,4 @@
+import re
 from typing import (
     Union,
     Optional,
@@ -44,6 +45,8 @@ from scp.utils.parser import(
 from scp.utils.unpack import unpackInlineMessage
 
 class WotoClientBase(Client):
+    HTTP_URL_MATCHING = r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*"
+    
     def is_silent(self, message: types.Message) -> bool:
         return (
             isinstance(message, types.Message)
@@ -51,6 +54,115 @@ class WotoClientBase(Client):
             and len(message.command) > 0
             and message.command[0x0].endswith('!')
         )
+        
+    def _get_inline_button_by_values(self, title: str, value: str) -> types.InlineKeyboardButton:
+        if re.findall(self.HTTP_URL_MATCHING, value):
+            return types.InlineKeyboardButton(text=title, url=value)
+        else:
+            return types.InlineKeyboardButton(text=title, callback_data=value)
+    
+    def _parse_inline_reply_markup(self, the_value: Union[dict, list]) -> types.InlineKeyboardMarkup:
+        """ Parses a dict or a list to a valid reply_markup
+        valid dict:
+        {
+            "hi": "https://google.com"
+            "same::another hi": "https://microsoft.com"
+            "ok": "callback data"
+        }
+        
+        valid list:
+        [
+            {'hello': 'world.com', 'this is on same row': 'ok'},
+            {'ok': 'button_data'},
+            {'okay': 'https://google.com'}
+        ]
+        """
+        keyboard_buttons: List[List[types.InlineKeyboardButton]] = []
+        
+        if isinstance(the_value, dict):
+            current_button_index = 0
+            for key in the_value:
+                if not isinstance(key, str):
+                    key = str(key)
+                original_value = the_value[key]
+                if key.startswith("same::"):
+                    key = key.removeprefix("same::")
+                    if current_button_index > 0:
+                        current_button_index -= 1
+                
+                if current_button_index >= len(keyboard_buttons):
+                    keyboard_buttons.append([])
+                if not keyboard_buttons[current_button_index]:
+                    keyboard_buttons[current_button_index] = []
+                keyboard_buttons[current_button_index].append(self._get_inline_button_by_values(key, original_value))
+                current_button_index += 1
+            return types.InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
+        elif isinstance(the_value, list):
+            current_button_index = 0
+            for current in the_value:
+                if not isinstance(current, dict): pass
+                for current_row_title in current:
+                    if current_button_index >= len(keyboard_buttons):
+                        keyboard_buttons.append([])
+                    keyboard_buttons[current_button_index].append(
+                        self._get_inline_button_by_values(
+                            current_row_title, current[current_row_title]
+                        )
+                    )
+                current_button_index += 1
+            return types.InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
+    
+    
+        
+    async def send_message(
+        self,
+        chat_id: Union[int, str],
+        text: str,
+        parse_mode: Optional["enums.ParseMode"] = None,
+        entities: List["types.MessageEntity"] = None,
+        disable_web_page_preview: bool = None,
+        disable_notification: bool = None,
+        reply_to_message_id: int = None,
+        schedule_date: datetime = None,
+        protect_content: bool = None,
+        reply_markup: Union[
+            "types.InlineKeyboardMarkup",
+            "types.ReplyKeyboardMarkup",
+            "types.ReplyKeyboardRemove",
+            "types.ForceReply"
+        ] = None
+    ) -> "types.Message":
+        if isinstance(reply_markup, (dict, list)):
+            reply_markup = self._parse_inline_reply_markup(reply_markup)
+        
+        try:
+            return await super().send_message(
+                chat_id=chat_id,
+                text=text,
+                parse_mode=parse_mode,
+                entities=entities,
+                disable_web_page_preview=disable_web_page_preview,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id,
+                schedule_date=schedule_date,
+                protect_content=protect_content,
+                reply_markup=reply_markup
+            )
+        except errors.SlowmodeWait as e:
+            await asyncio.sleep(e.x)
+            return await super().send_message(
+                chat_id=chat_id,
+                text=text,
+                parse_mode=parse_mode,
+                entities=entities,
+                disable_web_page_preview=disable_web_page_preview,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id,
+                schedule_date=schedule_date,
+                protect_content=protect_content,
+                reply_markup=reply_markup
+            )
+
     
     def get_non_cmd(self, message: types.Message) -> str:
         my_strs = split_some(message.text, 1, ' ', '\n')
