@@ -1,6 +1,6 @@
 import re
 from scp import bot, user
-from scp.core.filters.Command import prefixes
+from scp.core.filters.command import prefixes
 from scp.core.functions.plugins import HELP_COMMANDS
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from scp.utils.misc import paginate_modules
