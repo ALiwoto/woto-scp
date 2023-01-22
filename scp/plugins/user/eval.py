@@ -31,7 +31,7 @@ from pyrogram.raw.types.messages.bot_results import (
 exec_tasks = {}
 EVAL_PRETEXT = """
 async def input(prompt=None, **kwargs):
-    await user.get_user_input(prompt=prompt, message=message, **kwargs)
+    return await user.get_user_input(prompt=prompt, message=message, **kwargs)
 
 
 """
