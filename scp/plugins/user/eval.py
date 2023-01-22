@@ -29,7 +29,12 @@ from pyrogram.raw.types.messages.bot_results import (
 )
 
 exec_tasks = {}
+EVAL_PRETEXT = """
+async def input(prompt=None, **kwargs):
+    await user.get_user_input(prompt=prompt, message=message, **kwargs)
 
+
+"""
 
 @user.on_message(
     ~user.filters.forwarded
@@ -80,6 +85,8 @@ return inspect.getsource({code})
     await eval_base(user, message, code)
 
 async def eval_base(client: pClient, message: Message, code: str, silent: bool = False):
+    code = EVAL_PRETEXT + code
+    
     is_private: bool = code.find("SEND_PRIVATE") != -1
     tree: TModule = None
     try:
@@ -216,7 +223,7 @@ async def exit_exec(_, message: Message):
 
 
 @user.on_message(user.owner & user.command('listEval'))
-async def listexec(_, message: Message):
+async def list_exec(_, message: Message):
     try:
         x: BotResults = await user.get_inline_bot_results(
             info['_bot_username'],
@@ -283,7 +290,7 @@ async def _(_, query: InlineQuery):
     user.filters.user(info['_user_id'])
     & user.filters.regex('^cancel_'),
 )
-async def cancelexec(_, query: CallbackQuery):
+async def cancel_exec(_, query: CallbackQuery):
     Type = query.data.split('_')[1]
     taskID = query.data.split('_')[2]
     if Type == 'eval':

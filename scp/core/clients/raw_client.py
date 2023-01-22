@@ -2,18 +2,18 @@ import typing
 import json
 import uuid
 from datetime import datetime
-from typing import(
-    NoReturn, 
+from typing import (
+    NoReturn,
     Union,
     Optional,
     List,
     Callable
 )
-from pyrogram import(
-    filters, 
-    types, 
-    raw, 
-    errors, 
+from pyrogram import (
+    filters,
+    types,
+    raw,
+    errors,
     utils as pUtils,
 )
 from pyrogram.raw.types.messages.bot_results import BotResults
@@ -23,7 +23,7 @@ from wotoplatform import WotoClient
 from wotoplatform.types.errors import (
     ClientAlreadyInitializedException,
 )
-from scp.core.filters.Command import command
+from scp.core.filters.command import command
 from scp.utils import wfilters
 from scp.utils.auto_inline import (
     auto_inline_dict,
@@ -45,11 +45,12 @@ __scp__helper__bots__: typing.List[WotoClientBase] = None
 
 __wp_client__: WotoClient = None
 
+
 def __get_wp_client__() -> WotoClient:
     global __wp_client__
     if __wp_client__:
         return __wp_client__
-    
+
     __wp_client__ = WotoClient(
         username=the_config.wp_username,
         password=the_config.wp_password,
@@ -68,7 +69,7 @@ def _get_scp_bots() -> typing.List[WotoClientBase]:
         my_str = open('bots.json').read()
         # load into json
         my_json = json.loads(my_str)
-        if not isinstance(my_json, list): 
+        if not isinstance(my_json, list):
             return None
 
         my_bots: typing.List[WotoClientBase] = []
@@ -86,12 +87,15 @@ def _get_scp_bots() -> typing.List[WotoClientBase]:
                     api_hash=the_config.api_hash,
                 )
                 my_bots.append(current_client)
-            except Exception as ex: logging.warning(f'failed to load bots: {ex}')
-        
+            except Exception as ex:
+                logging.warning(f'failed to load bots: {ex}')
+
         __scp__helper__bots__ = my_bots
         return my_bots
 
-    except: return None
+    except:
+        return None
+
 
 class ScpClient(WotoClientBase):
     def __init__(
@@ -126,13 +130,15 @@ class ScpClient(WotoClientBase):
             self._sudo.append(self.me.id)
         if not self.me.id in self._owners:
             self._owners.append(self.me.id)
-        
+
         if not self.is_scp_bot:
             try:
                 await self.wp.start()
-            except ClientAlreadyInitializedException: pass
-            except Exception as e: logging.warning(e)
-            
+            except ClientAlreadyInitializedException:
+                pass
+            except Exception as e:
+                logging.warning(e)
+
         self.original_phone_number = self.me.phone_number
         self.db = DatabaseClient(self.storage.conn)
         logging.warning(
@@ -158,30 +164,32 @@ class ScpClient(WotoClientBase):
 
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
-    
+
     async def ban_chat_member(
-        self, 
-        chat_id: Union[int, str], 
-        user_id: Union[int, str], 
+        self,
+        chat_id: Union[int, str],
+        user_id: Union[int, str],
         until_date: datetime = pUtils.zero_datetime(),
     ) -> Union["types.Message", bool]:
         return await super().ban_chat_member(chat_id, user_id, until_date=until_date)
-    
+
     async def kick_chat_member(
-        self, 
-        chat_id: Union[int, str], 
+        self,
+        chat_id: Union[int, str],
         user_id: Union[int, str],
-        ignore_error: bool = True, 
+        ignore_error: bool = True,
         tries: int = 5,
         until_date: datetime = pUtils.zero_datetime(),
     ) -> Union["types.Message", bool]:
         ret_message: types.Message = None
         try:
             ret_message = await super().ban_chat_member(chat_id, user_id, until_date=until_date)
-        except Exception: pass
-        
+        except Exception:
+            pass
+
         done = False
-        if not tries: tries = 5
+        if not tries:
+            tries = 5
         current_tries = 0
         while not done and current_tries <= tries:
             current_tries += 1
@@ -197,7 +205,7 @@ class ScpClient(WotoClientBase):
             except Exception:
                 if not ignore_error:
                     raise
-        
+
         return ret_message
 
     # from Kantek
@@ -209,15 +217,15 @@ class ScpClient(WotoClientBase):
         ) as response:
             e = await response.text()
         return e if e != 'false' and e[:-1] != url else None
-    
+
     async def restart_scp(self, update_req: bool = False, hard: bool = False) -> bool:
         await self.stop_scp()
         return restart_woto_scp(update_req, hard)
-    
+
     async def exit_scp(self) -> 'NoReturn':
         await self.stop_scp()
         return exit()
-    
+
     async def stop_scp(self, only_me: bool = False):
         try:
             if only_me:
@@ -229,7 +237,7 @@ class ScpClient(WotoClientBase):
 
         except ConnectionError:
             pass
-    
+
     async def get_message_by_link(self, link: str) -> types.Message:
         link = link.replace('telegram.me', 't.me')
         link = link.replace('telegram.dog', 't.me')
@@ -237,7 +245,7 @@ class ScpClient(WotoClientBase):
         link = link.replace('http://', '')
         if link.find('t.me') == -1:
             return None
-        
+    
         chat_id = None
         message_id: int = 0
         # the format can be either like t.me/c/1627169341/1099 or
@@ -257,10 +265,10 @@ class ScpClient(WotoClientBase):
                 return None
             chat_id = my_strs[1]
             message_id = int(my_strs[2])
-        
+
         if not chat_id:
             return None
-        
+
         return await self.get_messages(chat_id, message_id)
 
     async def Request(self, url: str, type: str, *args, **kwargs):
@@ -274,11 +282,11 @@ class ScpClient(WotoClientBase):
             return await resp.json()
         except client_exceptions.ContentTypeError:
             return (await resp.read()).decode('utf-8')
-        
+
     async def delete_all_messages(
-        self, 
-        chat_id: Union[int, str], 
-        message_ids: Union[int, typing.Iterable[int]], 
+        self,
+        chat_id: Union[int, str],
+        message_ids: Union[int, typing.Iterable[int]],
         revoke: bool = True,
     ) -> bool:
         if len(message_ids) < 100:
@@ -287,7 +295,8 @@ class ScpClient(WotoClientBase):
                 message_ids=message_ids,
                 revoke=revoke
             )
-        all_messages  = [message_ids[i:i + 100] for i in range(0, len(message_ids), 100)]
+        all_messages = [message_ids[i:i + 100]
+                        for i in range(0, len(message_ids), 100)]
         for current in all_messages:
             try:
                 await self.delete_messages(
@@ -295,46 +304,46 @@ class ScpClient(WotoClientBase):
                     message_ids=current,
                 )
                 await asyncio.sleep(3)
-            except Exception: pass
-    
+            except Exception:
+                pass
+
     # async def eval_base(client: user, message: Message, code: str, silent: bool = False):
     eval_base = None
     # async def shell_base(message: Message, command: str):
     shell_base = None
-    
+
     async def get_my_dialogs(self) -> typing.List[types.Dialog]:
         if not self.__my_all_dialogs__ or len(self.__my_all_dialogs__) < 2:
             return await self.refresh_dialogs()
         return self.__my_all_dialogs__
-    
-    
-    
+
     async def send_message(
         self,
-        chat_id: typing.Union[int, str], 
-        text: str, parse_mode: typing.Optional["enums.ParseMode"] = None, 
-        entities: typing.List["types.MessageEntity"] = None, 
-        disable_web_page_preview: bool = None, 
-        disable_notification: bool = None, 
-        reply_to_message_id: int = None, 
-        schedule_date: datetime = None, 
-        protect_content: bool = None, 
-        reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup", "types.ReplyKeyboardRemove", "types.ForceReply"] = None
+        chat_id: typing.Union[int, str],
+        text: str, parse_mode: typing.Optional["enums.ParseMode"] = None,
+        entities: typing.List["types.MessageEntity"] = None,
+        disable_web_page_preview: bool = None,
+        disable_notification: bool = None,
+        reply_to_message_id: int = None,
+        schedule_date: datetime = None,
+        protect_content: bool = None,
+        reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup",
+                                   "types.ReplyKeyboardRemove", "types.ForceReply"] = None
     ) -> "types.Message":
         if self.me.is_bot or not isinstance(reply_markup, (types.InlineKeyboardMarkup, dict, list)):
             return await super().send_message(
-                chat_id, 
-                text, 
-                parse_mode, 
-                entities, 
-                disable_web_page_preview, 
-                disable_notification, 
-                reply_to_message_id, 
-                schedule_date, 
-                protect_content, 
+                chat_id,
+                text,
+                parse_mode,
+                entities,
+                disable_web_page_preview,
+                disable_notification,
+                reply_to_message_id,
+                schedule_date,
+                protect_content,
                 reply_markup
             )
-        
+
         # if this is a user and is trying to send a message with keyboard buttons, automate
         # sending it with using inline through bot.
         if isinstance(reply_markup, (dict, list)):
@@ -358,46 +367,46 @@ class ScpClient(WotoClientBase):
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id
             )
-        
+
     async def send_photo(
-        self, 
-        chat_id: typing.Union[int, str], 
-        photo: typing.Union[str, typing.BinaryIO], 
-        caption: str = "", 
-        parse_mode: typing.Optional["enums.ParseMode"] = None, 
-        caption_entities: typing.List["types.MessageEntity"] = None, 
-        ttl_seconds: int = None, 
-        disable_notification: bool = None, 
-        reply_to_message_id: int = None, 
-        schedule_date: datetime = None, 
-        protect_content: bool = None, 
-        reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup", "types.ReplyKeyboardRemove", "types.ForceReply"] = None, 
-        progress: Callable = None, 
+        self,
+        chat_id: typing.Union[int, str],
+        photo: typing.Union[str, typing.BinaryIO],
+        caption: str = "",
+        parse_mode: typing.Optional["enums.ParseMode"] = None,
+        caption_entities: typing.List["types.MessageEntity"] = None,
+        ttl_seconds: int = None,
+        disable_notification: bool = None,
+        reply_to_message_id: int = None,
+        schedule_date: datetime = None,
+        protect_content: bool = None,
+        reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup",
+                                   "types.ReplyKeyboardRemove", "types.ForceReply"] = None,
+        progress: Callable = None,
         progress_args: tuple = ()
     ) -> typing.Optional["types.Message"]:
         if self.me.is_bot or not isinstance(reply_markup, (types.InlineKeyboardMarkup, dict, list)) or not the_config.shared_channel:
             return await super().send_photo(
-                chat_id, 
-                photo, 
-                caption, 
-                parse_mode, 
-                caption_entities, 
-                ttl_seconds, 
-                disable_notification, 
-                reply_to_message_id, 
-                schedule_date, 
-                protect_content, 
-                reply_markup, 
-                progress, 
+                chat_id,
+                photo,
+                caption,
+                parse_mode,
+                caption_entities,
+                ttl_seconds,
+                disable_notification,
+                reply_to_message_id,
+                schedule_date,
+                protect_content,
+                reply_markup,
+                progress,
                 progress_args
             )
-        
-        
+
         # if this is a user and is trying to send a message with keyboard buttons, automate
         # sending it with using inline through bot.
-        
+
         sent_message = await super().send_photo(
-            chat_id=the_config.shared_channel, 
+            chat_id=the_config.shared_channel,
             photo=photo,
         )
         if isinstance(reply_markup, (dict, list)):
@@ -415,7 +424,7 @@ class ScpClient(WotoClientBase):
             self.the_bot.me.username,
             container.unique_id,
         )
-        
+
         for current_result in inline_response.results:
             await self.send_inline_bot_result(
                 chat_id=chat_id,
@@ -424,8 +433,6 @@ class ScpClient(WotoClientBase):
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id
             )
-        
-    
 
     async def send_inline_bot_result(
         self,
@@ -453,12 +460,11 @@ class ScpClient(WotoClientBase):
                 reply_to_message_id=reply_to_message_id
             )
 
-    
     async def get_dialog_by_id(self, chat_id: typing.Union[str, int]) -> types.Dialog:
         my_all = await self.get_my_dialogs()
         if not my_all:
             return None
-        
+
         for current in my_all:
             if not current.chat:
                 continue
@@ -466,7 +472,6 @@ class ScpClient(WotoClientBase):
                 return current
         return None
 
-    
     async def read_all_mentions(self, chat_id: typing.Union[str, int]) -> None:
         try:
             await self.send(
@@ -474,14 +479,14 @@ class ScpClient(WotoClientBase):
                     peer=await self.resolve_peer(chat_id),
                 ),
             )
-        except Exception: pass
-        
-    
+        except Exception:
+            pass
+
     async def refresh_dialogs(self) -> typing.List[types.Dialog]:
         self.__my_all_dialogs__ = []
         async for current in self.iter_dialogs():
             self.__my_all_dialogs__.append(current)
-        
+
         return self.__my_all_dialogs__
 
     async def netcat(
@@ -520,7 +525,7 @@ class ScpClient(WotoClientBase):
     dump_usernames = []
     for x in _config.get('woto-scp', 'SudoList').split():
         _sudo.append(int(x))
-    
+
     try:
         for x in _config.get('woto-scp', 'OwnerList').split():
             the_id = int(x)
@@ -535,16 +540,16 @@ class ScpClient(WotoClientBase):
             _enforcers.append(int(x))
     except Exception as e:
         logging.warning(f'{e}')
-    
+
     try:
         for x in _config.get('sibyl-system', 'inspectors').split():
             _inspectors.append(int(x))
     except Exception as e:
         logging.warning(f'{e}')
-    
+
     for x in _config.get('woto-scp', 'public_dumps').split():
         dump_usernames.append(x)
-    
+
     scp_config = the_config
     __my_all_dialogs__: typing.List[types.Dialog] = None
     cached_messages: typing.List[types.Message] = None
