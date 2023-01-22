@@ -115,21 +115,30 @@ class WotoClientBase(Client):
                 current_button_index += 1
             return types.InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
 
-    async def get_user_input(self, message: types.Message, prompt=None, as_text: bool = True) -> types.Message:
+    async def get_user_input(
+            self,
+            message: types.Message,
+            prompt: str = None,
+            as_text: bool = True,
+            delete_prompt:str = True
+    ) -> types.Message:
         if not prompt:
             prompt = self.html_italic("waiting for any kind of input...")
 
         if message.reply_to_message and message.reply_to_message.from_user:
             replied = message.reply_to_message
-            await replied.reply_text(text=prompt)
+            prompt_message = await replied.reply_text(text=prompt)
             result = await message.chat.listen(filters=self.filters.user(replied.from_user.id))
         else:
-            await message.reply_text(text=prompt, quote=False)
+            prompt_message = await message.reply_text(text=prompt, quote=False)
             result = await self.listen(chat_id=message.chat.id)
+
+        if delete_prompt:
+            await prompt_message.delete()
         
         if as_text:
             return getattr(result, "text", result)
-        
+
         return result
 
     async def send_message(
