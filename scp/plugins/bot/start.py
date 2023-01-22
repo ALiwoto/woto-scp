@@ -1,4 +1,4 @@
-from scp import bot, user, __version__, __longVersion__
+from scp import bot, user, __version__, __long_version__
 from scp.utils.selfInfo import info
 
 
@@ -23,7 +23,7 @@ async def _(_, message: bot.types.Message):
                 user.md.Link(
                     __version__,
                     'https://github.com/pokurt/woto-scp/commit/{}'.format(
-                        __longVersion__,
+                        __long_version__,
                     ),
                 ),
             ),

@@ -6,7 +6,7 @@ from pyrogram.filters import create
 from pyrogram.types import Message
 from pyrogram import Client
 from scp.utils.selfInfo import info
-from ...wotoConfig import the_config
+from ...woto_config import the_config
 
 prefixes = the_config.prefixes
 
@@ -34,6 +34,9 @@ def command(
             message.command = None
             if not text:
                 return False
+            if message.from_user != None and message.text.lower().find("@me") != -1:
+                text = text.replace("@me", f"@{message.from_user.username}")
+            
             regex = r'(?i)^({prefix})({regex})(@{bot_name})?(\s.*)?$'.format(
                 prefix='|'.join(re.escape(x) for x in flt.prefixes),
                 regex='|'.join(flt.commands),
