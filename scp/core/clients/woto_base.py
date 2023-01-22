@@ -125,7 +125,7 @@ class WotoClientBase(Client):
             result = await message.chat.listen(filters=self.filters.user(replied.from_user.id))
         else:
             await message.reply_text(text=prompt, quote=False)
-            result = await message.chat.listen(filters=self.filters.user(replied.from_user.id))
+            result = await self.listen(chat_id=message.chat.id)
         
         if as_text:
             return getattr(result, "text", result)
