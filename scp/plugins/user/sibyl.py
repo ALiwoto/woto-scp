@@ -41,15 +41,15 @@ async def sinfo_handler(_, message: Message):
             the_user = int(cmd[1])
         except ValueError:
             pass
-    ptxt = "Sending cymatic scan request to Sibyl System."
-    my_msg = await message.reply_text(ptxt)
+    my_txt = "Sending cymatic scan request to Sibyl System."
+    my_msg = await message.reply_text(my_txt)
     if not is_silent:
         await asyncio.sleep(1.2)
-        ptxt += "."
-        my_msg = await my_msg.edit_text(ptxt)
-        asyncio.sleep(1.2)
-        ptxt += "."
-        my_msg = await my_msg.edit_text(ptxt)
+        my_txt += "."
+        my_msg = await my_msg.edit_text(my_txt)
+        await asyncio.sleep(1.2)
+        my_txt += "."
+        my_msg = await my_msg.edit_text(my_txt)
     
     my_user : User = None
     try:
