@@ -63,7 +63,7 @@ class WotoConfig:
             self.dump_usernames.append(x)
 
         self.private_resources = self._the_config.getint('woto-scp', 'private_resources')
-        self.shared_channel = self._the_config.getint('woto-scp', 'shared_channel')
+        self.shared_channel = self._the_config.getint('woto-scp', 'shared_channel', fallback=self.private_resources)
         # sibyl configuration stuff:
         self.sibyl_token = self._the_config.get('sibyl-system', 'token')
         self.public_listener = self._the_config.getint('sibyl-system', 'public_listener')
