@@ -325,7 +325,7 @@ async def html_cssworker(target_html: str):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.sudo
-    & user.filters.command(
+    & user.command(
         'webPre',
         prefixes=user.cmd_prefixes,
     ),

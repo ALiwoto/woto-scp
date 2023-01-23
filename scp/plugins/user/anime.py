@@ -24,7 +24,7 @@ from pyrogram.types import Sticker
     ~user.filters.sticker & 
     ~user.filters.via_bot & 
     user.sudo & 
-    user.filters.command(
+    user.command(
         ['anilist', 'al', 'alc', 'alchar', 'alcharacter', 'anilistc', 'anilistchar', 'anilistcharacter'], 
         prefixes=user.cmd_prefixes,
     )
@@ -80,7 +80,7 @@ async def anilist(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['trace', 'tracemoe', 'whatanime', 'wa', 'wait'],
         prefixes=user.cmd_prefixes,
     ),

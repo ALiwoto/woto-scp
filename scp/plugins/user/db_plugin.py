@@ -6,7 +6,7 @@ import ujson
 
 @user.on_message(
 	user.filters.me &
-	user.filters.command(
+	user.command(
         ['sql'],
         prefixes=user.cmd_prefixes,
     ),
@@ -27,7 +27,7 @@ async def sql_exec(_, message: Message):
 
 @user.on_message(
 	user.filters.me &
-	user.filters.command(
+	user.command(
         ['sql_table'],
         prefixes=user.cmd_prefixes,
     ),

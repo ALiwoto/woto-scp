@@ -205,7 +205,7 @@ async def wordle_bot_message_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['wordle'],
         prefixes=user.cmd_prefixes,
     ),
@@ -228,7 +228,7 @@ async def enable_wordle_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['cWordle'],
         prefixes=user.cmd_prefixes,
     ),
@@ -274,7 +274,7 @@ async def cWordle_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['aWordle'],
         prefixes=user.cmd_prefixes,
     ),

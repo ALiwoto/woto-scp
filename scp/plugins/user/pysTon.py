@@ -28,7 +28,7 @@ __DOC__ = str(
 
 @user.on_message(
     (user.sudo | user.owner)
-    & user.filters.command(
+    & user.command(
         'execcc',
         prefixes=user.cmd_prefixes,
     ),

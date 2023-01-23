@@ -26,7 +26,7 @@ BACKUP_SHELL_SCRIPT = (
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.filters.me
-    & user.filters.command(
+    & user.command(
         'sBackup',
         prefixes=user.cmd_prefixes,
     ),
@@ -44,7 +44,7 @@ async def sBackup_handler(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.owner
-    & user.filters.command(
+    & user.command(
         ['shell', 'sh'],
         prefixes=user.cmd_prefixes,
     ),
@@ -62,7 +62,7 @@ async def shell(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.filters.me
-    & user.filters.command(
+    & user.command(
         'neo',
         prefixes=user.cmd_prefixes,
     ),
@@ -77,7 +77,7 @@ async def neo_handler(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.filters.me
-    & user.filters.command(
+    & user.command(
         'git',
         prefixes=user.cmd_prefixes,
     ),
@@ -91,7 +91,7 @@ async def git_handler(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.filters.me
-    & user.filters.command(
+    & user.command(
         'screen',
         prefixes=user.cmd_prefixes,
     ),
@@ -107,7 +107,7 @@ async def screen_handler(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.filters.me
-    & user.filters.command(
+    & user.command(
         'curl',
         prefixes=user.cmd_prefixes,
     ),
@@ -157,7 +157,7 @@ user.shell_base = shell_base
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.owner
-    & user.filters.command(
+    & user.command(
         'cat',
         prefixes=user.cmd_prefixes,
     ),
@@ -208,7 +208,7 @@ async def cat(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & (user.owner | user.special_users)
-    & user.filters.command(
+    & user.command(
         'toGif',
         prefixes=user.cmd_prefixes,
     ),
@@ -265,7 +265,7 @@ async def toGif_handler(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.sudo
-    & user.filters.command(
+    & user.command(
         'makeGif',
         prefixes=user.cmd_prefixes,
     ),
