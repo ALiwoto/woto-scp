@@ -37,7 +37,7 @@ STARTER = html_mono("• \u200D")
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['investigate'],
         prefixes=user.cmd_prefixes,
     ),
@@ -73,7 +73,7 @@ async def investigate_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['stalkers'],
         prefixes=user.cmd_prefixes,
     ),
@@ -155,7 +155,7 @@ async def stalkers_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['admins', 'admins!'],
         prefixes=user.cmd_prefixes,
     ),
@@ -251,7 +251,7 @@ async def by_channels_handler(_, message: Message):
 	~user.filters.via_bot &
     user.filters.reply &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['purge'],
         prefixes=user.cmd_prefixes,
     ),
@@ -274,7 +274,7 @@ async def purge_handler(_, message: Message):
 	~user.filters.via_bot &
     user.filters.reply &
 	user.sudo & 
-	user.filters.command(
+	user.command(
         ['tPurge'],
         prefixes=user.cmd_prefixes,
     ),
@@ -316,7 +316,7 @@ async def tPurge_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.sudo & 
-	user.filters.command(
+	user.command(
         ['deadaccs'],
         prefixes=user.cmd_prefixes,
     ),
@@ -350,7 +350,7 @@ async def deadaccs_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['members'],
         prefixes=user.cmd_prefixes,
     ),
@@ -420,7 +420,7 @@ async def members_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.sudo &
-	user.filters.command(
+	user.command(
         ['bots'],
         prefixes=user.cmd_prefixes,
     ),
@@ -516,7 +516,7 @@ async def bots_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['fmembers'],
         prefixes=user.cmd_prefixes,
     ),
@@ -1308,7 +1308,7 @@ async def tCacheMessages_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.sudo & 
-	user.filters.command(
+	user.command(
         ['cachedScan'],
         prefixes=user.cmd_prefixes,
     ),

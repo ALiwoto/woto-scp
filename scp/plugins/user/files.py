@@ -23,7 +23,7 @@ from scp.utils.parser import (
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['ls', 'hls', 'hiddenls'],
         prefixes=user.cmd_prefixes,
     ),
@@ -55,7 +55,7 @@ async def ls_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['pwd', 'dir'],
         prefixes=user.cmd_prefixes,
     ))
@@ -71,7 +71,7 @@ async def pwd_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['gitpull', 'restart'],
         prefixes=user.cmd_prefixes,
     ),
@@ -111,7 +111,7 @@ async def gitpull(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['ul', 'upload'],
         prefixes=user.cmd_prefixes,
     ),
@@ -157,7 +157,7 @@ async def upload_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['uld'],
         prefixes=user.cmd_prefixes,
     ),
@@ -203,7 +203,7 @@ async def uld_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['dl', 'download'],
         prefixes=user.cmd_prefixes,
     ),

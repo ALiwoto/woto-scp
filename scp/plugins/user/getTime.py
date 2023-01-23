@@ -23,7 +23,7 @@ __DOC__ = str(
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['time', 'now'],
         prefixes=user.cmd_prefixes,
     ))

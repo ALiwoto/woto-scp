@@ -17,7 +17,7 @@ from pyrogram.errors import(
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.sudo & 
-	user.filters.command(
+	user.command(
         ['ord'],
         prefixes=user.cmd_prefixes,
     ),
@@ -43,7 +43,7 @@ async def ord_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot &
 	user.sudo & 
-	user.filters.command(
+	user.command(
         ['chr'],
         prefixes=user.cmd_prefixes,
     ),
@@ -68,7 +68,7 @@ async def chr_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['pirate'],
         prefixes=user.cmd_prefixes,
     ),
@@ -157,7 +157,7 @@ async def pirate_handler(_, message: Message):
 	~user.filters.sticker & 
 	~user.filters.via_bot & 
 	user.owner & 
-	user.filters.command(
+	user.command(
         ['cBackup'],
         prefixes=user.cmd_prefixes,
     ),

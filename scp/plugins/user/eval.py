@@ -41,7 +41,7 @@ async def input(prompt=None, **kwargs):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.owner
-    & user.filters.command(
+    & user.command(
         'eval',
         prefixes=user.cmd_prefixes,
     ),
@@ -62,7 +62,7 @@ async def eval_handler(_, message: Message):
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.owner
-    & user.filters.command(
+    & user.command(
         'getsrc',
         prefixes=user.cmd_prefixes,
     ),
@@ -211,7 +211,7 @@ user.the_bot.eval_base = std_types.MethodType(eval_base, user.the_bot)
     & ~user.filters.sticker
     & ~user.filters.via_bot
     & user.owner
-    & user.filters.command(
+    & user.command(
         'exit',
         prefixes=user.cmd_prefixes,
     ),
