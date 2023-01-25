@@ -14,6 +14,7 @@ from ...woto_config import the_config
 
 prefixes = the_config.prefixes
 
+
 def command_OLD(
     commands: str or List[str],
     prefixes: str or List[str] = the_config.prefixes,
@@ -40,7 +41,7 @@ def command_OLD(
                 return False
             if message.from_user != None and message.text.lower().find("@me") != -1:
                 text = text.replace("@me", f"@{message.from_user.username}")
-            
+
             regex = r'(?i)^({prefix})({regex})(@{bot_name})?(\s.*)?$'.format(
                 prefix='|'.join(re.escape(x) for x in flt.prefixes),
                 regex='|'.join(flt.commands),
@@ -54,8 +55,9 @@ def command_OLD(
                     )
                 return True
             return p_command()
-        except Exception: logging.error(format_exc())
-    
+        except Exception:
+            logging.error(format_exc())
+
     try:
         commands = commands if isinstance(commands, list) else [commands]
         commands = {c if case_sensitive else c.lower() for c in commands}
@@ -69,9 +71,15 @@ def command_OLD(
             prefixes=prefixes,
             case_sensitive=case_sensitive,
         )
-    except Exception: logging.error(format_exc())
+    except Exception:
+        logging.error(format_exc())
 
-def command(commands: Union[str, List[str]], prefixes: Union[str, List[str]] = "/", case_sensitive: bool = False):
+
+def command(
+    commands: Union[str, List[str]], 
+    prefixes: Union[str, List[str]] = the_config.prefixes, 
+    case_sensitive: bool = False,
+):
     """Filter commands, i.e.: text messages starting with "/" or any other custom prefix.
 
     Parameters:
@@ -96,10 +104,10 @@ def command(commands: Union[str, List[str]], prefixes: Union[str, List[str]] = "
         username = client.me.username or ""
         text = message.text or message.caption
         message.command = None
-        
+
         if not text:
             return False
-        
+
         if message.from_user != None and message.text.lower().find("@me") != -1:
             text = text.replace("@me", f"@{message.from_user.username}")
 
@@ -144,4 +152,3 @@ def command(commands: Union[str, List[str]], prefixes: Union[str, List[str]] = "
         prefixes=prefixes,
         case_sensitive=case_sensitive
     )
-
