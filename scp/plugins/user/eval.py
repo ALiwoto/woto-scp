@@ -43,7 +43,6 @@ async def input(prompt=None, **kwargs):
     & user.owner
     & user.command(
         'eval',
-        prefixes=user.cmd_prefixes,
     ),
 )
 async def eval_handler(_, message: Message):
