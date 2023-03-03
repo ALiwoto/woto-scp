@@ -108,7 +108,7 @@ def command(
         if not text:
             return False
 
-        if message.from_user != None and message.text.lower().find("@me") != -1:
+        if message.from_user != None and text.lower().find("@me") != -1:
             text = text.replace("@me", f"@{message.from_user.username}")
 
         for prefix in flt.prefixes:
