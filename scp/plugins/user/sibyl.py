@@ -1,5 +1,4 @@
 import asyncio
-from time import sleep
 from pyrogram.types import (
     Message,
 )
@@ -8,14 +7,6 @@ from pyrogram.enums.parse_mode import ParseMode
 from scp import user
 from SibylSystem.types import GeneralInfo
 
-from scp.utils.parser import( 
-    html_bold,
-    html_mention,
-    html_mention_by_user, 
-    html_mono, 
-    html_normal,
-    split_some,
-)
 
 @user.on_message(
     (user.owner | user.enforcer | user.inspector) &
@@ -66,40 +57,40 @@ async def sinfo_handler(_, message: Message):
         if not the_info:
             await my_msg.edit_text('failed to receive info from Sibyl System.')
             return
-        txt = html_bold("Sibyl System scan results:", "\n")
+        txt = user.html_bold("Sibyl System scan results:", "\n")
         if my_user:
-            the_mention = await html_mention(
+            the_mention = await user.html_mention(
                 value=my_user,
                 client=user,
             )
-            txt += html_bold(" • User: ") + the_mention + "\n"
+            txt += user.html_bold(" • User: ") + the_mention + "\n"
         
-        txt += html_bold(" • ID: ") + html_mono(the_info.user_id, "\n")
-        txt += html_bold(" • Is banned: ") + html_mono(the_info.banned, "\n")
+        txt += user.html_bold(" • ID: ") + user.html_mono(the_info.user_id, "\n")
+        txt += user.html_bold(" • Is banned: ") + user.html_mono(the_info.banned, "\n")
         if the_info.banned:
             if the_info.banned_by != 0:
                 the_banner: User
                 try:
                     the_banner = await user.get_users(the_info.banned_by)
                 except Exception: pass
-                txt += html_bold(" • Banned by: ") + (
-                    html_mono(the_info.banned_by, "\n") 
+                txt += user.html_bold(" • Banned by: ") + (
+                    user.html_mono(the_info.banned_by, "\n") 
                     if not the_banner 
-                    else html_mention_by_user(the_banner, "\n")
+                    else user.html_mention_by_user(the_banner, "\n")
                 )
             if the_info.ban_flags and len(the_info.ban_flags) > 0:
                 f = ', '.join(the_info.ban_flags)
-                txt += html_bold(" • Ban flags: ") + html_mono(f, "\n")
-            txt += html_bold(" • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
-            txt += html_bold(" • Last update: ") + html_mono(the_info.date, "\n")
-            txt += html_bold(" • Ban reason: ")+ html_mono(the_info.reason, "\n")
-            txt += html_bold(" • Ban source: ")+ html_mono(the_info.ban_source_url, "\n")
+                txt += user.html_bold(" • Ban flags: ") + user.html_mono(f, "\n")
+            txt += user.html_bold(" • Crime Coefficient: ") + user.html_mono(the_info.crime_coefficient, "\n")
+            txt += user.html_bold(" • Last update: ") + user.html_mono(the_info.date, "\n")
+            txt += user.html_bold(" • Ban reason: ")+ user.html_mono(the_info.reason, "\n")
+            txt += user.html_bold(" • Ban source: ")+ user.html_mono(the_info.ban_source_url, "\n")
         else:
-            txt += html_bold(" • Crime Coefficient: ") + html_mono(the_info.crime_coefficient, "\n")
-            txt += html_bold(" • Last update: ") + html_mono(the_info.date, "\n")
+            txt += user.html_bold(" • Crime Coefficient: ") + user.html_mono(the_info.crime_coefficient, "\n")
+            txt += user.html_bold(" • Last update: ") + user.html_mono(the_info.date, "\n")
             if general_info:
                 div = user.sibyl.get_div(general_info)
-                txt += html_normal(
+                txt += user.html_normal(
                     "\nThe user is a valid " ,
                     user.sibyl.get_general_str(general_info),
                     " registered at PSB " + (f"division {div}." if div else "."),
@@ -107,10 +98,8 @@ async def sinfo_handler(_, message: Message):
         
         await my_msg.edit_text(txt, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
     except Exception as e:
-        #print(e)
-        #logging.exception("some errors found")
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
-        return
+        return await my_msg.edit_text("Got error: " + user.html_mono(e), parse_mode=ParseMode.HTML)
+        
 
 
 @user.on_message(
@@ -126,13 +115,13 @@ async def fScan_handler(_, message: Message):
     #is_silent = user.is_silent(message)
     replied = message.reply_to_message
     target_user = replied.from_user.id
-    reason_list = split_some(message.text, 1, ' ', '\n')
+    reason_list = user.split_some(message.text, 1, ' ', '\n')
     if len(reason_list) < 2:
         await message.reply_text('reason is required for this action')
     the_reason = reason_list[1]
 
-    ptxt = "Sending cymatic scan request to Sibyl System."
-    my_msg = await message.reply_text(ptxt)
+    p_txt = user.html_mono("Sending cymatic scan request to Sibyl System.")
+    my_msg = await message.reply_text(p_txt)
 
     try:
         user.sibyl.ban(
@@ -142,11 +131,11 @@ async def fScan_handler(_, message: Message):
             message=replied.text,
         )
     except Exception as e:
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
-        return
+        return await my_msg.edit_text("Got error: " + user.html_mono(e), parse_mode=ParseMode.HTML)
+        
     
-    await my_msg.edit_text(
-        html_mono('Cymatic scan request has been sent to Sibyl.'), 
+    return await my_msg.edit_text(
+        user.html_mono('Cymatic scan request has been sent to Sibyl.'), 
         parse_mode=ParseMode.HTML,
     )
 
@@ -179,11 +168,11 @@ async def revert_handler(_, message: Message):
     try:
         user.sibyl.revert(target_user)
     except Exception as e:
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
+        await my_msg.edit_text("Got error: " + user.html_mono(e), parse_mode=ParseMode.HTML)
         return
     
     await my_msg.edit_text(
-        html_mono('Cymatic scan request has been sent to Sibyl.'), 
+        user.html_mono('Cymatic scan request has been sent to Sibyl.'), 
         parse_mode=ParseMode.HTML,
     )
 
@@ -199,14 +188,14 @@ async def revert_handler(_, message: Message):
 async def rScan_handler(_, message: Message):
     #cmd = message.command
     #is_silent = user.is_silent(message)
-    reason_list = split_some(message.text, 2, ' ', '\n')
+    reason_list = user.split_some(message.text, 2, ' ', '\n')
     if len(reason_list) < 3:
         return await message.reply_text('usage: .rScan LINK reason')
     msg_link = reason_list[1]
     the_reason = reason_list[2]
 
-    ptxt = "Sending cymatic scan request to Sibyl System."
-    my_msg = await message.reply_text(ptxt)
+    p_txt = user.html_mono("Sending cymatic scan request to Sibyl System.")
+    my_msg = await message.reply_text(p_txt)
     target_message = await user.get_message_by_link(msg_link)
     if not target_message:
         return await message.reply_text('message not found')
@@ -226,11 +215,11 @@ async def rScan_handler(_, message: Message):
             message=target_message.text,
         )
     except Exception as e:
-        await my_msg.edit_text("Got error: " + html_mono(e), parse_mode=ParseMode.HTML)
+        await my_msg.edit_text("Got error: " + user.html_mono(e), parse_mode=ParseMode.HTML)
         return
     
-    await my_msg.edit_text(
-        html_mono('Cymatic scan request has been sent to Sibyl.'), 
+    return await my_msg.edit_text(
+        user.html_mono('Cymatic scan request has been sent to Sibyl.'), 
         parse_mode=ParseMode.HTML,
     )
 
