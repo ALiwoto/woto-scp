@@ -135,7 +135,7 @@ _AZURE_LANG_TO_VOICE = {
     ~user.filters.forwarded
     & ~user.filters.sticker
     & ~user.filters.via_bot
-    & user.filters.me
+    & (user.sudo | user.azure_sudo_users)
     & user.command(
         'toVoice',
         prefixes=user.cmd_prefixes,
