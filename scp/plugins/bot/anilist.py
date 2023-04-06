@@ -213,7 +213,7 @@ async def generate_character(anilist):
     filters.regex(r'^a(?:ni)?l(?:ist)?(c(?:har(?:acter)?)?)?\s+(.+)$'),
 )
 async def anilist_query(client, inline_query: InlineQuery):
-    if inline_query.from_user.id not in user._sudo:
+    if not user.scp_config.is_sudo(inline_query.from_user.id):
         await inline_query.answer([
             InlineQueryResultArticle('...no', InputTextMessageContent('...no'))
         ], cache_time=3600, is_personal=True)
@@ -290,13 +290,11 @@ async def anilist_move(_, callback_query: CallbackQuery):
     global message_info
     global message_lock
     
-    if callback_query.from_user.id not in user._sudo:
-        await callback_query.answer('...no', cache_time=3600, show_alert=True)
-        return
+    if not user.scp_config.is_sudo(callback_query.from_user.id):
+        return await callback_query.answer('...no', cache_time=3600, show_alert=True)
     async with message_lock:
         if callback_query.inline_message_id not in message_info:
-            await callback_query.answer('This message is too old', cache_time=3600, show_alert=True)
-            return
+            return await callback_query.answer('This message is too old', cache_time=3600, show_alert=True)
         query, page, character = message_info[callback_query.inline_message_id]
         opage = page
         if callback_query.matches[0].group(1) == 'back':
