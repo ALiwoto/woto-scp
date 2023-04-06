@@ -189,7 +189,7 @@ async def to_voice_handler(_, message: Message):
         )
     
     speech_config.speech_recognition_language = the_lang
-    user_selected_voice = getattr(speech_config, 'user_selected_voice')
+    user_selected_voice = getattr(speech_config, 'user_selected_voice', None)
     if user_selected_voice:
         # The full list of supported voices can be found here:
         # https://aka.ms/csspeech/voicenames
