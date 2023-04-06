@@ -191,7 +191,7 @@ class WotoClientBase(Client):
             )
 
     def get_non_cmd(self, message: types.Message) -> str:
-        my_strs = split_some(message.text, 1, ' ', '\n')
+        my_strs = split_some(message.text or message.caption, 1, ' ', '\n')
         if len(my_strs) < 2:
             return ''
         return my_strs[1]
@@ -300,7 +300,7 @@ class WotoClientBase(Client):
     def unpack_inline_message_id(inline_message_id: str) -> Atr:
         return unpackInlineMessage(inline_message_id)
 
-    def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
+    def to_output_file(self, value: Union[str, bytes], file_name: str = "output.txt") -> BytesIO:
         return to_output_file(value=value, file_name=file_name)
 
     async def invoke(

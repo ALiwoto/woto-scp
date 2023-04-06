@@ -19,3 +19,4 @@ yarl==1.8.2
 httpx==0.21.0
 sibylsystem==0.0.24
 wotoplatform==0.0.25
+azure-cognitiveservices-speech==1.27.0
