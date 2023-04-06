@@ -214,9 +214,6 @@ async def cat(_, message: Message):
     ),
 )
 async def toGif_handler(_, message: Message):
-    if not message.reply_to_message or not message.reply_to_message.sticker:
-        return
-    
     replied_message = message.reply_to_message
     if replied_message == None or not replied_message.media:
         return await message.reply_text('Please reply to a media message with this command.')
