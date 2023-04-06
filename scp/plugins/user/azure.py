@@ -56,11 +56,15 @@ async def to_voice_handler(_, message: Message):
         )
         setattr(user, 'speech_syn', speech_syn)
     
+    top_message = await message.reply_text(
+        text=user.html_mono('Generating voice for the given text...')
+    )
     speech_result = speech_syn.speak_text_async(the_text).get()
     audio_data: bytes = getattr(speech_result, 'audio_data', None)
     if not audio_data:
         return await message.reply_text('Failed to retrieve audio data from azure servers.')
     
+    await top_message.delete()
     await message.reply_document(
         document=user.to_output_file(audio_data, 'output.wav')
     )
