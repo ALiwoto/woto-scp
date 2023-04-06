@@ -166,7 +166,7 @@ async def to_voice_handler(_, message: Message):
 
     audio_config = getattr(user, 'audio_config', None)
     if not audio_config:
-        audio_config = speech_sdk.audio.AudioOutputConfig(use_default_speaker=False)
+        audio_config = speech_sdk.audio.AudioOutputConfig(use_default_speaker=True)
         setattr(user,  'audio_config', audio_config)
     
     speech_config = getattr(user, 'speech_config', None)
