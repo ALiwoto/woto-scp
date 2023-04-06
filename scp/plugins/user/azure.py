@@ -86,8 +86,6 @@ _AZURE_LANG_TO_VOICE = {
         ('en-GB-AlfieNeural', VoiceGender.MALE)
     ],
     'en-US': [
-        ('en-US-AIGenerate1Neural', VoiceGender.MALE),
-        ('en-US-AIGenerate2Neural', VoiceGender.FEMALE),
         ('en-US-AmberNeural', VoiceGender.FEMALE),
         ('en-US-AnaNeural', VoiceGender.FEMALE_CHILD),
         ('en-US-AriaNeural', VoiceGender.FEMALE),
