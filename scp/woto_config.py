@@ -54,7 +54,7 @@ class WotoConfig:
             self._the_config.get('woto-scp', 'Prefixes').split() or ['!', '.']
         )
         self.log_channel = self._the_config.getint('woto-scp', 'log_channel')
-        self.dump_usernames = list_map(int, self._the_config.get('woto-scp', 'public_dumps').split())
+        self.dump_usernames = self._the_config.get('woto-scp', 'public_dumps').split()
 
         self.private_resources = self._the_config.getint('woto-scp', 'private_resources')
         self.shared_channel = self._the_config.getint('woto-scp', 'shared_channel', fallback=self.private_resources)
