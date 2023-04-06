@@ -252,8 +252,12 @@ def remove_empty_strs(values: list) -> list:
 def is_invalid_str(value: str) -> bool:
     return not value or len(value.strip()) == 0 or value.isspace()
 
-def to_output_file(value: str, file_name: str = "output.txt") -> BytesIO:
-    f = BytesIO(fix_encoding(value))
+def to_output_file(value: Union[str, bytes], file_name: str = "output.txt") -> BytesIO:
+    if isinstance(value, str):
+        f = BytesIO(fix_encoding(value))
+    else:
+        f =  BytesIO(value)
+        
     f.name = file_name
     return f
 
