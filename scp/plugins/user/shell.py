@@ -216,17 +216,22 @@ async def cat(_, message: Message):
 async def toGif_handler(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.sticker:
         return
+    
+    replied_message = message.reply_to_message
+    if replied_message == None or not replied_message.media:
+        return await message.reply_text('Please reply to a media message with this command.')
+    
+    if not replied_message.media.name in ("VIDEO", "STICKER", "ANIMATION"):
+        return await message.reply_text(f'Invalid media message detected: {replied_message.media.name}')
+    
     sticker = message.reply_to_message.sticker
-    if not sticker.is_video:
-        await message.reply_text('the sticker needs to be a video-sticker')
-        return
+    if sticker and not sticker.is_video:
+        return await message.reply_text('the sticker needs to be a video-sticker')
     
     rfile = tempfile.NamedTemporaryFile()
     await user.download_media(
-        message.reply_to_message, 
+        message=message.reply_to_message, 
         file_name=rfile.name,
-        # progress=progress_callback, 
-        # progress_args=(reply, 'Downloading...', False),
     )
     output_to_gif = 'output-toGif.mp4'
     the_command = f'rm "{output_to_gif}" -f && ffmpeg -an -sn -i "{rfile.name}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error'
