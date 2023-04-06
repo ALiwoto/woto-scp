@@ -2,7 +2,7 @@ from scp import user, bot
 from scp.utils.selfInfo import info
 
 
-__PLUGIN__ = 'pipeChat'
+__PLUGIN__ = 'pipe_chat'
 __DOC__ = str(
     user.md.KanTeXDocument(
         user.md.Section(
