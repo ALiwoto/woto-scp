@@ -206,6 +206,16 @@ async def to_voice_handler(_, message: Message):
     speech_result = speech_syn.speak_text_async(the_text).get()
     audio_data: bytes = getattr(speech_result, 'audio_data', None)
     if not audio_data:
+        error_message = getattr(
+            getattr(speech_result, 'cancellation_details'), 
+            'error_details',
+            None
+        )
+        if error_message:
+            error_message = user.html_mono(error_message)
+            return await message.reply_text(
+                message=f'Failed to retrieve audio data from azure servers:\n{error_message}'
+            )
         return await message.reply_text('Failed to retrieve audio data from azure servers.')
     
     await top_message.delete()
