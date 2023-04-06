@@ -193,9 +193,9 @@ async def to_voice_handler(_, message: Message):
     if user_selected_voice:
         # The full list of supported voices can be found here:
         # https://aka.ms/csspeech/voicenames
-        speech_config.speech_synthesis_voice_name=user_selected_voice
+        speech_config.speech_synthesis_voice_name = user_selected_voice
     else:
-        speech_config.speech_synthesis_voice_name = voice_name
+        speech_config.speech_synthesis_voice_name = voice_name[0][0]
     
     speech_syn = speech_sdk.SpeechSynthesizer(
         speech_config=speech_config,
