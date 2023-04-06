@@ -126,10 +126,10 @@ class ScpClient(WotoClientBase):
     async def start(self):
         await super().start()
         # me = await super().get_me()
-        if not self.me.id in self._sudo:
-            self._sudo.append(self.me.id)
-        if not self.me.id in self._owners:
-            self._owners.append(self.me.id)
+        if not self.me.id in self.scp_config._sudo_users:
+            self.scp_config._sudo_users.append(self.me.id)
+        if not self.me.id in self.scp_config._owner_users:
+            self.scp_config._owner_users.append(self.me.id)
 
         if not self.is_scp_bot:
             try:
@@ -516,40 +516,7 @@ class ScpClient(WotoClientBase):
     types = types
     md = Markdown
     exceptions = errors
-    _config = ConfigParser()
-    _config.read('config.ini')
-    _sudo = []
-    _owners = []
-    _enforcers = []
-    _inspectors = []
-    dump_usernames = []
-    for x in _config.get('woto-scp', 'SudoList').split():
-        _sudo.append(int(x))
-
-    try:
-        for x in _config.get('woto-scp', 'OwnerList').split():
-            the_id = int(x)
-            if not x in _sudo:
-                _sudo.append(the_id)
-            _owners.append(the_id)
-    except Exception as e:
-        logging.warning(f'{e}')
-
-    try:
-        for x in _config.get('sibyl-system', 'enforcers').split():
-            _enforcers.append(int(x))
-    except Exception as e:
-        logging.warning(f'{e}')
-
-    try:
-        for x in _config.get('sibyl-system', 'inspectors').split():
-            _inspectors.append(int(x))
-    except Exception as e:
-        logging.warning(f'{e}')
-
-    for x in _config.get('woto-scp', 'public_dumps').split():
-        dump_usernames.append(x)
-
+    
     scp_config = the_config
     __my_all_dialogs__: typing.List[types.Dialog] = None
     cached_messages: typing.List[types.Message] = None
