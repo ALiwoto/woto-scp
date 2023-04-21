@@ -466,7 +466,7 @@ class ScpClient(WotoClientBase):
         ))
         message_from_bot: types.Message = None
         for _ in range(10):
-            message_from_bot = await self.the_bot.scp_listen()
+            message_from_bot = await self.the_bot.scp_listen(chat_id=self.me.id)
             if message_from_bot.media == message.media:
                 break
         else:
