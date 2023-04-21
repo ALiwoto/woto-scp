@@ -4,13 +4,13 @@ import urllib.request
 import aiohttp
 
 
-class repo_info:
+class RepoInfo:
     repo = None
     target_dir = None
     branch = None
 
 
-class api_urls:
+class ApiUrls:
     recursive = 'https://api.github.com/repos/{}/git/trees/{}?recursive=1'
     no_recursive = 'https://api.github.com/repos/{}/git/trees/{}'
 
@@ -51,7 +51,7 @@ class Octodir:
     async def __get_repo_tree(self):
         async with aiohttp.ClientSession() as ses:
             api = await ses.get(
-                api_urls.recursive.format(
+                ApiUrls.recursive.format(
                     self.repo,
                     self.branch,
                 ),
@@ -87,7 +87,7 @@ class Octodir:
 
             target_dir = [item for item in splitted_url[4:]]
 
-            repo_data = repo_info()
+            repo_data = RepoInfo()
             repo_data.repo = owner + '/' + repo
             repo_data.branch = branch
             repo_data.target_dir = '/'.join(target_dir)
@@ -100,7 +100,7 @@ class Octodir:
         repo_data = self.__scrutinize_url(self.folder_url)
         async with aiohttp.ClientSession() as ses:
             api = await ses.get(
-                api_urls.no_recursive.format(
+                ApiUrls.no_recursive.format(
                     repo_data.repo, repo_data.branch,
                 ),
             )
