@@ -163,7 +163,7 @@ class WotoClientBase(Client):
             current_button_index = 0
             for current in the_value:
                 if not isinstance(current, dict):
-                    pass
+                    continue
                 for current_row_title in current:
                     if current_button_index >= len(keyboard_buttons):
                         keyboard_buttons.append([])
