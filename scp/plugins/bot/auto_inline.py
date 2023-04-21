@@ -3,16 +3,16 @@ import re
 from scp.utils.selfInfo import info
 from scp import bot
 from scp.utils.auto_inline import AutoInlineType, auto_inline_dict
-import pyrogram
 from pyrogram import utils as pUtils
 from pyrogram.file_id import FileType
+from pyrogram.types import InlineQuery
 
 
 @bot.on_inline_query(
     bot.filters.user(bot.the_user.me.id)
     & bot.filters.regex('^auIn'),
 )
-async def answer_auto_inline_query(__, query: bot.types.InlineQuery):
+async def answer_auto_inline_query(__, query: InlineQuery):
     query_text = query.query
     container = auto_inline_dict.get(query_text, None)
     if not container: return
@@ -27,7 +27,11 @@ async def answer_auto_inline_query(__, query: bot.types.InlineQuery):
         answers.append(
             bot.types.InlineQueryResultArticle(
                 title=container.title,
-                input_message_content=bot.types.InputTextMessageContent(container.text),
+                input_message_content=bot.types.InputTextMessageContent(
+                    container.text,
+                    disable_web_page_preview=container.disable_web_page_preview,
+                    entities=container.entities,
+                ),
                 reply_markup=container.keyboard,
             ),
         )
