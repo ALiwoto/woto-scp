@@ -1,13 +1,16 @@
 from scp.utils.selfInfo import info
 from scp import bot
-
+from pyrogram.types import (
+    Message,
+    CallbackQuery
+)
 
 @bot.on_message(
     bot.filters.user(info['_user_id'])
     & bot.command('config', prefixes='/')
     & bot.filters.private,
 )
-async def _(_, message: bot.types.Message):
+async def _(_, message: Message):
     doc = bot.md.KanTeXDocument()
     sec = bot.md.Section('Configurations')
     for x, y in bot._config.__dict__['_sections'].items():
@@ -35,7 +38,7 @@ async def _(_, message: bot.types.Message):
     )
     & bot.filters.regex('^edit/config'),
 )
-async def _(_, query: bot.types.CallbackQuery):
+async def _(_, query: CallbackQuery):
     if query.data == 'edit/config':
         buttons = []
         for _, y in bot._config.__dict__['_sections'].items():
