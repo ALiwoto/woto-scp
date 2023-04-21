@@ -5,8 +5,6 @@ from datetime import datetime
 from typing import (
     NoReturn,
     Union,
-    Optional,
-    List,
     Callable
 )
 from pyrogram import (
@@ -33,9 +31,7 @@ from scp.utils.auto_inline import (
 from scp.utils.sibylUtils import SibylClient
 from scp.database.database_client import DatabaseClient
 from scp.utils.misc import restart_scp as restart_woto_scp
-from configparser import ConfigParser
 from kantex import md as Markdown
-from aiohttp import ClientSession, client_exceptions
 from .woto_base import WotoClientBase
 from ...woto_config import the_config
 import asyncio
@@ -114,7 +110,6 @@ class ScpClient(WotoClientBase):
             app_version='woto-scp',
             no_updates=False,
         )
-        self.aioclient: ClientSession = ClientSession()
         self.is_scp_bot = is_scp_bot
         if is_scp_bot:
             self.the_bot = self
@@ -208,16 +203,6 @@ class ScpClient(WotoClientBase):
 
         return ret_message
 
-    # from Kantek
-    async def resolve_url(self, url: str) -> str:
-        if not url.startswith('http'):
-            url: str = f'http://{url}'
-        async with self.aioclient.get(
-            f'http://expandurl.com/api/v1/?url={url}',
-        ) as response:
-            e = await response.text()
-        return e if e != 'false' and e[:-1] != url else None
-
     async def restart_scp(self, update_req: bool = False, hard: bool = False) -> bool:
         await self.stop_scp()
         return restart_woto_scp(update_req, hard)
@@ -271,18 +256,6 @@ class ScpClient(WotoClientBase):
 
         return await self.get_messages(chat_id, message_id)
 
-    async def Request(self, url: str, type: str, *args, **kwargs):
-        if type == 'get':
-            resp = await self.aioclient.get(url, *args, **kwargs)
-        elif type == 'post':
-            resp = await self.aioclient.post(url, *args, **kwargs)
-        elif type == 'put':
-            resp = await self.aioclient.put(url, *args, **kwargs)
-        try:
-            return await resp.json()
-        except client_exceptions.ContentTypeError:
-            return (await resp.read()).decode('utf-8')
-
     async def delete_all_messages(
         self,
         chat_id: Union[int, str],
@@ -311,11 +284,6 @@ class ScpClient(WotoClientBase):
     eval_base = None
     # async def shell_base(message: Message, command: str):
     shell_base = None
-
-    async def get_my_dialogs(self) -> typing.List[types.Dialog]:
-        if not self.__my_all_dialogs__ or len(self.__my_all_dialogs__) < 2:
-            return await self.refresh_dialogs()
-        return self.__my_all_dialogs__
 
     async def send_message(
         self,
@@ -460,18 +428,6 @@ class ScpClient(WotoClientBase):
                 reply_to_message_id=reply_to_message_id
             )
 
-    async def get_dialog_by_id(self, chat_id: typing.Union[str, int]) -> types.Dialog:
-        my_all = await self.get_my_dialogs()
-        if not my_all:
-            return None
-
-        for current in my_all:
-            if not current.chat:
-                continue
-            if current.chat.username == chat_id or current.chat.id == chat_id:
-                return current
-        return None
-
     async def read_all_mentions(self, chat_id: typing.Union[str, int]) -> None:
         try:
             await self.send(
@@ -482,35 +438,49 @@ class ScpClient(WotoClientBase):
         except Exception:
             pass
 
-    async def refresh_dialogs(self) -> typing.List[types.Dialog]:
-        self.__my_all_dialogs__ = []
-        async for current in self.iter_dialogs():
-            self.__my_all_dialogs__.append(current)
-
-        return self.__my_all_dialogs__
-
-    async def netcat(
-        self,
-        host: str,
-        port: int,
-        content: str
-    ):
-        reader, writer = await asyncio.open_connection(
-            host, port,
-        )
-        writer.write(content.encode())
-        await writer.drain()
-        data = (await reader.read(100)).decode().strip('\n\x00')
-        writer.close()
-        await writer.wait_closed()
-        return data
+    async def get_media_file_id(
+        self, 
+        message: types.Message, 
+        delay: float = 2,
+    ) -> str:
+        """
+            Returns the perma media id (file_id) of a media message.
+            The id belongs to the scp_bot, it's not usable by the user; because
+            media ids for users in telegram will get revoked too soon, hence there is
+            no point in getting the id that belongs to the user.
+            If the message is not a media message, it returns None.
+        """
+        if not message.media:
+            return None
+        
+        if self.me.is_bot:
+            return getattr(getattr(message, message.media.name.lower(), None), 
+                       "file_id", None)
+        
+        asyncio.create_task(self.forward_messages_with_delay(
+            chat_id=self.the_bot.me.id,
+            from_chat_id=message.chat.id,
+            message_ids=message.id,
+            disable_notification=False,
+            delay=delay,
+        ))
+        message_from_bot: types.Message = None
+        for _ in range(10):
+            message_from_bot = await self.the_bot.scp_listen()
+            if message_from_bot.media == message.media:
+                break
+        else:
+            return None
+        
+        return getattr(getattr(message, message.media.name.lower(), None), 
+                       "file_id", None)
+        
 
     original_phone_number: str = ''
     is_scp_bot: bool = False
     wordle_global_config = None
     the_bot: 'ScpClient'
     the_user: 'ScpClient'
-    filters = filters
     wfilters = wfilters
     raw = raw
     types = types
@@ -518,7 +488,7 @@ class ScpClient(WotoClientBase):
     exceptions = errors
     
     scp_config = the_config
-    __my_all_dialogs__: typing.List[types.Dialog] = None
+    
     cached_messages: typing.List[types.Message] = None
     the_bots: typing.List[WotoClientBase] = _get_scp_bots()
     are_bots_started: bool = False
@@ -534,17 +504,16 @@ class ScpClient(WotoClientBase):
     db: DatabaseClient = None
     log_channel = the_config.log_channel
     private_resources = the_config.private_resources
+
     # sibyl configuration stuff:
-    sibyl_token = the_config.sibyl_token
-    public_listener = the_config.public_listener
-    public_logger = the_config.public_logger
-    private_listener = the_config.private_listener
-    private_logger = the_config.private_logger
     public_sibyl_filter = filters.chat(
-        public_listener,
+        the_config.public_listener,
     )
     private_sibyl_filter = filters.chat(
-        private_listener,
+        the_config.private_listener,
     )
-    sibyl: SibylClient = SibylClient(sibyl_token)
+    sibyl: SibylClient = SibylClient(the_config.sibyl_token)
+
     auto_read_enabled = True
+    pm_log_enabled = True
+

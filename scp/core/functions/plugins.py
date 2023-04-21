@@ -9,7 +9,7 @@ from pathlib import Path
 HELP_COMMANDS = {}
 
 
-async def loadBotPlugins():
+async def load_bot_plugins():
     for setting in ALL_SETTINGS:
         importlib.import_module(
             'scp.plugins.bot.' + setting,

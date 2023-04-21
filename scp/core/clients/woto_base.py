@@ -5,6 +5,7 @@ from typing import (
     List,
     AsyncGenerator,
 )
+from aiohttp import ClientSession, client_exceptions
 from datetime import datetime
 import logging
 import asyncio
@@ -24,6 +25,7 @@ from pyrogram import (
     raw,
     errors,
     session,
+    filters as pyroFilters
 )
 from pyrogram.raw.functions.channels import GetFullChannel
 from pyrogram.raw.functions.phone import EditGroupCallTitle
@@ -47,6 +49,63 @@ from scp.utils.unpack import unpackInlineMessage
 
 class WotoClientBase(Client):
     HTTP_URL_MATCHING = r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*"
+
+    filters = pyroFilters
+    __my_all_dialogs__: typing.List[types.Dialog] = None
+    aioclient: ClientSession = ClientSession()
+
+    async def refresh_dialogs(self) -> typing.List[types.Dialog]:
+        self.__my_all_dialogs__ = []
+        async for current in self.iter_dialogs():
+            self.__my_all_dialogs__.append(current)
+
+        return self.__my_all_dialogs__
+    
+    async def get_dialog_by_id(self, chat_id: typing.Union[str, int]) -> types.Dialog:
+        my_all = await self.get_my_dialogs()
+        if not my_all:
+            return None
+
+        for current in my_all:
+            if not current.chat:
+                continue
+            if current.chat.username == chat_id or current.chat.id == chat_id:
+                return current
+        return None
+
+    async def get_my_dialogs(self) -> typing.List[types.Dialog]:
+        if not self.__my_all_dialogs__ or len(self.__my_all_dialogs__) < 2:
+            return await self.refresh_dialogs()
+        return self.__my_all_dialogs__
+
+    async def scp_listen(self, chat_id, filters=None, timeout=None) -> types.Message:
+        """
+            Wrapper function for pyromod.listen.
+        """
+        return await self.listen(chat_id=chat_id, filters=filters, timeout=timeout)
+
+    # from Kantek
+    async def resolve_url(self, url: str) -> str:
+        if not url.startswith('http'):
+            url: str = f'http://{url}'
+        async with self.aioclient.get(
+            f'http://expandurl.com/api/v1/?url={url}',
+        ) as response:
+            e = await response.text()
+        return e if e != 'false' and e[:-1] != url else None
+
+    async def Request(self, url: str, type: str, *args, **kwargs):
+        if type == 'get':
+            resp = await self.aioclient.get(url, *args, **kwargs)
+        elif type == 'post':
+            resp = await self.aioclient.post(url, *args, **kwargs)
+        elif type == 'put':
+            resp = await self.aioclient.put(url, *args, **kwargs)
+        try:
+            return await resp.json()
+        except client_exceptions.ContentTypeError:
+            return (await resp.read()).decode('utf-8')
+
 
     def is_silent(self, message: types.Message) -> bool:
         return (
@@ -504,3 +563,39 @@ class WotoClientBase(Client):
             protect_content=protect_content,
             reply_markup=reply_markup
         )
+
+    async def forward_messages_with_delay(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[int, str],
+        message_ids: int,
+        disable_notification: bool = None,
+        schedule_date: datetime = None,
+        protect_content: bool = None,
+        delay: float = 1,
+    ) -> Union["types.Message", List["types.Message"]]:
+        await asyncio.sleep(delay=delay)
+        return await self.forward_messages(
+            chat_id=chat_id,
+            from_chat_id=from_chat_id,
+            message_ids=message_ids,
+            disable_notification=disable_notification,
+            schedule_date=schedule_date,
+            protect_content=protect_content,
+        )
+
+    async def netcat(
+        self,
+        host: str,
+        port: int,
+        content: str
+    ):
+        reader, writer = await asyncio.open_connection(
+            host, port,
+        )
+        writer.write(content.encode())
+        await writer.drain()
+        data = (await reader.read(100)).decode().strip('\n\x00')
+        writer.close()
+        await writer.wait_closed()
+        return data
