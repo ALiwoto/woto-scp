@@ -33,7 +33,7 @@ async def pm_log_handler(_, message: Message):
         {"↩️ Reply": f"reply_{message.from_user.id}_{message.id}", "▶️ Send message": f"msg_{message.from_user.id}"},
         {"❌ Block": f"block_{message.from_user.id}", f"💢 Delete": "delete_msg"},
         {"🌀 React": f"react_{message.from_user.id}_{message.id}", "✅ Mark as read": f"read_{message.from_user.id}_{message.id}"},
-        ({"🖼 Send media here": f"sendMedia_{message.from_user.id}_{message.id}"} if message.media else None)
+        ({"🖼 Send media here": f"sendMedia_{message.from_user.id}_{message.id}"} if user.is_real_media(message) else None)
     ]
 
     await user.send_message(
