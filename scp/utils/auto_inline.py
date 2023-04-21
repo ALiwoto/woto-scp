@@ -31,6 +31,8 @@ class AutoInlineContainer:
     media_chat_id: Union[str, int] = None
     media_message_id: int = None
     media_path: str = None
+    disable_web_page_preview: bool = False
+    entities: list = None
     media_url: str = None
     keyboard: InlineKeyboardMarkup = None
     progress: Callable = None
@@ -54,6 +56,8 @@ class AutoInlineContainer:
         media_chat_id: Union[str, int] = None,
         media_message_id: int = None,
         media_path: str = None,
+        disable_web_page_preview: bool = False,
+        entities: list = None,
         media_url: str = None,
         keyboard: InlineKeyboardMarkup = None,
         progress: Callable = None,
@@ -72,6 +76,8 @@ class AutoInlineContainer:
         self.media_chat_id = media_chat_id
         self.media_message_id = media_message_id
         self.media_path = media_path
+        self.disable_web_page_preview = disable_web_page_preview
+        self.entities = entities
         self.media_url = media_url
         self.keyboard = keyboard
         self.progress = progress

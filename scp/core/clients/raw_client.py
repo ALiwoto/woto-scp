@@ -300,16 +300,16 @@ class ScpClient(WotoClientBase):
     ) -> "types.Message":
         if self.me.is_bot or not isinstance(reply_markup, (types.InlineKeyboardMarkup, dict, list)):
             return await super().send_message(
-                chat_id,
-                text,
-                parse_mode,
-                entities,
-                disable_web_page_preview,
-                disable_notification,
-                reply_to_message_id,
-                schedule_date,
-                protect_content,
-                reply_markup
+                chat_id=chat_id,
+                text=text,
+                parse_mode=parse_mode,
+                entities=entities,
+                disable_web_page_preview=disable_web_page_preview,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id,
+                schedule_date=schedule_date,
+                protect_content=protect_content,
+                reply_markup=reply_markup,
             )
 
         # if this is a user and is trying to send a message with keyboard buttons, automate
@@ -321,6 +321,8 @@ class ScpClient(WotoClientBase):
             message_type=AutoInlineType.TEXT,
             text=text,
             keyboard=reply_markup,
+            disable_web_page_preview=disable_web_page_preview,
+            entities=entities,
         )
         auto_inline_dict[container.unique_id] = container
         inline_response: BotResults = await self.get_inline_bot_results(
