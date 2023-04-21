@@ -16,9 +16,18 @@ async def pm_log_handler(_, message: Message):
     
     txt = user.html_normal(f"#PM #{user.me.first_name} (")
     txt += user.html_mono(user.me.id, ")")
-    txt += user.html_bold(f"\n• FROM:", f" {message.from_user.first_name[:16]} (")
+    txt += user.html_bold(f"\n• FROM: ", " (")
+    if message.from_user.username:
+        txt += user.html_link(message.from_user.first_name[:16], f"https://t.me/{message.from_user.username}", " (")
+    else:
+        txt += user.html_normal(message.from_user.first_name[:16], " (")
     txt += user.html_mono(message.from_user.id, ")")
-    txt += user.html_bold("\n• MESSAGE:", f" {await get_message_content(message)}")
+    if message.forward_from_chat or message.forward_from:
+        txt += user.html_bold("\n• FORWARD FROM: ") + get_formatted_forward(message)
+    if message.caption:
+        txt += user.html_bold("\n• CAPTION:", message.caption[:900])
+    txt += user.html_bold("\n• MESSAGE: ")
+    txt += await get_message_content(message)
 
     keyboard = [
         {"↩️ Reply": f"reply_{message.from_user.id}_{message.id}", "▶️ Send message": f"msg_{message.from_user.id}"},
@@ -37,12 +46,35 @@ async def pm_log_handler(_, message: Message):
 
 async def get_message_content(message: Message) -> str:
     if message.text:
-        return message.text[:1024]
+        return user.html_normal(message.text[:1024])
     elif message.media:
-        return (await user.get_media_file_id(
+        return user.html_mono(await user.get_media_file_id(
             message=message,
             delay=1,
-        )) + (message.caption[:1024] if message.caption else "")
+        ))
     else:
         return "UNKNOWN MESSAGE TYPE"
 
+
+def get_formatted_forward(message: Message) -> str:
+    if message.forward_from:
+        f_user = message.forward_from
+        txt = user.html_link(f_user.first_name[:16], f"https://t.me/{f_user.username}", " (")
+        txt += user.html_mono(f_user.id, ")")
+        return txt
+    elif message.forward_sender_name:
+        return user.html_mono(message.forward_sender_name)
+    elif message.forward_from_chat:
+        f_chat = message.forward_from_chat
+        if f_chat.username:
+            txt = user.html_link(f_chat.title, f"https://t.me/{f_chat.username}/{message.forward_from_message_id}", " (")
+            txt += user.html_mono(f_chat.id, ")")
+            return txt
+        
+        # no username; use the id
+        # the link format is https://t.me/c/CHAT_ID/MSG_ID here.
+        txt = user.html_link(f_chat.title, f"https://t.me/c/{str(f_chat.id)[4:]}/{message.forward_from_message_id}", " (")
+        txt += user.html_mono(f_chat.id, ")")
+        return txt
+
+    return None
