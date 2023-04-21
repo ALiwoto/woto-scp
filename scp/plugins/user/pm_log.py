@@ -18,7 +18,7 @@ async def pm_log_handler(_, message: Message):
     txt += user.html_mono(user.me.id, ")")
     txt += user.html_bold(f"\n• FROM:", f" {message.from_user.first_name[:16]} (")
     txt += user.html_mono(message.from_user.id, ")")
-    txt += user.html_bold(f"\n• MESSAGE: {await get_message_content(message)}")
+    txt += user.html_bold("\n• MESSAGE:", f" {await get_message_content(message)}")
 
     keyboard = [
         {"↩️ Reply": f"reply_{message.from_user.id}_{message.id}", "▶️ Send message": f"msg_{message.from_user.id}"},
@@ -30,7 +30,8 @@ async def pm_log_handler(_, message: Message):
     await user.send_message(
         chat_id=user.scp_config.pm_log_channel,
         text=txt,
-        reply_markup=keyboard
+        reply_markup=keyboard,
+        disable_web_page_preview=True
     )
     
 
