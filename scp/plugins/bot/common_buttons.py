@@ -68,7 +68,7 @@ async def send_media_button_handler(_, query: CallbackQuery):
     # second way around: no message is passed
     my_strs = query.data.split("_")
     from_chat_id = int(my_strs[1])
-    message_id = my_strs[2]
+    message_id = int(my_strs[2])
 
     try:
         await user.forward_messages(
