@@ -123,6 +123,7 @@ class WotoClientBase(Client):
 
     def _parse_inline_reply_markup(self, the_value: Union[dict, list]) -> types.InlineKeyboardMarkup:
         """ Parses a dict or a list to a valid reply_markup
+
         valid dict:
         {
             "hi": "https://google.com"
