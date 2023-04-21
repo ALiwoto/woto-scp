@@ -123,11 +123,11 @@ class ScpClient(WotoClientBase):
         # me = await super().get_me()
         if not self.me.id in self.scp_config._sudo_users:
             self.scp_config._sudo_users.append(self.me.id)
-            self.sudo |= self.filters.User(self.me.id)
+            self.sudo |= self.filters.user(self.me.id)
         
         if not self.me.id in self.scp_config._owner_users:
             self.scp_config._owner_users.append(self.me.id)
-            self.owner |= self.filters.User(self.me.id)
+            self.owner |= self.filters.user(self.me.id)
 
         if not self.is_scp_bot:
             try:
