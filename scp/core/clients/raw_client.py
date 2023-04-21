@@ -474,7 +474,7 @@ class ScpClient(WotoClientBase):
         else:
             return None
         
-        return getattr(getattr(message, message.media.name.lower(), None), 
+        return getattr(getattr(message_from_bot, message_from_bot.media.name.lower(), None), 
                        "file_id", None)
         
 
