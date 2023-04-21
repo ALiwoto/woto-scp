@@ -328,8 +328,12 @@ def get_html_normal(*argv) -> str:
     if argv is None or len(argv) == 0: return ""
     my_str = ""
     for value in argv:
+        if value == None:
+            continue
         if isinstance(value, str):
             my_str += value
+        else:
+            my_str += str(value)
     
     return my_str
 

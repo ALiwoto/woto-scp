@@ -14,6 +14,7 @@ async def pm_log_handler(_, message: Message):
     if not user.scp_config.pm_log_channel or not user.pm_log_enabled:
         return
     
+    is_real_media = user.is_real_media(message)
     txt = user.html_normal(f"#PM #{user.me.first_name} (")
     txt += user.html_mono(user.me.id, ")")
     txt += user.html_bold(f"\n• FROM: ")
@@ -26,14 +27,15 @@ async def pm_log_handler(_, message: Message):
         txt += user.html_bold("\n• FORWARD FROM: ") + get_formatted_forward(message)
     if message.caption:
         txt += user.html_bold("\n• CAPTION:", message.caption[:900])
-    txt += user.html_bold("\n• MESSAGE: ")
+    
+    txt += user.html_bold("\n• MESSAGE: ", (f"({message.media.name.lower()}) " if is_real_media else None))
     txt += await get_message_content(message)
 
     keyboard = [
         {"↩️ Reply": f"reply_{message.from_user.id}_{message.id}", "▶️ Send message": f"msg_{message.from_user.id}"},
         {"❌ Block": f"block_{message.from_user.id}", f"💢 Delete": "delete_msg"},
         {"🌀 React": f"react_{message.from_user.id}_{message.id}", "✅ Mark as read": f"read_{message.from_user.id}_{message.id}"},
-        ({"🖼 Send media here": f"sendMedia_{message.from_user.id}_{message.id}"} if user.is_real_media(message) else None)
+        ({"🖼 Send media here": f"sendMedia_{message.from_user.id}_{message.id}"} if is_real_media else None)
     ]
 
     await user.send_message(

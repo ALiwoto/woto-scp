@@ -56,7 +56,10 @@ class WotoClientBase(Client):
     aioclient: ClientSession = ClientSession()
 
     def is_real_media(self, message: types.Message) -> bool:
-        return message != None and message.media != MessageMediaType.WEB_PAGE
+        return (message != None and 
+                message.media != None and
+                message.media != MessageMediaType.WEB_PAGE)
+                
                 
     async def refresh_dialogs(self) -> typing.List[types.Dialog]:
         self.__my_all_dialogs__ = []
