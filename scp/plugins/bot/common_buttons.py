@@ -67,7 +67,7 @@ async def send_media_button_handler(_, query: CallbackQuery):
     
     # second way around: no message is passed
     my_strs = query.data.split("_")
-    from_chat_id = my_strs[1]
+    from_chat_id = int(my_strs[1])
     message_id = my_strs[2]
 
     try:
@@ -77,7 +77,7 @@ async def send_media_button_handler(_, query: CallbackQuery):
             message_ids=message_id
         )
     except Exception as e:
-        await query.answer(f"Failed duo to: {str(e)[60]}")
+        await query.answer(f"Failed due to: {str(e)[:60]}")
 
 
     
