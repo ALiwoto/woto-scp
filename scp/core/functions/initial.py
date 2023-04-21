@@ -49,8 +49,8 @@ async def reboot():
             'scp.plugins.bot.' + setting,
         )
         importlib.reload(imported_module)
-    for modul in ALL_MODULES:
-        imported_module = importlib.import_module('scp.plugins.user.' + modul)
+    for current_module in ALL_MODULES:
+        imported_module = importlib.import_module('scp.plugins.user.' + current_module)
         if hasattr(
             imported_module,
             '__PLUGIN__',

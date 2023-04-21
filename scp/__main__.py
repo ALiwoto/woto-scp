@@ -6,7 +6,7 @@ from pyrogram import idle
 from scp import user, bot
 from scp.core.functions.plugins import (
     loadUserPlugins,
-    loadBotPlugins,
+    load_bot_plugins,
     loadPrivatePlugins,
 )
 from scp.utils.selfInfo import updateInfo
@@ -24,7 +24,7 @@ async def start_bot():
     #await InitializeDatabase()
     asyncio.create_task(shell())
     await asyncio.gather(
-        loadBotPlugins(),
+        load_bot_plugins(),
         loadUserPlugins(),
         loadPrivatePlugins(),
         idle()

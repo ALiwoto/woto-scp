@@ -18,6 +18,7 @@ class WotoConfig:
     _special_users: typing.List[int] = []
     prefixes: typing.List[str] = []
     log_channel: int = 0
+    pm_log_channel: int = 0
     dump_usernames = []
     private_resources: int = 0
     shared_channel: int = 0
@@ -53,8 +54,9 @@ class WotoConfig:
         self.prefixes = (
             self._the_config.get('woto-scp', 'Prefixes').split() or ['!', '.']
         )
-        self.log_channel = self._the_config.getint('woto-scp', 'log_channel')
-        self.dump_usernames = self._the_config.get('woto-scp', 'public_dumps').split()
+        self.log_channel = self._the_config.getint('woto-scp', 'log_channel', fallback='')
+        self.pm_log_channel = self._the_config.getint('woto-scp', 'pm_log_channel', fallback=0)
+        self.dump_usernames = self._the_config.get('woto-scp', 'public_dumps', fallback='').split()
 
         self.private_resources = self._the_config.getint('woto-scp', 'private_resources')
         self.shared_channel = self._the_config.getint('woto-scp', 'shared_channel', fallback=self.private_resources)
