@@ -16,7 +16,7 @@ async def pm_log_handler(_, message: Message):
     
     txt = user.html_normal(f"#PM #{user.me.first_name} (")
     txt += user.html_mono(user.me.id, ")")
-    txt += user.html_bold(f"\n• FROM: ", " (")
+    txt += user.html_bold(f"\n• FROM: ")
     if message.from_user.username:
         txt += user.html_link(message.from_user.first_name[:16], f"https://t.me/{message.from_user.username}", " (")
     else:
