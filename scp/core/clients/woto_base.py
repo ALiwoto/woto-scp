@@ -32,6 +32,7 @@ from pyrogram.raw.functions.phone import EditGroupCallTitle
 from pyrogram.raw.types.messages.chat_full import ChatFull
 from pyrogram.raw.types.channel_full import ChannelFull
 from pyrogram.enums.parse_mode import ParseMode
+from pyrogram.enums.message_media_type import MessageMediaType
 from scp.utils.parser import (
     html_mono,
     html_bold,
@@ -54,6 +55,9 @@ class WotoClientBase(Client):
     __my_all_dialogs__: typing.List[types.Dialog] = None
     aioclient: ClientSession = ClientSession()
 
+    def is_real_media(self, message: types.Message) -> bool:
+        return message != None and message.media != MessageMediaType.WEB_PAGE
+                
     async def refresh_dialogs(self) -> typing.List[types.Dialog]:
         self.__my_all_dialogs__ = []
         async for current in self.iter_dialogs():
