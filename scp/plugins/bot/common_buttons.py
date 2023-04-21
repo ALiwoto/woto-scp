@@ -5,49 +5,49 @@ from pyrogram.types import CallbackQuery
 
 @bot.on_callback_query(
     user.sudo &
-    filters.regex("^reply_$")
+    filters.regex("^reply_")
 )
 async def reply_button_handler(_, query: CallbackQuery):
     pass
 
 @bot.on_callback_query(
     user.sudo &
-    filters.regex("^msg_$")
+    filters.regex("^msg_")
 )
 async def send_msg_button_handler(_, query: CallbackQuery):
     pass
 
 @bot.on_callback_query(
     user.sudo &
-    filters.regex("^block_$")
+    filters.regex("^block_")
 )
 async def block_button_handler(_, query: CallbackQuery):
     pass
 
 @bot.on_callback_query(
     user.sudo &
-    filters.regex("delete_msg")
+    filters.regex("delete_msg$")
 )
 async def delete_msg_button_handler(_, query: CallbackQuery):
     pass
 
 @bot.on_callback_query(
     user.sudo &
-    filters.regex("^react_$")
+    filters.regex("^react_")
 )
 async def react_button_handler(_, query: CallbackQuery):
     pass
 
 @bot.on_callback_query(
     user.sudo &
-    filters.regex("^read_$")
+    filters.regex("^read_")
 )
 async def read_button_handler(_, query: CallbackQuery):
     pass
 
 @bot.on_callback_query(
     user.sudo &
-    filters.regex("^sendMedia_$")
+    filters.regex("^sendMedia_")
 )
 async def send_media_button_handler(_, query: CallbackQuery):
     message_field = query.message.text.split("• MESSAGE: (")
