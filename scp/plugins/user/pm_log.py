@@ -13,6 +13,9 @@ from pyrogram.types import Message
 async def pm_log_handler(_, message: Message):
     if not user.scp_config.pm_log_channel or not user.pm_log_enabled:
         return
+    elif message.from_user.first_name.find('sibyl') != -1:
+        # ignore messages coming from sibyl-associated bots or accounts.
+        return
     
     is_real_media = user.is_real_media(message)
     txt = user.html_normal(f"#PM #{user.me.first_name} (")
