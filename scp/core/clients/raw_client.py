@@ -169,12 +169,11 @@ class ScpClient(WotoClientBase):
         if link_to_message:
             try:
                 message = await self.get_message_by_link(link_to_message)
+                if not message.command:
+                    message.command = [] #TODO: FIXME
+                
             except: pass
         
-        file = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or './'))
-        if os.path.isdir(file):
-            file = os.path.join(file, '')
-
         available_media = ("audio", "document", "photo", "sticker", "animation", "video", "voice", "video_note")
         for i in available_media:
             if getattr(message, i, None):

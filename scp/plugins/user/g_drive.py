@@ -39,6 +39,10 @@ async def gUpload_handler(_, message: Message):
     if download_message is None:
         return await message.reply_text('Media required')
     
+    file_path = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or './'))
+    if os.path.isdir(file_path):
+        file_path = os.path.join(file_path, '')
+
     text = 'Downloading...'
     reply = await message.reply_text(text)
     try:
