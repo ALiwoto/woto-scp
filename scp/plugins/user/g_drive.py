@@ -35,8 +35,6 @@ except: logging.warn('failed to load gdrive.')
     ),
 )
 async def gUpload_handler(_, message: Message):
-    original_message = message
-
     download_message = await user.get_message_to_download(message)
     if not download_message:
         return await message.reply_text('Media required')
@@ -44,13 +42,18 @@ async def gUpload_handler(_, message: Message):
         top_message = await message.reply_text(
             'Required message is empty, searching for the correct one...'
         )
-        download_message = await user.get_message_to_download(original_message, True)
+        download_message = await user.get_message_to_download(message, True)
         if not download_message or message.empty:
             return await top_message.edit_text('message iteration ended.')
         
         await top_message.edit_text('Next message found! \n' + user.html_mono(download_message.link))
 
-    file_path = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or './'))
+    target_cmd = ' '.join(message.command[1:])
+    if target_cmd and target_cmd.find('https:') != -1 and target_cmd.find('http:') != -1:
+        file_path = os.path.abspath(os.path.expanduser(' '.join(target_cmd[1:]) or './'))
+    else:
+        file_path = os.path.abspath(os.path.expanduser('./'))
+    
     if os.path.isdir(file_path):
         file_path = os.path.join(file_path, '')
 
@@ -69,7 +72,7 @@ async def gUpload_handler(_, message: Message):
             user.g_auth = g_auth
             user.g_drive = g_drive
         except Exception as e: 
-            return await user.reply_exception(original_message, e=e)
+            return await user.reply_exception(message, e=e)
     
     file_metadata = {
         'title': os.path.basename(file_path)
@@ -83,6 +86,6 @@ async def gUpload_handler(_, message: Message):
         g_file.SetContentFile(file_path)
         g_file.Upload()  # Upload the file.
     except Exception as e:
-        return await user.reply_exception(original_message, e=e)
+        return await user.reply_exception(message, e=e)
     
     await reply.edit_text(f'File is ready to download.\n' + user.html_mono(html.escape(g_file['webContentLink'])))
