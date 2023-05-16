@@ -13,7 +13,9 @@ from pyrogram.types import Message
 async def pm_log_handler(_, message: Message):
     if not user.scp_config.pm_log_channel or not user.pm_log_enabled:
         return
-    elif message.from_user.first_name.find('sibyl') != -1:
+
+    sender = message.from_user
+    if sender.id == 777000 or sender.first_name.find('sibyl') != -1:
         # ignore messages coming from sibyl-associated bots or accounts.
         return
     
@@ -21,11 +23,11 @@ async def pm_log_handler(_, message: Message):
     txt = user.html_normal(f"#PM #{user.me.first_name} (")
     txt += user.html_mono(user.me.id, ")")
     txt += user.html_bold(f"\n• FROM: ")
-    if message.from_user.username:
+    if sender.username:
         txt += user.html_link(message.from_user.first_name[:16], f"https://t.me/{message.from_user.username}", " (")
     else:
-        txt += user.html_normal(message.from_user.first_name[:16], " (")
-    txt += user.html_mono(message.from_user.id, ")")
+        txt += user.html_normal(sender.first_name[:16], " (")
+    txt += user.html_mono(sender.id, ")")
     if message.forward_from_chat or message.forward_from:
         txt += user.html_bold("\n• FORWARD FROM: ") + get_formatted_forward(message)
     if message.caption:
