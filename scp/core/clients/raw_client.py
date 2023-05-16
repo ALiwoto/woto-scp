@@ -164,11 +164,15 @@ class ScpClient(WotoClientBase):
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
 
-    async def get_message_to_download(self, message: types.Message) -> types.Message:
+    async def get_message_to_download(self, message: types.Message, continue_till_found: bool = False) -> types.Message:
         link_to_message = self.get_non_cmd(message)
         if link_to_message:
             try:
-                message = await self.get_message_by_link(link_to_message)
+                message = await self.get_message_by_link(link_to_message, continue_till_found)
+                if not message or message.empty:
+                    # just return it, no need to check anything
+                    return message
+                
                 if not message.command:
                     message.command = [] #TODO: FIXME
                 
@@ -250,7 +254,7 @@ class ScpClient(WotoClientBase):
         except ConnectionError:
             pass
 
-    async def get_message_by_link(self, link: str) -> types.Message:
+    async def get_message_by_link(self, link: str, continue_til_found: bool = False) -> types.Message:
         link = link.replace('telegram.me', 't.me')
         link = link.replace('telegram.dog', 't.me')
         link = link.replace('https://', '')
@@ -280,8 +284,23 @@ class ScpClient(WotoClientBase):
 
         if not chat_id:
             return None
+        
+        if not continue_til_found:
+            return await self.get_messages(chat_id, message_id)
+        
+        messages = await self.get_history(
+            chat_id=chat_id,
+            limit=1,
+        )
+        if messages:
+            to_id = messages[0].id
+        
+        while message_id <= to_id:
+            the_message = await self.get_messages(chat_id, message_id)
+            if the_message and not the_message.empty:
+                return the_message
 
-        return await self.get_messages(chat_id, message_id)
+        return None 
 
     async def delete_all_messages(
         self,
