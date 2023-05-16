@@ -22,6 +22,7 @@ class WotoConfig:
     dump_usernames = []
     private_resources: int = 0
     shared_channel: int = 0
+    gdrive_upload_folder_id: str = None
 
     _enforcers = []
     _inspectors = []
@@ -60,6 +61,7 @@ class WotoConfig:
 
         self.private_resources = self._the_config.getint('woto-scp', 'private_resources')
         self.shared_channel = self._the_config.getint('woto-scp', 'shared_channel', fallback=self.private_resources)
+        self.dump_usernames = self._the_config.get('woto-scp', 'gdrive_upload_folder_id', fallback='')
 
         # sibyl configuration
         try:
