@@ -30,7 +30,7 @@ except: logging.warn('failed to load gdrive.')
     ~user.filters.via_bot &
     user.owner &
     user.command(
-        ['ul', 'upload'],
+        ['gul', 'gUpload'],
         prefixes=user.cmd_prefixes,
     ),
 )
