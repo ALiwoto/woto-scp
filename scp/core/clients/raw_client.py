@@ -1,4 +1,5 @@
 import typing
+import os
 import json
 import uuid
 from datetime import datetime
@@ -162,6 +163,30 @@ class ScpClient(WotoClientBase):
 
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
+
+    async def get_message_to_download(self, message: types.Message) -> types.Message:
+        link_to_message = self.get_non_cmd(message)
+        if link_to_message:
+            try:
+                message = await self.get_message_by_link(link_to_message)
+            except: pass
+        
+        file = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or './'))
+        if os.path.isdir(file):
+            file = os.path.join(file, '')
+
+        available_media = ("audio", "document", "photo", "sticker", "animation", "video", "voice", "video_note")
+        for i in available_media:
+            if getattr(message, i, None):
+                return message
+        else:
+            reply = message.reply_to_message
+            if not getattr(reply, 'empty', True):
+                for i in available_media:
+                    if getattr(reply, i, None):
+                        return reply
+        
+        return None
 
     async def ban_chat_member(
         self,

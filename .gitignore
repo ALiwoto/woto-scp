@@ -115,12 +115,17 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# vs
+.vs
+
 # Pyre type checker
 .pyre/
 *.session
 bot.ini
 *.session-journal
 config.ini
+gdrive_settings.yaml
+g_credentials.json
 scp/logs/*.txt
 scp/plugins/private/*.py
 test.py

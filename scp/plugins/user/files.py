@@ -209,25 +209,10 @@ async def uld_handler(_, message: Message):
     ),
 )
 async def download_handler(_, message: Message):
-    file = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or './'))
-    if os.path.isdir(file):
-        file = os.path.join(file, '')
-    available_media = ("audio", "document", "photo", "sticker", "animation", "video", "voice", "video_note")
-    download_message = None
-    for i in available_media:
-        if getattr(message, i, None):
-            download_message = message
-            break
-    else:
-        reply = message.reply_to_message
-        if not getattr(reply, 'empty', True):
-            for i in available_media:
-                if getattr(reply, i, None):
-                    download_message = reply
-                    break
+    download_message = await user.get_message_to_download(message)
     if download_message is None:
-        await message.reply_text('Media required')
-        return
+        return await message.reply_text('Media required')
+    
     text = 'Downloading...'
     reply = await message.reply_text(text)
     try:
