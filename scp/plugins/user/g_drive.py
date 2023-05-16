@@ -1,7 +1,6 @@
 
 import logging
 import os
-import html
 import logging
 from pyrogram.types import (
     Message,
@@ -15,6 +14,7 @@ from pydrive.drive import GoogleDrive
 
 g_auth: GoogleAuth = None
 g_drive: GoogleDrive = None
+__MESSAGE_LINK_TO_DRIVE_CACHE = {}
 
 try:
     g_auth: GoogleAuth = GoogleAuth(settings_file='gdrive_settings.yaml')
@@ -48,6 +48,10 @@ async def gUpload_handler(_, message: Message):
         
         await top_message.edit_text('Next message found! \n' + user.html_mono(download_message.link))
 
+    if download_message.link and __MESSAGE_LINK_TO_DRIVE_CACHE.get(download_message.link, None):
+        return await message.reply_text(
+            f'File is ready to download.\n' + user.html_normal(__MESSAGE_LINK_TO_DRIVE_CACHE[download_message.link]))
+    
     target_cmd = ' '.join(message.command[1:])
     if target_cmd and target_cmd.find('https:') != -1 and target_cmd.find('http:') != -1:
         file_path = os.path.abspath(os.path.expanduser(' '.join(target_cmd[1:]) or './'))
@@ -88,4 +92,5 @@ async def gUpload_handler(_, message: Message):
     except Exception as e:
         return await user.reply_exception(message, e=e)
     
-    await reply.edit_text(f'File is ready to download.\n' + user.html_mono(html.escape(g_file['webContentLink'])))
+    __MESSAGE_LINK_TO_DRIVE_CACHE[download_message.link] = g_file['webContentLink']
+    await reply.edit_text(f'File is ready to download.\n' + user.html_normal(g_file['webContentLink']))
