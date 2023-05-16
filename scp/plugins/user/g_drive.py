@@ -69,7 +69,7 @@ async def gUpload_handler(_, message: Message):
             user.g_auth = g_auth
             user.g_drive = g_drive
         except Exception as e: 
-            return await user.reply_exception('Failed to load google drive:', e=e)
+            return await user.reply_exception(original_message, e=e)
     
     file_metadata = {
         'title': os.path.basename(file_path)
@@ -77,8 +77,12 @@ async def gUpload_handler(_, message: Message):
     if user.scp_config.gdrive_upload_folder_id:
         file_metadata['parents'] = [{'id': user.scp_config.gdrive_upload_folder_id}]
     
-    g_file = g_drive.CreateFile(file_metadata)
-    # Read file and set it as the content of this instance.
-    g_file.SetContentFile(file_path)
-    g_file.Upload()  # Upload the file.
+    try:
+        g_file = g_drive.CreateFile(file_metadata)
+        # Read file and set it as the content of this instance.
+        g_file.SetContentFile(file_path)
+        g_file.Upload()  # Upload the file.
+    except Exception as e:
+        return await user.reply_exception(original_message, e=e)
+    
     await reply.edit_text(f'File is ready to download.\n' + user.html_mono(html.escape(g_file['webContentLink'])))
