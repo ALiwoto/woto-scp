@@ -35,10 +35,21 @@ except: logging.warn('failed to load gdrive.')
     ),
 )
 async def gUpload_handler(_, message: Message):
+    original_message = message
+
     download_message = await user.get_message_to_download(message)
-    if download_message is None:
+    if not download_message:
         return await message.reply_text('Media required')
-    
+    elif download_message.empty:
+        top_message = await message.reply_text(
+            'Required message is empty, searching for the correct one...'
+        )
+        download_message = await user.get_message_to_download(original_message, True)
+        if not download_message or message.empty:
+            return await top_message.edit_text('message iteration ended.')
+        
+        await top_message.edit_text('Next message found! \n' + user.html_mono(download_message.link))
+
     file_path = os.path.abspath(os.path.expanduser(' '.join(message.command[1:]) or './'))
     if os.path.isdir(file_path):
         file_path = os.path.join(file_path, '')
