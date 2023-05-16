@@ -254,7 +254,12 @@ class ScpClient(WotoClientBase):
         except ConnectionError:
             pass
 
-    async def get_message_by_link(self, link: str, continue_til_found: bool = False) -> types.Message:
+    async def get_message_by_link(
+            self, 
+            link: str, 
+            continue_til_found: bool = False,
+            chunk_amount: int = 10,
+        ) -> types.Message:
         link = link.replace('telegram.me', 't.me')
         link = link.replace('telegram.dog', 't.me')
         link = link.replace('https://', '')
@@ -296,9 +301,13 @@ class ScpClient(WotoClientBase):
             to_id = messages[0].id
         
         while message_id <= to_id:
-            the_message = await self.get_messages(chat_id, message_id)
-            if the_message and not the_message.empty:
-                return the_message
+            the_messages: typing.List[types.Message] = \
+                await self.get_messages(chat_id, [i for i in range(message_id, message_id + chunk_amount)])
+            for msg in the_messages:
+                if msg and not msg.empty:
+                    return msg
+            
+            message_id += chunk_amount
 
         return None 
 
