@@ -72,10 +72,7 @@ class WotoClientBase(Client):
         schedule_date: datetime = None,
         protect_content: bool = None
     ) -> Union["types.Message", List["types.Message"]]:
-        is_iterable = not isinstance(message_ids, int)
-        message_ids = list(message_ids) if is_iterable else [message_ids]
-        
-        target_chat = await self.get_chat(chat_id)
+        target_chat = await self.get_chat(from_chat_id)
         if not target_chat.has_protected_content:
             return await super().forward_messages(
                 chat_id=chat_id,
