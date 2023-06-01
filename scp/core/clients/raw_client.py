@@ -344,6 +344,7 @@ class ScpClient(WotoClientBase):
         parse_mode: typing.Optional["enums.ParseMode"] = None,
         caption_entities: typing.List["types.MessageEntity"] = None,
         ttl_seconds: int = None,
+        has_spoiler: bool = None,
         disable_notification: bool = None,
         reply_to_message_id: int = None,
         schedule_date: datetime = None,
@@ -355,19 +356,20 @@ class ScpClient(WotoClientBase):
     ) -> typing.Optional["types.Message"]:
         if self.me.is_bot or not isinstance(reply_markup, (types.InlineKeyboardMarkup, dict, list)) or not the_config.shared_channel:
             return await super().send_photo(
-                chat_id,
-                photo,
-                caption,
-                parse_mode,
-                caption_entities,
-                ttl_seconds,
-                disable_notification,
-                reply_to_message_id,
-                schedule_date,
-                protect_content,
-                reply_markup,
-                progress,
-                progress_args
+                chat_id=chat_id,
+                photo=photo,
+                caption=caption,
+                parse_mode=parse_mode,
+                caption_entities=caption_entities,
+                has_spoiler=has_spoiler,
+                ttl_seconds=ttl_seconds,
+                disable_notification=disable_notification,
+                reply_to_message_id=reply_to_message_id,
+                schedule_date=schedule_date,
+                protect_content=protect_content,
+                reply_markup=reply_markup,
+                progress=progress,
+                progress_args=progress_args
             )
 
         # if this is a user and is trying to send a message with keyboard buttons, automate
