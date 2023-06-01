@@ -1,4 +1,5 @@
 import re
+import os
 from typing import (
     Union,
     Optional,
@@ -118,6 +119,7 @@ class WotoClientBase(Client):
 
             tmp_message = await self.send_specified_media(
                 chat_id=chat_id,
+                media=downloaded_content,
                 caption=current_message.caption,
                 caption_entities=current_message.caption_entities,
                 disable_notification=disable_notification,
@@ -125,6 +127,7 @@ class WotoClientBase(Client):
                 protect_content=protect_content,
             )
             message_results.append(tmp_message)
+            os.remove(downloaded_content)
         
         if len(message_results) == 1:
             # return the only message
