@@ -282,7 +282,6 @@ class WotoClientBase(Client):
                 protect_content=protect_content,
                 has_spoiler=has_spoiler,
                 title=title,
-                has_spoiler=has_spoiler
             )
         elif media_type == MessageMediaType.DOCUMENT:
             return await self.send_document(
@@ -319,8 +318,7 @@ class WotoClientBase(Client):
                 protect_content=protect_content,
                 reply_markup=reply_markup,
                 reply_to_message_id=reply_to_message_id,
-                ttl_seconds=ttl_seconds,
-                has_spoiler=has_spoiler
+                ttl_seconds=ttl_seconds
             )
         elif media_type == MessageMediaType.VIDEO:
             return await self.send_video(
@@ -342,8 +340,7 @@ class WotoClientBase(Client):
                 reply_to_message_id=reply_to_message_id,
                 thumb=thumb,
                 ttl_seconds=ttl_seconds,
-                width=width,
-                has_spoiler=has_spoiler
+                width=width
             )
         elif media_type == MessageMediaType.VIDEO_NOTE:
             return await self.send_video_note(
