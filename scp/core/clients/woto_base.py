@@ -95,7 +95,7 @@ class WotoClientBase(Client):
             if not current_message or current_message.empty:
                 continue
 
-            if not current_message.media:
+            if not self.is_real_media(current_message):
                 if not current_message.text:
                     continue
 
@@ -116,6 +116,7 @@ class WotoClientBase(Client):
 
             tmp_message = await self.send_specified_media(
                 chat_id=chat_id,
+                media_type=current_message.media,
                 media=downloaded_content,
                 caption=current_message.caption,
                 caption_entities=current_message.caption_entities,
