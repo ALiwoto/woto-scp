@@ -1,10 +1,11 @@
 import re
-import os
 from typing import (
     Union,
     Optional,
     List,
     AsyncGenerator,
+    Iterable,
+    BinaryIO
 )
 from aiohttp import ClientSession, client_exceptions
 from datetime import datetime
@@ -60,8 +61,259 @@ class WotoClientBase(Client):
         return (message != None and 
                 message.media != None and
                 message.media != MessageMediaType.WEB_PAGE)
-                
-                
+    
+    async def forward_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[int, str],
+        message_ids: Union[int, Iterable[int]],
+        disable_notification: bool = None,
+        schedule_date: datetime = None,
+        protect_content: bool = None
+    ) -> Union["types.Message", List["types.Message"]]:
+        is_iterable = not isinstance(message_ids, int)
+        message_ids = list(message_ids) if is_iterable else [message_ids]
+        
+        target_chat = await self.get_chat(chat_id)
+        if not target_chat.has_protected_content:
+            return await super().forward_messages(
+                chat_id=chat_id,
+                from_chat_id=from_chat_id,
+                message_ids=message_ids,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                protect_content=protect_content
+            )
+
+        is_iterable = not isinstance(message_ids, int)
+        message_ids = list(message_ids) if is_iterable else [message_ids]
+        all_messages: List[types.Message] = await self.get_messages(
+            chat_id=from_chat_id,
+            message_ids=message_ids
+        )
+
+        message_results: List[types.Message] = []
+        for current_message in all_messages:
+            if not current_message or current_message.empty:
+                continue
+            
+            if not current_message.media:
+                if not current_message.text:
+                    continue
+
+                # just simply send the text message there
+                tmp_message = await self.send_message(
+                    chat_id=chat_id,
+                    text=current_message.text,
+                    disable_notification=disable_notification,
+                    schedule_date=schedule_date
+                )
+                message_results.append(tmp_message)
+                continue
+
+            # download and send the media
+            downloaded_content = await self.download_media(current_message)
+            if not downloaded_content:
+                continue
+
+            tmp_message = await self.send_specified_media(
+                chat_id=chat_id,
+                caption=current_message.caption,
+                caption_entities=current_message.caption_entities,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                protect_content=protect_content,
+            )
+            message_results.append(tmp_message)
+        
+        if len(message_results) == 1:
+            # return the only message
+            return message_results[0]
+        return message_results
+
+
+        
+    async def send_specified_media(
+        self,
+        chat_id: Union[int, str],
+        media: Union[str, bytes, BytesIO],
+        media_type: MessageMediaType,
+        caption: str = None,
+        parse_mode: Union[str, ParseMode] = None,
+        caption_entities: List["types.MessageEntity"] = None,
+        disable_notification: bool = None,
+        reply_to_message_id: int = None,
+        schedule_date: datetime = None,
+        reply_markup: "types.InlineKeyboardMarkup" = None,
+        progress: callable = None,
+        progress_args: tuple = (),
+        progress_kwargs: dict = {},
+        protect_content: bool = None,
+        unsave: bool = False,
+        file_name: str = None,
+        thumb: str | BinaryIO = None,
+        duration: int = 0,
+        has_spoiler: bool = None,
+        width: int = 0,
+        height: int = 0,
+        performer: str = None,
+        title: str = None,
+        force_document: bool = None,
+        ttl_seconds: int = None,
+    ) -> "types.Message":
+        if media_type == MessageMediaType.ANIMATION:
+            return await self.send_animation(
+                chat_id=chat_id,
+                animation=media,
+                caption=caption,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                parse_mode=parse_mode,
+                caption_entities=caption_entities,
+                reply_to_message_id=reply_to_message_id,
+                reply_markup=reply_markup,
+                progress=progress,
+                progress_args=progress_args,
+                progress_kwargs=progress_kwargs,
+                unsave=unsave,
+                file_name=file_name,
+                thumb=thumb,
+                protect_content=protect_content,
+                duration=duration,
+                has_spoiler=has_spoiler,
+                width=width,
+                height=height
+            )
+        elif media_type == MessageMediaType.AUDIO:
+            return await self.send_audio(
+                chat_id=chat_id,
+                audio=media,
+                caption=caption,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                caption_entities=caption_entities,
+                duration=duration,
+                performer=performer,
+                file_name=file_name,
+                thumb=thumb,
+                parse_mode=parse_mode,
+                reply_to_message_id=reply_to_message_id,
+                reply_markup=reply_markup,
+                progress=progress,
+                progress_args=progress_args,
+                progress_kwargs=progress_kwargs,
+                protect_content=protect_content,
+                has_spoiler=has_spoiler,
+                title=title,
+                has_spoiler=has_spoiler
+            )
+        elif media_type == MessageMediaType.DOCUMENT:
+            return await self.send_document(
+                chat_id=chat_id,
+                document=media,
+                caption=caption,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                caption_entities=caption_entities,
+                thumb=thumb,
+                file_name=file_name,
+                force_document=force_document,
+                parse_mode=parse_mode,
+                progress=progress,
+                progress_args=progress_args,
+                progress_kwargs=progress_kwargs,
+                reply_to_message_id=reply_to_message_id,
+                reply_markup=reply_markup,
+                protect_content=protect_content,
+                has_spoiler=has_spoiler
+            )
+        elif media_type == MessageMediaType.PHOTO:
+            return await self.send_photo(
+                chat_id=chat_id,
+                photo=media,
+                caption=caption,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                has_spoiler=has_spoiler,
+                caption_entities=caption_entities,
+                parse_mode=parse_mode,
+                progress=progress,
+                progress_args=progress_args,
+                protect_content=protect_content,
+                reply_markup=reply_markup,
+                reply_to_message_id=reply_to_message_id,
+                ttl_seconds=ttl_seconds,
+                has_spoiler=has_spoiler
+            )
+        elif media_type == MessageMediaType.VIDEO:
+            return await self.send_video(
+                chat_id=chat_id,
+                video=media,
+                caption=caption,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                has_spoiler=has_spoiler,
+                caption_entities=caption_entities,
+                duration=duration,
+                file_name=file_name,
+                height=height,
+                parse_mode=parse_mode,
+                progress=progress,
+                progress_args=progress_args,
+                protect_content=protect_content,
+                reply_markup=reply_markup,
+                reply_to_message_id=reply_to_message_id,
+                thumb=thumb,
+                ttl_seconds=ttl_seconds,
+                width=width,
+                has_spoiler=has_spoiler
+            )
+        elif media_type == MessageMediaType.VIDEO_NOTE:
+            return await self.send_video_note(
+                chat_id=chat_id,
+                video_note=media,
+                caption=caption,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                duration=duration,
+                protect_content=protect_content,
+                thumb=thumb,
+                reply_to_message_id=reply_to_message_id,
+                progress=progress,
+                progress_args=progress_args,
+                reply_markup=reply_markup,
+            )
+        elif media_type == MessageMediaType.VOICE:
+            return await self.send_voice(
+                chat_id=chat_id,
+                voice=media,
+                caption=caption,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                caption_entities=caption_entities,
+                duration=duration,
+                parse_mode=parse_mode,
+                progress=progress,
+                progress_args=progress_args,
+                protect_content=protect_content,
+                reply_markup=reply_markup,
+                reply_to_message_id=reply_to_message_id,
+            )
+        elif media_type == MessageMediaType.STICKER:
+            return await self.send_sticker(
+                chat_id=chat_id,
+                sticker=media,
+                disable_notification=disable_notification,
+                schedule_date=schedule_date,
+                progress=progress,
+                progress_args=progress_args,
+                protect_content=protect_content,
+                reply_markup=reply_markup,
+                reply_to_message_id=reply_to_message_id,
+            )
+        else:
+            raise ValueError("Unknown media type!")
+
     async def refresh_dialogs(self) -> typing.List[types.Dialog]:
         self.__my_all_dialogs__ = []
         async for current in self.iter_dialogs():
