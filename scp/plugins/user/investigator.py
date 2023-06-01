@@ -166,7 +166,7 @@ async def cBackup_handler(_, message: Message):
     if not user.the_bots or len(user.the_bots) < 1:
         return await message.reply_text('bot lists is empty.')
     
-    if not user.dump_usernames or len(user.dump_usernames) < 1:
+    if not user.scp_config.dump_usernames or len(user.scp_config.dump_usernames) < 1:
         return await message.reply_text('list of public usernames is empty.')
     
     if not user.are_bots_started:
@@ -186,7 +186,7 @@ async def cBackup_handler(_, message: Message):
     # .cBackup target_chat backup_channel_id from_id-to_id
     
     target_chat = args[1]
-    public_username: str = user.dump_usernames[0]
+    public_username: str = user.scp_config.dump_usernames[0]
     tg_link_first = f'https://t.me/{public_username}/'
     the_chat: Chat = None
     backup_channel_id = args[2]
@@ -228,7 +228,7 @@ async def cBackup_handler(_, message: Message):
     for index in range(from_id, to_id + 1):
         await asyncio.sleep(5)
         current_bot_index = index % len(user.the_bots)
-        public_username = user.dump_usernames[index % len(user.dump_usernames)]
+        public_username = user.scp_config.dump_usernames[index % len(user.scp_config.dump_usernames)]
         tg_link_first = f'https://t.me/{public_username}/'
         try:
             current_user_message = await user.the_bots[current_bot_index].forward_messages(
