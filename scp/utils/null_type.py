@@ -11,7 +11,6 @@ class _Null:
 
 Null = _Null()
 
-
 def nullable(cls):
     def nullable_func(func):
         def wrapper(self, *a, **kw):
@@ -29,7 +28,3 @@ def nullable(cls):
         cls.__getattr__ = lambda self, attr: Null
 
     return cls
-
-
-def make_nullable(the_type: type):
-   the_type.__getattribute__ = nullable(the_type.__getattribute__)
