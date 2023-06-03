@@ -1,8 +1,12 @@
-from scp.utils.null_type import make_nullable
-from pyrogram.types import Message
+from scp.utils.null_type import nullable
+from pyrogram.types import (
+    Message,
+    User
+)
 
 def make_types_nullable():
-    make_nullable(Message)
+    nullable(Message)
+    nullable(User)
 
 # loads extra features
 def load_extra_features():
