@@ -20,21 +20,16 @@ def nullable(cls):
                 return Null
             else:
                 return ret
-
         return wrapper
 
-    cls.__getattribute_ = nullable_func(cls._getattribute_)
+    cls.__getattribute__ = nullable_func(cls.__getattribute__)
+    if hasattr(cls, '_getattr_'):
+        cls.__getattr__ = nullable_func(cls.__getattr__)
+    else:
+        cls.__getattr__ = lambda self, attr: Null
+
     return cls
 
-def normal_nullable(func):
-  def nullable_func(self, *a, **kw):
-      ret = func(self, *a, **kw)
-      if ret is None:
-         return Null
-      else:
-         return ret
-
-  return nullable_func
 
 def make_nullable(the_type: type):
-   the_type.__getattribute__ = normal_nullable(the_type.__getattribute__)
+   the_type.__getattribute__ = nullable(the_type.__getattribute__)
