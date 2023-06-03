@@ -16,9 +16,9 @@ async def load_bot_plugins():
         )
 
 
-async def loadUserPlugins():
-    for modul in ALL_MODULES:
-        imported_module = importlib.import_module('scp.plugins.user.' + modul)
+async def load_user_plugins():
+    for current_module in ALL_MODULES:
+        imported_module = importlib.import_module('scp.plugins.user.' + current_module)
         if hasattr(
             imported_module,
             '__PLUGIN__',
@@ -40,7 +40,7 @@ async def loadUserPlugins():
             HELP_COMMANDS[imported_module.__PLUGIN__.lower()] = imported_module
 
 
-async def loadPrivatePlugins():
+async def load_private_plugins():
     def __list_all_modules():
         mod_paths = glob.glob(
             dirname(Path(__file__).parent.parent) + '/plugins/private/*.py',
@@ -50,9 +50,9 @@ async def loadPrivatePlugins():
             for f in mod_paths
             if isfile(f) and f.endswith('.py')
         ]
-    for modul in sorted(__list_all_modules()):
+    for current_module in sorted(__list_all_modules()):
         imported_module = importlib.import_module(
-            'scp.plugins.private.' + modul,
+            'scp.plugins.private.' + current_module,
         )
         if hasattr(
             imported_module,
