@@ -21,13 +21,15 @@ def nullable(cls):
         def wrapper(self, *a, **kw):
             ret = func(self, *a, **kw)
             if ret is None:
+                if a[0] == 'media':
+                    return None
                 return Null
             else:
                 return ret
         return wrapper
 
     cls.__getattribute__ = nullable_func(cls.__getattribute__)
-    if hasattr(cls, '_getattr_'):
+    if hasattr(cls, '__getattr__'):
         cls.__getattr__ = nullable_func(cls.__getattr__)
     else:
         cls.__getattr__ = lambda self, attr: Null
