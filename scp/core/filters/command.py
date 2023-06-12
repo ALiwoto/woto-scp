@@ -5,10 +5,8 @@ from typing import List, Union
 import pyrogram
 from pyrogram.filters import (
     create,
-    command as p_command
 )
 from pyrogram.types import Message
-from pyrogram import Client
 from scp.utils.selfInfo import info
 from ...woto_config import the_config
 
