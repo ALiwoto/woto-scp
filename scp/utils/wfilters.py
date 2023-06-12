@@ -1,3 +1,4 @@
+import pyrogram
 from pyrogram import (
     types,
     filters,
@@ -93,3 +94,26 @@ async def channel_in_group_filter(_, __, m: types.Message) -> bool:
 
 channel_in_group = filters.create(channel_in_group_filter)
 """Filter messages sent by contact users."""
+
+
+async def tagged_filter(_, client:'pyrogram.Client', m: types.Message) -> bool:
+    if m.empty or not client or not client.me:
+        return False
+    elif not m.text and not m.caption:
+        return False
+    
+    my_text = (m.text or m.caption).lower()
+    if client.me.username and my_text.find(client.me.username) != -1:
+        return True
+    elif client.me.first_name and my_text.find(client.me.first_name) != -1:
+        return True
+    elif client.me.last_name and my_text.find(client.me.last_name) != -1:
+        return True
+    
+    return False
+    
+    
+
+tagged = filters.create(tagged_filter)
+"""Filter messages that are tagging you in some ways."""
+

@@ -18,7 +18,9 @@ class WotoConfig:
     _special_users: typing.List[int] = []
     prefixes: typing.List[str] = []
     log_channel: int = 0
-    pm_log_channel: int = 0
+    avalon_pms: int = 0
+    avalon_bots: int = 0
+    avalon_tags: int = 0
     dump_usernames = []
     private_resources: int = 0
     shared_channel: int = 0
@@ -56,9 +58,7 @@ class WotoConfig:
             self._the_config.get('woto-scp', 'Prefixes').split() or ['!', '.']
         )
         self.log_channel = self._the_config.getint('woto-scp', 'log_channel', fallback='')
-        self.pm_log_channel = self._the_config.getint('woto-scp', 'pm_log_channel', fallback=0)
         self.dump_usernames = self._the_config.get('woto-scp', 'public_dumps', fallback='').split()
-
         self.private_resources = self._the_config.getint('woto-scp', 'private_resources')
         self.shared_channel = self._the_config.getint('woto-scp', 'shared_channel', fallback=self.private_resources)
         self.gdrive_upload_folder_id = self._the_config.get('woto-scp', 'gdrive_upload_folder_id', fallback='')
@@ -78,6 +78,12 @@ class WotoConfig:
         # microsoft-azure configuration
         try:
             self.load_azure_config()
+        except Exception as e:
+            logging.warning(e, stacklevel=3)
+
+        # avalon configuration
+        try:
+            self.load_avalon()
         except Exception as e:
             logging.warning(e, stacklevel=3)
         
@@ -106,6 +112,11 @@ class WotoConfig:
             int, self._the_config.get('microsoft-azure', 'azure_sudo_users').split())
         self.azure_api_key = self._the_config.get('microsoft-azure', 'azure_api_key')
         self.azure_api_region = self._the_config.get('microsoft-azure', 'azure_api_region')
+
+    def load_avalon(self) -> None:
+        self.avalon_pms = self._the_config.getint('avalon', 'avalon_pms', fallback=0)
+        self.avalon_bots = self._the_config.getint('avalon', 'avalon_bots', fallback=0)
+        self.avalon_tags = self._the_config.getint('avalon', 'avalon_tags', fallback=0)
 
     def is_sudo(self, user: int) -> bool:
         return user in self._owner_users or user in self._sudo_users

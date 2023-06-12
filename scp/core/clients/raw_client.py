@@ -517,5 +517,5 @@ class ScpClient(WotoClientBase):
     sibyl: SibylClient = SibylClient(the_config.sibyl_token)
 
     auto_read_enabled = True
-    pm_log_enabled = True
+    avalon_system_enabled = True
 
