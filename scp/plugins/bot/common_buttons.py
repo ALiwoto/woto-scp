@@ -51,6 +51,13 @@ async def read_button_handler(_, query: CallbackQuery):
     ) & filters.regex("^sendMedia_")
 )
 async def send_media_button_handler(_, query: CallbackQuery):
+    target_chat_id = user.scp_config.avalon_pms
+    my_strs = query.data.split("_")
+    from_chat_id = int(my_strs[1])
+    message_id = int(my_strs[2])
+    if len(my_strs) > 3:
+        target_chat_id = int(my_strs[3])
+
     if query.message:
         message_field = query.message.text.split("• MESSAGE: (")
         if not message_field or message_field[0].find(")") == -1:
@@ -63,16 +70,14 @@ async def send_media_button_handler(_, query: CallbackQuery):
         if not send_method:
             return await query.answer(f"Couldn't find send method for {media_type}.")
         
-        return await send_method(user, query.message.chat.id, file_id, reply_to_message_id=query.message.id)
+        return await send_method(user, target_chat_id, file_id, reply_to_message_id=query.message.id)
     
-    # second way around: no message is passed
-    my_strs = query.data.split("_")
-    from_chat_id = int(my_strs[1])
-    message_id = int(my_strs[2])
+    
 
+    # second way around: no message is passed
     try:
         await user.forward_messages(
-            chat_id=user.scp_config.pm_log_channel,
+            chat_id=target_chat_id,
             from_chat_id=from_chat_id,
             message_ids=message_id
         )

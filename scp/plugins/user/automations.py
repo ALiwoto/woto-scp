@@ -19,7 +19,7 @@ __PLUGIN__ = 'automations'
 )
 async def auto_read_handler(_, message: Message):
     if (not user.auto_read_enabled or message.id % 2 != 0 or
-        message.chat.id == user.scp_config.pm_log_channel):
+        message.chat.id == user.scp_config.avalon_pms):
         return
     try:
         await user.read_chat_history(message.chat.id)
