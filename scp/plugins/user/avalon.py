@@ -71,7 +71,8 @@ async def pm_log_handler(_, message: Message):
     )
 
 @user.on_message(
-    user.filters.bot,
+    user.filters.bot &
+    user.filters.private,
     group=100,
 )
 async def bots_log_handler(_, message: Message):
@@ -93,6 +94,8 @@ async def bots_log_handler(_, message: Message):
 )
 async def tags_log_handler(_, message: Message):
     if not user.scp_config.avalon_tags or not user.avalon_system_enabled:
+        return
+    elif not message.from_user:
         return
     
     txt, keyboard = await get_txt_and_keyboard(message)
