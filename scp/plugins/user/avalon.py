@@ -49,7 +49,8 @@ __DOC__ = str(
         user.filters.group |
         user.filters.channel |
         user.filters.me |
-        user.filters.bot
+        user.filters.bot |
+        user.sudo | user.owner
     ),
     group=100,
 )
@@ -89,7 +90,12 @@ async def bots_log_handler(_, message: Message):
     )
 
 @user.on_message(
-    user.wfilters.tagged,
+    user.wfilters.tagged &
+    ~(
+        user.filters.private |
+        user.filters.me |
+        user.filters.private
+    ),
     group=101,
 )
 async def tags_log_handler(_, message: Message):
