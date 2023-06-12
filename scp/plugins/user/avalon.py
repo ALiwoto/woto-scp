@@ -94,7 +94,7 @@ async def bots_log_handler(_, message: Message):
     ~(
         user.filters.private |
         user.filters.me |
-        user.filters.private
+        user.owner
     ),
     group=101,
 )
