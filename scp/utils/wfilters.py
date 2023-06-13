@@ -101,7 +101,7 @@ async def tagged_filter(_, client:'pyrogram.Client', m: types.Message) -> bool:
         return False
     elif not m.text and not m.caption:
         return False
-    elif m.chat and m.chat.title.lower().find('avalon') != -1:
+    elif m.chat and m.chat.title and m.chat.title.lower().find('avalon') != -1:
         return False
     
     my_text = (m.text or m.caption).lower()
