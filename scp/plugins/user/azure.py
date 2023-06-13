@@ -214,7 +214,7 @@ async def to_voice_handler(_, message: Message):
         if error_message:
             error_message = user.html_mono(error_message)
             return await message.reply_text(
-                message=f'Failed to retrieve audio data from azure servers:\n{error_message}'
+                text=f'Failed to retrieve audio data from azure servers:\n{error_message}'
             )
         return await message.reply_text('Failed to retrieve audio data from azure servers.')
     
