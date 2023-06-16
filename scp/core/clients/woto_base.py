@@ -59,10 +59,10 @@ class WotoClientBase(Client):
     aioclient: ClientSession = ClientSession()
 
     def is_real_media(self, message: types.Message) -> bool:
-        return (message != None and 
+        return (message != None and
                 message.media != None and
                 message.media != MessageMediaType.WEB_PAGE)
-    
+
     async def forward_messages(
         self,
         chat_id: Union[int, str],
@@ -126,7 +126,7 @@ class WotoClientBase(Client):
             )
             message_results.append(tmp_message)
             os.remove(downloaded_content)
-        
+
         if len(message_results) == 1:
             # return the only message
             return message_results[0]
@@ -143,7 +143,7 @@ class WotoClientBase(Client):
         the_message = await self.get_message_by_link(message_link)
         if not the_message:
             raise ValueError("Invalid message link provided")
-        
+
         return await self.forward_messages(
             chat_id=chat_id,
             from_chat_id=the_message.chat.id,
@@ -154,8 +154,8 @@ class WotoClientBase(Client):
         )
 
     async def get_message_by_link(
-        self, 
-        link: str, 
+        self,
+        link: str,
         continue_til_found: bool = False,
         chunk_amount: int = 10,
     ) -> types.Message:
@@ -165,7 +165,7 @@ class WotoClientBase(Client):
         link = link.replace('http://', '')
         if link.find('t.me') == -1:
             return None
-    
+
         chat_id = None
         message_id: int = 0
         # the format can be either like t.me/c/1627169341/1099 or
@@ -188,28 +188,27 @@ class WotoClientBase(Client):
 
         if not chat_id:
             return None
-        
+
         if not continue_til_found:
             return await self.get_messages(chat_id, message_id)
-        
+
         messages = await self.get_history(
             chat_id=chat_id,
             limit=1,
         )
         if messages:
             to_id = messages[0].id
-        
+
         while message_id <= to_id:
             the_messages: typing.List[types.Message] = \
                 await self.get_messages(chat_id, [i for i in range(message_id, message_id + chunk_amount)])
             for msg in the_messages:
                 if msg and not msg.empty:
                     return msg
-            
+
             message_id += chunk_amount
 
-        return None 
-
+        return None
 
     async def send_specified_media(
         self,
@@ -395,7 +394,7 @@ class WotoClientBase(Client):
             self.__my_all_dialogs__.append(current)
 
         return self.__my_all_dialogs__
-    
+
     async def get_dialog_by_id(self, chat_id: typing.Union[str, int]) -> types.Dialog:
         my_all = await self.get_my_dialogs()
         if not my_all:
@@ -440,7 +439,6 @@ class WotoClientBase(Client):
             return await resp.json()
         except client_exceptions.ContentTypeError:
             return (await resp.read()).decode('utf-8')
-
 
     def is_silent(self, message: types.Message) -> bool:
         return (
@@ -515,7 +513,7 @@ class WotoClientBase(Client):
             message: types.Message,
             prompt: str = None,
             as_text: bool = True,
-            delete_prompt:str = True
+            delete_prompt: str = True
     ) -> types.Message:
         if not prompt:
             prompt = self.html_italic("waiting for any kind of input...")
@@ -530,7 +528,7 @@ class WotoClientBase(Client):
 
         if delete_prompt:
             await prompt_message.delete()
-        
+
         if as_text:
             return getattr(result, "text", result)
 
@@ -761,6 +759,19 @@ class WotoClientBase(Client):
         filter: "enums.ChatMembersFilter" = enums.ChatMembersFilter.SEARCH
     ) -> Optional[AsyncGenerator["types.ChatMember", None]]:
         return super().get_chat_members(chat_id, query, limit, filter)
+
+    async def fetch_chat_members(
+        self,
+        chat_id: int | str,
+        query: str = "",
+        limit: int = 0,
+        filter: "enums.ChatMembersFilter" = enums.ChatMembersFilter.SEARCH
+    ):
+        results = []
+        async for member in self.get_chat_members(chat_id=chat_id, query=query, limit=limit, filter=filter):
+            results.append(member)
+        
+        return results
 
     def iter_dialogs(
         self,
