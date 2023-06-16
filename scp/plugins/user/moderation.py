@@ -180,7 +180,7 @@ async def admins_handler(_, message: Message):
     common = user.is_silent(message)
     m = None
     try:
-        m = await user.get_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
+        m = await user.fetch_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
     except Exception as ex:
         await top_msg.edit_text(text=html_mono(ex))
         return
@@ -374,7 +374,7 @@ async def members_handler(_, message: Message):
     txt: str = ''
     m = None
     try:
-        m = await user.get_chat_members(the_chat)
+        m = await user.fetch_chat_members(the_chat)
     except Exception as ex:
         await top_msg.edit_text(text=html_mono(ex))
         return
@@ -549,7 +549,7 @@ async def fmembers_handler(_, message: Message):
     txt: str = ''
     m = None
     try:
-        m = await user.get_chat_members(the_chat)
+        m = await user.fetch_chat_members(the_chat)
     except Exception as ex:
         await top_msg.edit_text(text=html_mono(ex))
         return
@@ -630,10 +630,9 @@ async def fadmins_handler(_, message: Message):
     common = not user.is_silent(message)
     m = None
     try:
-        m = await user.get_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
+        m = await user.fetch_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
     except Exception as ex:
-        await top_msg.edit_text(text=html_mono(ex))
-        return
+        return await top_msg.edit_text(text=html_mono(ex))
     
     creator: ChatMember = None
     admins: list[ChatMember] = []
