@@ -178,23 +178,26 @@ async def admins_handler(_, message: Message):
     top_msg = await message.reply_text(html_mono("fetching group admins..."))
     txt = ''
     common = user.is_silent(message)
-    m = None
+    the_members = None
     try:
-        m = await user.fetch_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
+        the_members = await user.fetch_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
     except Exception as ex:
         await top_msg.edit_text(text=html_mono(ex))
         return
     creator: ChatMember = None
     admins: list[ChatMember] = []
     bots: list[ChatMember] = []
-    for i in m:
-        if i.status == 'creator':
-            creator = i
-        elif i.status == 'administrator':
-            if i.user.is_bot:
-                bots.append(i)
+    for current_member in the_members:
+        if not isinstance(current_member, ChatMember):
+            continue
+
+        if current_member.status == ChatMemberStatus.OWNER:
+            creator = current_member
+        elif current_member.status == ChatMemberStatus.ADMINISTRATOR:
+            if current_member.user.is_bot:
+                bots.append(current_member)
                 continue
-            admins.append(i)
+            admins.append(current_member)
 
     if not creator and len(admins) == 0:
         await top_msg.edit_text(text="Seems like all admins are anon...")
