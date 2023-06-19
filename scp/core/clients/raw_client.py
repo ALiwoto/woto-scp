@@ -168,15 +168,18 @@ class ScpClient(WotoClientBase):
         link_to_message = self.get_non_cmd(message)
         if link_to_message:
             try:
-                message = await self.get_message_by_link(link_to_message, continue_till_found)
-                if message and not message.empty:
+                linked_message = await self.get_message_by_link(link_to_message, continue_till_found)
+                if linked_message and not linked_message.empty:
                     # just return it, no need to check anything
-                    return message
-                
-                if not message.command:
-                    message.command = [] #TODO: FIXME
+                    return await self.get_message_to_download(
+                        message=message,
+                        continue_till_found=continue_till_found
+                    )
                 
             except: pass
+        
+        if not message.command:
+            message.command = [] #TODO: FIXME
         
         available_media = ("audio", "document", "photo", "sticker", "animation", "video", "voice", "video_note")
         for i in available_media:
