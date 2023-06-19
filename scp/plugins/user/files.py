@@ -213,12 +213,21 @@ async def download_handler(_, message: Message):
     if download_message is None:
         return await message.reply_text('Media required')
     
+    target_cmd = ' '.join(message.command[1:])
+    if target_cmd and target_cmd.find('https:') != -1 and target_cmd.find('http:') != -1:
+        file_path = os.path.abspath(os.path.expanduser(' '.join(target_cmd[1:]) or './'))
+    else:
+        file_path = os.path.abspath(os.path.expanduser('./'))
+    
+    if os.path.isdir(file_path):
+        file_path = os.path.join(file_path, '')
+    
     text = 'Downloading...'
     reply = await message.reply_text(text)
     try:
-        file = await download_message.download(file, progress=progress_callback, progress_args=(reply, text, False))
+        file_path = await download_message.download(file_path, progress=progress_callback, progress_args=(reply, text, False))
     except user.exceptions.MediaInvalid:
         await message.reply_text('Download cancelled!')
     else:
-        await reply.edit_text(f'Downloaded to {html.escape(file)}')
+        await reply.edit_text(f'Downloaded to {html.escape(file_path)}')
 
