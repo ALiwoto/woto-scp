@@ -169,7 +169,7 @@ class ScpClient(WotoClientBase):
         if link_to_message:
             try:
                 message = await self.get_message_by_link(link_to_message, continue_till_found)
-                if not message or message.empty:
+                if message and not message.empty:
                     # just return it, no need to check anything
                     return message
                 
