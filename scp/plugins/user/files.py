@@ -213,7 +213,7 @@ async def download_handler(_, message: Message):
     if download_message is None:
         return await message.reply_text('Media required')
     
-    target_cmd = ' '.join(message.command[1:])
+    target_cmd = ' '.join(user.get_non_cmd(message=message))
     if target_cmd and target_cmd.find('https:') != -1 and target_cmd.find('http:') != -1:
         file_path = os.path.abspath(os.path.expanduser(' '.join(target_cmd[1:]) or './'))
     else:
