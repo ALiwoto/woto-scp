@@ -1,5 +1,6 @@
 from scp import user
 from pyrogram.types import Message
+from enum import Enum
 
 """
 Avalon centralized system.
@@ -43,6 +44,10 @@ __DOC__ = str(
     ),
 )
 
+class AvalonMode(Enum):
+    PM = 0
+    BOT = 1
+    TAG = 2
 
 @user.on_message(
     ~(
@@ -104,7 +109,7 @@ async def tags_log_handler(_, message: Message):
     elif not message.from_user:
         return
     
-    txt, keyboard = await get_txt_and_keyboard(message)
+    txt, keyboard = await get_txt_and_keyboard(message, AvalonMode.TAG)
 
     await user.send_message(
         chat_id=user.scp_config.avalon_tags,
@@ -149,11 +154,16 @@ def get_formatted_forward(message: Message) -> str:
 
     return None
 
-async def get_txt_and_keyboard(message: Message):
+async def get_txt_and_keyboard(message: Message, mode: AvalonMode = AvalonMode.PM):
     sender = message.from_user
 
     is_real_media = user.is_real_media(message)
-    txt = user.html_normal(f"#PM #{user.me.first_name} (")
+    txt = ''
+    if mode == AvalonMode.PM:
+        txt += user.html_normal(f"#PM #{user.me.first_name} (")
+    elif mode == AvalonMode.TAG:
+        txt += user.html_normal(f"#TAG #{user.me.first_name} (")
+
     txt += user.html_mono(user.me.id, ")")
     txt += user.html_bold(f"\n• FROM: ")
     if sender.username:
@@ -161,6 +171,11 @@ async def get_txt_and_keyboard(message: Message):
     else:
         txt += user.html_normal(sender.first_name[:16], " (")
     txt += user.html_mono(sender.id, ")")
+
+    if mode == AvalonMode.TAG:
+        txt += user.html_bold("\n• LINK: ")
+        txt += await user.html_normal_chat_link("here", message.chat)
+
     if message.forward_from_chat or message.forward_from:
         txt += user.html_bold("\n• FORWARD FROM: ") + get_formatted_forward(message)
     if message.caption:
