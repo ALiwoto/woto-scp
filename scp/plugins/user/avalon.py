@@ -174,7 +174,7 @@ async def get_txt_and_keyboard(message: Message, mode: AvalonMode = AvalonMode.P
 
     if mode == AvalonMode.TAG:
         txt += user.html_bold("\n• LINK: ")
-        txt += await user.html_normal_chat_link("here", message.chat)
+        txt += await user.html_link("here", message.link)
 
     if message.forward_from_chat or message.forward_from:
         txt += user.html_bold("\n• FORWARD FROM: ") + get_formatted_forward(message)

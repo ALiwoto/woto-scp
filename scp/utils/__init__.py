@@ -1,6 +1,7 @@
 import time
 import asyncio
 import mimetypes
+from enum import Enum
 from datetime import timedelta
 from pyrogram.types import(
     Message,
@@ -8,6 +9,18 @@ from pyrogram.types import(
 from . import wfilters
 
 
+class AutoReadMode(Enum):
+    OFF = 0
+
+    OPTIMIZED = 1
+
+    CHANNELS = 2
+
+    GROUPS = 3
+
+    PMS = 4
+
+    EVERYTHING = 5
 
 # https://stackoverflow.com/a/49361727
 def format_bytes(size):
