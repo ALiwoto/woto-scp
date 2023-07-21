@@ -166,6 +166,10 @@ class ScpClient(WotoClientBase):
 
     async def get_message_to_download(self, message: types.Message, continue_till_found: bool = False) -> types.Message:
         link_to_message = self.get_non_cmd(message)
+        splitted = link_to_message.split()
+        if len(splitted) > 0:
+            link_to_message = splitted[0]
+        
         if link_to_message:
             try:
                 linked_message = await self.get_message_by_link(link_to_message, continue_till_found)
