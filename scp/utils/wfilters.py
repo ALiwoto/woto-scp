@@ -105,7 +105,7 @@ async def tagged_filter(_, client:'pyrogram.Client', m: types.Message) -> bool:
         return False
     
     my_text = (m.text or m.caption).lower()
-    if client.me.username and my_text.find(client.me.username) != -1:
+    if client.me.username and my_text.find(client.me.username.lower()) != -1:
         return True
     elif client.me.first_name and my_text.find(client.me.first_name) != -1:
         return True
