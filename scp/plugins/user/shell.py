@@ -309,7 +309,7 @@ async def makeGif_handler(_, message: Message):
     try:
         await user.send_animation(
             chat_id=message.chat.id, 
-            document=outfile, 
+            animation=outfile, 
             progress=progress_callback, 
             progress_args=(reply, text, True),
             reply_to_message_id=(
@@ -379,7 +379,7 @@ async def makeVid_handler(_, message: Message):
     try:
         await user.send_video(
             chat_id=message.chat.id, 
-            document=outfile, 
+            video=outfile, 
             progress=progress_callback, 
             progress_args=(reply, text, True),
             reply_to_message_id=(
