@@ -167,12 +167,29 @@ async def addPBots_handler(_, message: Message):
     if not user.the_bots or len(user.the_bots) < 1:
         return await message.reply_text('bot lists is empty.')
     
+    if not user.are_bots_started:
+        top_message = await message.reply_text(user.html_mono('starting bots...'))
+        await user.start_all_bots()
+        await top_message.edit_text(user.html_mono('bots started.'))
+    
+    added = 0
+    failed = 0
     for current_bot in user.the_bots:
-        await user.promote_chat_member(
-            chat_id=message.chat.id, 
-            user_id=current_bot.me.username,
-            privileges=ChatPrivileges(can_post_messages=True),
-        )
+        try:
+            await user.promote_chat_member(
+                chat_id=message.chat.id, 
+                user_id=current_bot.me.username,
+                privileges=ChatPrivileges(can_post_messages=True),
+            )
+            added += 1
+        except Exception as e:
+            print(e)
+            failed += 1
+            continue
+    
+    text = user.html_bold(f'Added: ') + user.html_mono(added, '\n')
+    text += user.html_bold(f'Failed: ') + user.html_mono(failed, '\n')
+    await message.reply_text(text, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
 
 @user.on_message(
 	~user.filters.forwarded &
