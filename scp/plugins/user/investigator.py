@@ -3,6 +3,7 @@ from scp import user
 from pyrogram.types import (
     Message,
     Chat,
+    ChatPrivileges,
 )
 from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.errors import(
@@ -151,6 +152,27 @@ async def pirate_handler(_, message: Message):
     text += user.html_mono(done, ' messages were pirated successfully.\n')
     text += user.html_mono(failed, ' messages were not pirated.')
     await message.reply_text(text, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
+
+@user.on_message(
+	~user.filters.forwarded &
+	~user.filters.sticker & 
+	~user.filters.via_bot & 
+	user.owner & 
+	user.command(
+        ['addPBots'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def addPBots_handler(_, message: Message):
+    if not user.the_bots or len(user.the_bots) < 1:
+        return await message.reply_text('bot lists is empty.')
+    
+    for current_bot in user.the_bots:
+        await user.promote_chat_member(
+            chat_id=message.chat.id, 
+            user_id=current_bot.me.username,
+            privileges=ChatPrivileges(can_post_messages=True),
+        )
 
 @user.on_message(
 	~user.filters.forwarded &
