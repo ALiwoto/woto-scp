@@ -278,7 +278,6 @@ class WotoClientBase(Client):
                 progress=progress,
                 progress_args=progress_args,
                 protect_content=protect_content,
-                has_spoiler=has_spoiler,
                 title=title,
             )
         elif media_type == MessageMediaType.DOCUMENT:
@@ -297,8 +296,7 @@ class WotoClientBase(Client):
                 progress_args=progress_args,
                 reply_to_message_id=reply_to_message_id,
                 reply_markup=reply_markup,
-                protect_content=protect_content,
-                has_spoiler=has_spoiler
+                protect_content=protect_content
             )
         elif media_type == MessageMediaType.PHOTO:
             return await self.send_photo(
