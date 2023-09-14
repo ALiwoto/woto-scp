@@ -224,7 +224,6 @@ class WotoClientBase(Client):
         reply_markup: "types.InlineKeyboardMarkup" = None,
         progress: callable = None,
         progress_args: tuple = (),
-        progress_kwargs: dict = {},
         protect_content: bool = None,
         unsave: bool = False,
         file_name: str = None,
@@ -239,6 +238,7 @@ class WotoClientBase(Client):
         ttl_seconds: int = None,
     ) -> "types.Message":
         if media_type == MessageMediaType.ANIMATION:
+            self.send_animation
             return await self.send_animation(
                 chat_id=chat_id,
                 animation=media,
@@ -251,7 +251,6 @@ class WotoClientBase(Client):
                 reply_markup=reply_markup,
                 progress=progress,
                 progress_args=progress_args,
-                progress_kwargs=progress_kwargs,
                 unsave=unsave,
                 file_name=file_name,
                 thumb=thumb,
@@ -278,7 +277,6 @@ class WotoClientBase(Client):
                 reply_markup=reply_markup,
                 progress=progress,
                 progress_args=progress_args,
-                progress_kwargs=progress_kwargs,
                 protect_content=protect_content,
                 has_spoiler=has_spoiler,
                 title=title,
@@ -297,7 +295,6 @@ class WotoClientBase(Client):
                 parse_mode=parse_mode,
                 progress=progress,
                 progress_args=progress_args,
-                progress_kwargs=progress_kwargs,
                 reply_to_message_id=reply_to_message_id,
                 reply_markup=reply_markup,
                 protect_content=protect_content,
