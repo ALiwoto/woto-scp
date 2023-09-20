@@ -64,6 +64,10 @@ class WotoClientBase(Client):
                 message.media != MessageMediaType.WEB_PAGE)
     
     def fix_eval_text(self, txt: str) -> str:
+        if txt[1:].startswith("eval"):
+            txt = txt[1:].lstrip("eval")
+        
+        # remove all non-printable characters from the code.
         return txt.replace("\u00A0", "")
 
     async def forward_messages(
