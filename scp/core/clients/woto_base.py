@@ -68,7 +68,7 @@ class WotoClientBase(Client):
             txt = txt[1:].lstrip("eval")
         
         # remove all non-printable characters from the code.
-        return txt.replace("\u00A0", "")
+        return txt.replace("\u00A0", " ")
 
     async def forward_messages(
         self,
