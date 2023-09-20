@@ -52,9 +52,12 @@ async def eval_handler(_, message: Message):
             return
         code = message.reply_to_message.text
     
+    if message.text:
+        message.text = user.fix_eval_text(message.text)
+    if message.reply_to_message and message.reply_to_message.text:
+        message.reply_to_message.text = user.fix_eval_text(message.reply_to_message.text)
     await eval_base(user, message, code)
     
-
 
 @user.on_message(
     ~user.filters.forwarded
