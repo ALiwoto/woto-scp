@@ -64,7 +64,7 @@ class WotoClientBase(Client):
                 message.media != MessageMediaType.WEB_PAGE)
     
     def fix_eval_text(self, txt: str) -> str:
-        return txt.replace(chr("\u00A0"), "")
+        return txt.replace("\u00A0", "")
 
     async def forward_messages(
         self,
