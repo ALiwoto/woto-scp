@@ -83,7 +83,7 @@ return inspect.getsource({code})
     await eval_base(user, message, code)
 
 async def eval_base(client: pClient, message: Message, code: str, silent: bool = False):
-    code = EVAL_PRETEXT +  user.fix_eval_text(code)
+    code = EVAL_PRETEXT + user.fix_eval_text(code)
     
     is_private: bool = code.find("SEND_PRIVATE") != -1
     tree: TModule = None
