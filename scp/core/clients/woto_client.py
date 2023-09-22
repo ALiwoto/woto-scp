@@ -9,7 +9,7 @@ from .woto_base import (
 )
 
 class WotoPyroClient(WotoClientBase):
-    async def get_file(
+    def get_file(
         self,
         file_id: FileId,
         file_size: int = 0,
@@ -22,7 +22,7 @@ class WotoPyroClient(WotoClientBase):
         Overrides the original get_file method and sets a higher limit for downloading it.
         """
         limit = (1 << 32) - 1
-        return await super().get_file(
+        return super().get_file(
             file_id=file_id,
             file_size=file_size,
             limit=limit,
