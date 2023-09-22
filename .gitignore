@@ -130,6 +130,7 @@ gdrive_settings.yaml
 g_credentials.json
 scp/logs/*.txt
 scp/plugins/private/*.py
+scp/plugins/private/*.sh
 test.py
 woto_files
 unknown_errors.txt
