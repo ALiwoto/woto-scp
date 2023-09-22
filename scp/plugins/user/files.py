@@ -209,7 +209,7 @@ async def uld_handler(_, message: Message):
     ),
 )
 async def download_handler(_, message: Message):
-    download_message = await user.get_message_to_download(message)
+    download_message: Message = await user.get_message_to_download(message)
     if download_message is None:
         return await message.reply_text('Media required')
     
