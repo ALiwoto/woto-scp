@@ -34,6 +34,7 @@ from scp.database.database_client import DatabaseClient
 from scp.utils.misc import restart_scp as restart_woto_scp
 from kantex import md as Markdown
 from .woto_base import WotoClientBase
+from .woto_client import WotoPyroClient
 from ...woto_config import the_config
 import asyncio
 import logging
@@ -94,7 +95,7 @@ def _get_scp_bots() -> typing.List[WotoClientBase]:
         return None
 
 
-class ScpClient(WotoClientBase):
+class ScpClient(WotoPyroClient):
     def __init__(
         self,
         name: str,
