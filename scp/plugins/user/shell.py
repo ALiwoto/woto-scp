@@ -243,7 +243,7 @@ async def toGif_handler(_, message: Message):
         file_name=rfile.name,
     )
     output_to_gif = 'output-toGif.mp4'
-    the_command = f'rm "{output_to_gif}" -f && ffmpeg -an -sn -i "{rfile.name}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error'
+    the_command = f'rm "{output_to_gif}" -f; ffmpeg -an -sn -i "{rfile.name}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error'
     await shell_base(message, the_command, silent_on_success=True)
     
     # text = f'Uploading {html_mono(output_to_gif)}...'
@@ -311,7 +311,7 @@ async def makeGif_handler(_, message: Message):
     sh_txt = f'rm "{outfile}" -f'
     scale_value = "scale='min(iw,1280)':'min(ih,720)'"
     times_value = f'-ss {start_t} -to {end_t}'
-    sh_txt += f' & {user.ffmpeg_path} -sn -hide_banner -loglevel error -an {times_value} -i "{user_file_name}"'
+    sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error -an {times_value} -i "{user_file_name}"'
     sh_txt += f' -vf "{scale_value}" -pix_fmt yuv420p -c:v libx264 "{outfile}" '
     await shell_base(message, sh_txt)
     
@@ -377,11 +377,11 @@ async def makeVid_handler(_, message: Message):
         )
     
     
-    outfile = 'aliwoto-output-cutGif.mp4'
+    outfile = 'aliwoto-output-cutVid.mp4'
     sh_txt = f'rm "{outfile}" -f'
     scale_value = "scale='min(iw,1280)':'min(ih,720)'"
     times_value = f'-ss {start_t} -to {end_t}'
-    sh_txt += f' & {user.ffmpeg_path} -sn -hide_banner -loglevel error {times_value} -i "{user_file_name}"'
+    sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error {times_value} -i "{user_file_name}"'
     sh_txt += f' -vf "{scale_value}" -pix_fmt yuv420p -c:v libx264 "{outfile}" '
     await shell_base(message, sh_txt)
     
