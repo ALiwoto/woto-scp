@@ -9,6 +9,9 @@ from .woto_base import (
 )
 
 class WotoPyroClient(WotoClientBase):
+    ffmpeg_path: str = 'ffmpeg'
+
+
     def get_file(
         self,
         file_id: FileId,
