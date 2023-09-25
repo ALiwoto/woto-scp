@@ -85,6 +85,18 @@ async def neo_handler(_, message: Message):
 async def git_handler(_, message: Message):
     await shell_base(message, message.text[1:])
 
+@user.on_message(
+    ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & user.filters.me
+    & user.command(
+        'ffmpeg',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def git_handler(_, message: Message):
+    await shell_base(message, message.text[1:].replace('ffmpeg', user.ffmpeg_path, 1))
 
 @user.on_message(
     ~user.filters.forwarded
