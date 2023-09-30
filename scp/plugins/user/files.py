@@ -121,11 +121,11 @@ async def upload_handler(_, message: Message):
     if not file:
         return
     
-    should_delete = message.command[0].endswith('d')
+    should_delete = message.command[0].lower().endswith('d')
     text = f'Uploading {html_mono(file)}...'
     reply = await message.reply_text(text)
-    file_name = os.path.basename(file)
     if os.path.isdir(file):
+        file_name = os.path.basename(file)
         shutil.make_archive(f"{file_name}-archive", 'zip', file)
         file = os.path.expanduser(f"{file_name}-archive.zip")
     
@@ -170,11 +170,12 @@ async def upload_handler(_, message: Message):
     file = os.path.expanduser(' '.join(message.command[1:]))
     if not file:
         return
-    should_delete = message.command[0].endswith("d")
+    
+    should_delete = message.command[0].lower().endswith('d')
     text = f'Uploading {html_mono(file)}...'
     reply = await message.reply_text(text)
-    file_name = os.path.basename(file)
     if os.path.isdir(file):
+        file_name = os.path.basename(file)
         shutil.make_archive(f"{file_name}-archive", 'zip', file)
         file = os.path.expanduser(f"{file_name}-archive.zip")
     
