@@ -138,3 +138,6 @@ bots.json
 
 # old and deprecated pyfiles
 *.pyold
+
+# the env folders
+scp-venv/
