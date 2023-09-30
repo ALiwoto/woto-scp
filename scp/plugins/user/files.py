@@ -158,6 +158,52 @@ async def upload_handler(_, message: Message):
 	~user.filters.via_bot &
 	user.owner & 
 	user.command(
+        ['ulv', 'upload_video'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def upload_handler(_, message: Message):
+    file = os.path.expanduser(' '.join(message.command[1:]))
+    if not file:
+        return
+    text = f'Uploading {html_mono(file)}...'
+    reply = await message.reply_text(text)
+    file_name = os.path.basename(file)
+    if os.path.isdir(file):
+        shutil.make_archive(f"{file_name}-archive", 'zip', file)
+        file = os.path.expanduser(f"{file_name}-archive.zip")
+    
+    try:
+        await user.send_video(
+            chat_id=message.chat.id, 
+            video=file, 
+            progress=progress_callback, 
+            progress_args=(reply, text, True), 
+            force_document=True, 
+            reply_to_message_id=(
+                None if message.chat.type in ('private', 'bot') 
+                else message.id
+            ),
+        )
+    except user.exceptions.MediaInvalid:
+        await message.reply_text('Video upload cancelled!')
+    except Exception as e:
+        try:
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
+            return
+        except Exception: pass
+        await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
+    else:
+        await reply.delete()
+
+
+@user.on_message(
+    ~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot &
+	user.owner & 
+	user.command(
         ['uld'],
         prefixes=user.cmd_prefixes,
     ),
@@ -195,6 +241,52 @@ async def uld_handler(_, message: Message):
         await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
     else:
         await reply.delete()
+
+@user.on_message(
+    ~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot &
+	user.owner & 
+	user.command(
+        ['ulvd'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def uld_handler(_, message: Message):
+    file = os.path.expanduser(' '.join(message.command[1:]))
+    if not file:
+        return
+    text = f'Uploading {html_mono(file)}...'
+    reply = await message.reply_text(text)
+    file_name = os.path.basename(file)
+    if os.path.isdir(file):
+        shutil.make_archive(f"{file_name}-archive", 'zip', file)
+        file = os.path.expanduser(f"{file_name}-archive.zip")
+    
+    try:
+        await user.send_video(
+            chat_id=message.chat.id, 
+            video=file, 
+            progress=progress_callback, 
+            progress_args=(reply, text, True),
+            reply_to_message_id=(
+                None if message.chat.type in ('private', 'bot') 
+                else message.id
+            ),
+        )
+        os.remove(file)
+    except user.exceptions.MediaInvalid:
+        await message.reply_text('Upload cancelled!')
+    except Exception as e:
+        try:
+            await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
+            return
+        except Exception: pass
+        await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
+    else:
+        await reply.delete()
+
 
 
 @user.on_message(
