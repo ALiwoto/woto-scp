@@ -184,8 +184,7 @@ async def upload_handler(_, message: Message):
             chat_id=message.chat.id, 
             video=file, 
             progress=progress_callback, 
-            progress_args=(reply, text, True), 
-            force_document=True, 
+            progress_args=(reply, text, True),
             reply_to_message_id=(
                 None if message.chat.type in ('private', 'bot') 
                 else message.id
