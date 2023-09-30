@@ -246,4 +246,4 @@ async def download_handler(_, message: Message):
     except user.exceptions.MediaInvalid:
         await message.reply_text('Download cancelled!')
     else:
-        await reply.edit_text(f'Downloaded to {html.escape(file_path)}')
+        await reply.edit_text(f'Downloaded to {html_mono(file_path)}')
