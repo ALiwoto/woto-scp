@@ -303,21 +303,17 @@ async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
     return html_link(value, link, *argv)
 
 async def html_mention(value: Union[User, Union[Chat, int]], name: str = None, client: Client = None, *argv):
+    if isinstance(value, str):
+        value: Chat = await client.get_chat(user_ids=value)
+    
     if isinstance(value, Chat):
         if value.type != ChatType.PRIVATE and value.type != ChatType.BOT:
             if not name: name = value.title
-            # this value can't really be mentioned... so
             return html_normal_chat_link(name, value, *argv)
-    
-    if isinstance(value, str):
-        the_chat: Chat = await client.get_chat(user_ids=value)
-        if the_chat.type != ChatType.PRIVATE and the_chat.type != ChatType.BOT:
-            if not name: name = the_chat.title
-            return html_normal_chat_link(name, the_chat, *argv)
         
         if not name:
-            name = f"{the_chat.first_name} {the_chat.last_name}"[:24]
-        value = the_chat.id
+            name = f"{value.first_name} {value.last_name}"[:24]
+        value = value.id
 
     if isinstance(value, int):
         if not name and client:
