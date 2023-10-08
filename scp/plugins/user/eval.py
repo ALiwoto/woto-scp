@@ -326,6 +326,8 @@ async def get_id_handler(_, message: Message):
             my_title: str = ''
             if current.chat.first_name: my_title += current.chat.first_name
             if current.chat.last_name: my_title += current.chat.last_name
+            else: current.chat.last_name = '' # to prevent showing "None"
+
             if current.chat.username: my_title += current.chat.username
             if current.chat.title: my_title += current.chat.title
             if not my_title: continue
