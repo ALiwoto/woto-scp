@@ -43,6 +43,13 @@ class WotoConfig:
     azure_api_key: str = ''
     azure_api_region: str = ''
 
+    use_proxy :bool = False
+    scheme : str = ''
+    hostname : str = ''
+    port : int = 0
+    username : str = ''
+    password : str = ''
+
     def __init__(self, config_file='config.ini') -> None:
         self._the_config = ConfigParser()
         self._the_config.read(config_file)
@@ -86,7 +93,12 @@ class WotoConfig:
             self.load_avalon()
         except Exception as e:
             logging.warning(e, stacklevel=3)
-        
+
+        # proxy configuration
+        try:
+            self.load_proxy()
+        except Exception as e:
+            logging.warning(e, stacklevel=3)
     
     def load_sibyl_config(self) -> None:
         self._special_users = list_map(int, self._the_config.get('sibyl-system', 'enforcers').split())
@@ -117,6 +129,15 @@ class WotoConfig:
         self.avalon_pms = self._the_config.getint('avalon', 'avalon_pms', fallback=0)
         self.avalon_bots = self._the_config.getint('avalon', 'avalon_bots', fallback=0)
         self.avalon_tags = self._the_config.getint('avalon', 'avalon_tags', fallback=0)
+
+    def load_proxy(self) -> None:
+        self.use_proxy = self._the_config.getboolean('proxy', 'use_proxy', fallback=False)
+        self.scheme = self._the_config.get('proxy', 'scheme', fallback='')
+        self.hostname = self._the_config.get('proxy', 'hostname', fallback='')
+        self.port = self._the_config.getint('proxy', 'port', fallback=0)
+        self.username = self._the_config.get('proxy', 'username', fallback=None)
+        self.password = self._the_config.get('proxy', 'password', fallback=None)
+
 
     def is_sudo(self, user: int) -> bool:
         return user in self._owner_users or user in self._sudo_users

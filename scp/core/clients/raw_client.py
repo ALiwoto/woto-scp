@@ -103,6 +103,15 @@ class ScpClient(WotoPyroClient):
         the_scp_bot: 'ScpClient' = None
     ):
         self.name = name
+        proxy = None
+        if the_config.use_proxy:
+            proxy = {
+                "scheme": the_config.scheme,  # "socks4", "socks5" and "http" are supported
+                "hostname": the_config.hostname,
+                "port": the_config.port,
+                "username": the_config.username,
+                "password": the_config.password
+            }
         super().__init__(
             name=name,
             api_id=the_config.api_id,
@@ -111,6 +120,7 @@ class ScpClient(WotoPyroClient):
             device_model='kaizoku',
             app_version='woto-scp',
             no_updates=False,
+            proxy = proxy,
         )
         self.is_scp_bot = is_scp_bot
         if is_scp_bot:
@@ -526,4 +536,3 @@ class ScpClient(WotoPyroClient):
 
     auto_read_enabled = True
     avalon_system_enabled = True
-
