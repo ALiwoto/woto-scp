@@ -320,6 +320,21 @@ async def cancel_exec(_, query: CallbackQuery):
 )
 async def get_id_handler(_, message: Message):
     message = message.reply_to_message or message
+    user_input = user.get_non_cmd(message)
+    if user_input:
+        text = user.html_bold("Result:")
+        for current in await user.get_my_dialogs():
+            my_title: str = ''
+            if current.chat.first_name: my_title += current.chat.first_name
+            else: continue
+            my_title = my_title.lower()
+            if my_title.find(user_input) != -1: 
+                id = current.chat.id
+                first_name = str(current.chat.first_name)
+                text += (f"\n  {await user.html_mention(id,first_name)} {user.html_mono(str(id))}")
+        return await message.reply_text(text)
+
+
     media = get_media_attr(
         message,
         [
