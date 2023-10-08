@@ -3,7 +3,6 @@ from pyzxing import BarCodeReader
 from io import BytesIO
 import os
 
-
 __PLUGIN__ = 'qrCode'
 __DOC__ = str(
     user.md.KanTeXDocument(
