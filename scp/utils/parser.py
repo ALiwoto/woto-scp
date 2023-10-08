@@ -4,6 +4,7 @@ from pyrogram import types
 import html
 import re
 from pyrogram.client import Client
+from pyrogram.enums.chat_type import ChatType
 from pyrogram.enums.message_service_type import MessageServiceType
 from pyrogram.types import (
     User,
@@ -187,8 +188,8 @@ def humanize_time(seconds: int) -> str:
     return ping_time
 
 
-def get_media_attr(message: Message, Attr: list):
-    for attribute in Attr:
+def get_media_attr(message: Message, attr: list):
+    for attribute in attr:
         attr = getattr(message, attribute)
         if attr:
             return attr
@@ -301,20 +302,37 @@ async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
 
     return html_link(value, link, *argv)
 
-async def html_mention(value: Union[User, int], name: str = None, client: Client = None, *argv):
+async def html_mention(value: Union[User, Chat, int], name: str = None, client: Client = None, *argv):
+    if isinstance(value, Chat):
+        if value.type != ChatType.PRIVATE and value.type != ChatType.BOT:
+            if not name: name = value.title
+            # this value can't really be mentioned... so
+            return html_normal_chat_link(name, value, *argv)
+    
+    if isinstance(value, str):
+        the_chat: Chat = await client.get_chat(user_ids=value)
+        if the_chat.type != ChatType.PRIVATE and the_chat.type != ChatType.BOT:
+            if not name: name = the_chat.title
+            return html_normal_chat_link(name, the_chat, *argv)
+        
+        if not name:
+            name = f"{the_chat.first_name} {the_chat.last_name}"[:24]
+        value = the_chat.id
+
     if isinstance(value, int):
         if not name and client:
             try:
-                the_user: User
-                the_user = await client.get_users(user_ids=value)
-                name = the_user.first_name
+                the_user: User = await client.get_users(user_ids=value)
+                name = f"{the_user.first_name} {the_user.last_name}"[:24]
             except Exception:
                 return html_mono(value, *argv)
         elif not name:
             name = str(value)
         return f"<a href=tg://user?id={value}>{html.escape(name)}</a>"
     elif isinstance(value, User):
-        return f"<a href=tg://user?id={value.id}>{html.escape(value.first_name)}</a>"
+        if not name:
+            name = f"{value.first_name} {value.last_name}"[:24]
+        return f"<a href=tg://user?id={value.id}>{html.escape(name)}</a>"
 
 def html_mention_by_user(value: User, *argv):
     if not isinstance(value, User):
