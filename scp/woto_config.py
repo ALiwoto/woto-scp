@@ -12,6 +12,8 @@ class WotoConfig:
 
     api_id: str = ''
     api_hash: str = ''
+    device_model: str = ''
+    app_version: str = ''
 
     _sudo_users: typing.List[int] = []
     _owner_users: typing.List[int] = []
@@ -24,6 +26,7 @@ class WotoConfig:
     dump_usernames = []
     private_resources: int = 0
     shared_channel: int = 0
+    auto_read_mode: int =  0
     gdrive_upload_folder_id: str = None
 
     _enforcers = []
@@ -44,11 +47,11 @@ class WotoConfig:
     azure_api_region: str = ''
 
     use_proxy :bool = False
-    scheme : str = ''
-    hostname : str = ''
-    port : int = 0
-    username : str = ''
-    password : str = ''
+    proxy_scheme : str = ''
+    proxy_hostname : str = ''
+    proxy_port : int = 0
+    proxy_username : str = ''
+    proxy_password : str = ''
 
     def __init__(self, config_file='config.ini') -> None:
         self._the_config = ConfigParser()
@@ -56,6 +59,8 @@ class WotoConfig:
 
         self.api_id = self._the_config.get('pyrogram', 'api_id')
         self.api_hash = self._the_config.get('pyrogram', 'api_hash')
+        self.device_model = self._the_config.get('pyrogram', 'device_model', fallback='Kaizoku v1.2')
+        self.app_version = self._the_config.get('pyrogram', 'app_version', fallback='woto-scp v0.0.1')
 
         self._owner_users = list_map(int, self._the_config.get('woto-scp', 'owner_list').split())
         self._sudo_users = list_map(int, self._the_config.get('woto-scp', 'sudo_list').split())
@@ -66,8 +71,9 @@ class WotoConfig:
         )
         self.log_channel = self._the_config.getint('woto-scp', 'log_channel', fallback='')
         self.dump_usernames = self._the_config.get('woto-scp', 'public_dumps', fallback='').split()
-        self.private_resources = self._the_config.getint('woto-scp', 'private_resources')
+        self.private_resources = self._the_config.getint('woto-scp', 'private_resources', fallback=0)
         self.shared_channel = self._the_config.getint('woto-scp', 'shared_channel', fallback=self.private_resources)
+        self.auto_read_mode = self._the_config.getint('woto-scp', 'auto_read_mode', fallback=0)
         self.gdrive_upload_folder_id = self._the_config.get('woto-scp', 'gdrive_upload_folder_id', fallback='')
 
         # sibyl configuration
@@ -132,11 +138,11 @@ class WotoConfig:
 
     def load_proxy(self) -> None:
         self.use_proxy = self._the_config.getboolean('proxy', 'use_proxy', fallback=False)
-        self.scheme = self._the_config.get('proxy', 'scheme', fallback='')
-        self.hostname = self._the_config.get('proxy', 'hostname', fallback='')
-        self.port = self._the_config.getint('proxy', 'port', fallback=0)
-        self.username = self._the_config.get('proxy', 'username', fallback=None)
-        self.password = self._the_config.get('proxy', 'password', fallback=None)
+        self.proxy_scheme = self._the_config.get('proxy', 'scheme', fallback='')
+        self.proxy_hostname = self._the_config.get('proxy', 'hostname', fallback='')
+        self.proxy_port = self._the_config.getint('proxy', 'port', fallback=0)
+        self.proxy_username = self._the_config.get('proxy', 'username', fallback=None)
+        self.proxy_password = self._the_config.get('proxy', 'password', fallback=None)
 
 
     def is_sudo(self, user: int) -> bool:
