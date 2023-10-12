@@ -106,21 +106,22 @@ class ScpClient(WotoPyroClient):
         proxy = None
         if the_config.use_proxy:
             proxy = {
-                "scheme": the_config.scheme,  # "socks4", "socks5" and "http" are supported
-                "hostname": the_config.hostname,
-                "port": the_config.port,
-                "username": the_config.username,
-                "password": the_config.password
+                "scheme": the_config.proxy_scheme,  # "socks4", "socks5" and "http" are supported
+                "hostname": the_config.proxy_hostname,
+                "port": the_config.proxy_port,
+                "username": the_config.proxy_username,
+                "password": the_config.proxy_password
             }
+        
         super().__init__(
             name=name,
             api_id=the_config.api_id,
             api_hash=the_config.api_hash,
             workers=16,
-            device_model='kaizoku',
-            app_version='woto-scp',
+            device_model=the_config.device_model,
+            app_version=the_config.app_version,
             no_updates=False,
-            proxy = proxy,
+            proxy=proxy,
         )
         self.is_scp_bot = is_scp_bot
         if is_scp_bot:
