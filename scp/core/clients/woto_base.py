@@ -70,6 +70,11 @@ class WotoClientBase(Client):
         # remove all non-printable characters from the code.
         return txt.replace("\u00A0", "").strip()
 
+    def remove_file(self, file_name: str) -> None:
+        try:
+            os.remove(file_name)
+        except: return None
+    
     async def forward_messages(
         self,
         chat_id: Union[int, str],

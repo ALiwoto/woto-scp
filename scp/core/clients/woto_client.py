@@ -7,6 +7,8 @@ from pyrogram.file_id import FileId
 from .woto_base import (
     WotoClientBase,
 )
+import yt_dlp
+
 
 class WotoPyroClient(WotoClientBase):
     ffmpeg_path: str = 'ffmpeg'
@@ -33,3 +35,5 @@ class WotoPyroClient(WotoClientBase):
             progress=progress,
             progress_args=progress_args
         )
+    
+    yt_client: yt_dlp.YoutubeDL = yt_dlp.YoutubeDL(params={"no_color": True})
