@@ -96,11 +96,13 @@ celerybeat-schedule
 # Environments
 .env
 .venv
+.woto
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+woto/
 
 # Spyder project settings
 .spyderproject
