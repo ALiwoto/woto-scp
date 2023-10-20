@@ -297,11 +297,30 @@ class ScpClient(WotoPyroClient):
             except Exception:
                 pass
 
-    # async def eval_base(client: user, message: Message, code: str, silent: bool = False):
-    eval_base = None
-    # async def shell_base(message: Message, command: str):
-    shell_base = None
+    async def eval_base(self, client, message, code: str, silent: bool = False):
+        """
+        Runs a python code and returns the output.
+        """
 
+        # not implemented here, but it's supposed to be implemented in
+        # the plugins. If no plugin is implementing it, this method
+        # will do nothing.
+        # This definition here is only for documentation purposes.
+        pass
+    
+
+    async def shell_base(self, message, command: str):
+        """
+        Runs a shell command.
+        """
+
+        # not implemented here, but it's supposed to be implemented in
+        # the plugins. If no plugin is implementing it, this method
+        # will do nothing.
+        # This definition here is only for documentation purposes.
+        pass
+    
+    
     async def send_message(
         self,
         chat_id: typing.Union[int, str],
@@ -495,8 +514,7 @@ class ScpClient(WotoPyroClient):
         
         return getattr(getattr(message_from_bot, message_from_bot.media.name.lower(), None), 
                        "file_id", None)
-        
-
+    
     original_phone_number: str = ''
     is_scp_bot: bool = False
     wordle_global_config = None

@@ -127,7 +127,11 @@ async def screen_handler(_, message: Message):
 async def curl_handler(_, message: Message):
     await shell_base(message, message.text[1:])
 
-async def shell_base(message: Message, command: str, silent_on_success: bool = False):
+async def shell_base(
+    message: Message = None, 
+    command: str = None, 
+    silent_on_success: bool = False,
+):
     reply = await message.reply_text('Executing...', quote=True)
     process = await asyncio.create_subprocess_shell(
         command,
