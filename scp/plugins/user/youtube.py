@@ -168,6 +168,7 @@ async def _(_, query: CallbackQuery):
                     silent_on_success=True,
                     throw_on_error=True,
                 )
+            user.remove_file(file_name)
             file_name = correct_file_name
         except: pass # fallback to just sending original file
     
