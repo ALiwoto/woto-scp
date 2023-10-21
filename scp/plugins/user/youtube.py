@@ -132,7 +132,7 @@ async def _(_, query: CallbackQuery):
         # convert the file to mp3 with ffmpeg if it's not mp3
         if not file_name.endswith(".mp3"):
             correct_file_name = file_name.replace(file_name.split(".")[-1], "mp3")
-            user.remove_file(file_name)
+            user.remove_file(correct_file_name)
             await user.shell_base(
                 message=media_info["user_message"],
                 command=f"{user.ffmpeg_path} -i \"{file_name}\" \"{correct_file_name}\" -hide_banner -loglevel error",
