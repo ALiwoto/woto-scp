@@ -67,8 +67,8 @@ async def yt_handler(_, message: Message):
                 reply_markup=keyboard,
             )
             result["sent_message"] = sent_message
-    except Exception as err:
-        print(err)
+            return
+    except: pass
 
     # fallback to text
     await message.reply_text(
