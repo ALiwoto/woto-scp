@@ -135,7 +135,7 @@ async def _(_, query: CallbackQuery):
             user.remove_file(file_name)
             await user.shell_base(
                 message=media_info["user_message"],
-                command=f"{user.ffmpeg_path} -i {file_name} {correct_file_name} -hide_banner -loglevel error",
+                command=f"{user.ffmpeg_path} -i \"{file_name}\" \"{correct_file_name}\" -hide_banner -loglevel error",
                 silent_on_success=True
             )
             file_name = correct_file_name
