@@ -49,6 +49,7 @@
         "opage",
         "popen",
         "postprocessors",
+        "preferedformat",
         "preferredcodec",
         "preferredquality",
         "psutil",
