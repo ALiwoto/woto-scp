@@ -165,7 +165,7 @@ async def _(_, query: CallbackQuery):
             file_name = correct_file_name
         except: pass # fallback to just sending original file
     
-    if query_data[2] == "mp3":
+    if media_format == "mp3":
         await user.send_audio(
             chat_id=media_info["chat_id"],
             audio=file_name,
