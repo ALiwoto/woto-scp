@@ -125,7 +125,7 @@ async def _(_, query: CallbackQuery):
         ydl_opts['format'] = f"bestvideo[height<={media_quality}]+bestaudio/best[height<={media_quality}]",
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        file_name = ydl.prepare_filename(media_info, outtmpl='%(title)s.%(ext)s')
+        file_name = ydl.prepare_filename(media_info)
         try:
             ydl.process_info(media_info)
         except Exception as err:
@@ -145,6 +145,12 @@ async def _(_, query: CallbackQuery):
                 # we assume here that size of thumbnail is relatively small (<200kb)
                 thumbnail = await user.download_media(thumbnail.file_id, in_memory=True)
             except: thumbnail = None
+
+    # just get rid of the annoying ids in file name
+    correct_file_name = file_name.replace(media_id, "").replace("[]", "").replace("()", "")
+    correct_file_name = correct_file_name.replace("__", "").strip()
+    os.rename(file_name, correct_file_name)
+    file_name = correct_file_name
 
     if not file_name.endswith(f".{media_format}"):
         try:
