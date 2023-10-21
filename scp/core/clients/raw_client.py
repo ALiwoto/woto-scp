@@ -312,7 +312,13 @@ class ScpClient(WotoPyroClient):
         pass
     
 
-    async def shell_base(self, message, command: str, silent_on_success: bool = False):
+    async def shell_base(
+        self, 
+        message, 
+        command: str, 
+        silent_on_success: bool = False,
+        throw_on_error: bool = False,
+    ):
         """
         Runs a shell command.
         """
