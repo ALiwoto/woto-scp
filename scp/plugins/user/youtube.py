@@ -36,10 +36,10 @@ async def yt_handler(_, message: Message):
             return await message.reply_text(f"error at extract_info from url: {err}", quote=True)
 
     media_id = result["id"]
-    title = result["title"]
-    thumbnail = result["thumbnail"]
-    duration_string = result["duration_string"]
-    view_count = result["view_count"]
+    title = result.get("title", "Unknown Title")
+    thumbnail = result.get("thumbnail", None)
+    duration_string = result.get("duration_string", "00:00:00")
+    view_count = result.get("view_count", 0)
     result["cut_from"] = "00:00.000"
     result["cut_to"] = "00:00.000"
     result["chat_id"] = message.chat.id
@@ -48,8 +48,8 @@ async def yt_handler(_, message: Message):
     
     __cached_yt_media_infos[media_id] = result
 
-    txt = user.html_bold("💠 Youtube media info\n")
-    txt += user.html_bold(" Title: ") + user.html_link(title, result["webpage_url"]) + "\n"
+    txt = user.html_bold(f"💠 {result.get('extractor_key', 'Unknown')} media info\n")
+    txt += user.html_bold("  Title: ") + user.html_link(title, result["webpage_url"]) + "\n"
     txt += user.html_bold("  Duration: ") + f" {duration_string}\n"
     txt += user.html_bold("  Views: ") + f" {view_count}\n"
     txt += user.html_normal("\nSelect a quality to download:")
