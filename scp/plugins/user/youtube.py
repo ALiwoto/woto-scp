@@ -99,6 +99,8 @@ async def _(_, query: CallbackQuery):
         "Now downloading... please wait...",
         show_alert=True,
     )
+    await query.edit_message_reply_markup(reply_markup=None)
+    
     ydl_opts: dict = {}
     if query_data[2] == "mp3":
         ydl_opts = {
@@ -140,7 +142,6 @@ async def _(_, query: CallbackQuery):
                 thumbnail = await user.download_media(thumbnail.file_id, in_memory=True)
             except: thumbnail = None
 
-    await query.edit_message_reply_markup(reply_markup=None)
     if query_data[2] == "mp3":
         # convert the file to mp3 with ffmpeg if it's not mp3
         if not file_name.endswith(".mp3"):
