@@ -132,7 +132,7 @@ async def _(_, query: CallbackQuery):
             )
     
     thumbnail = None
-    if isinstance(media_info["sent_message"], Message):
+    if isinstance(getattr(media_info, "sent_message", None), Message):
         thumbnail = getattr(media_info["sent_message"], "user_photo", None)
         if thumbnail:
             try:
