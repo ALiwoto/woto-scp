@@ -10,6 +10,7 @@ import os
 __PLUGIN__ = 'youtube'
 
 
+_SEP_CHAR = "+-()-+"
 __cached_yt_media_infos = {}
 
 @user.on_message(
@@ -48,13 +49,15 @@ async def yt_handler(_, message: Message):
     txt += user.html_bold("  Duration: ") + f" {duration_string}\n"
     txt += user.html_bold("  Views: ") + f" {view_count}\n"
     txt += user.html_normal("\nSelect a quality to download:")
+
+    k_id = f"{_SEP_CHAR}{media_id}{_SEP_CHAR}"
     keyboard = [
-        {"Mp3" : f"yt_{media_id}_mp3"},
-        {"240p" : f"yt_{media_id}_240"},
-        {"360p" : f"yt_{media_id}_360"},
-        {"480p" : f"yt_{media_id}_480"},
-        {"720p" : f"yt_{media_id}_720"},
-        {"1080p" : f"yt_{media_id}_1080"},
+        {"Mp3" : f"yt{k_id}mp3"},
+        {"240p" : f"yt_{k_id}_240"},
+        {"360p" : f"yt_{k_id}_360"},
+        {"480p" : f"yt_{k_id}_480"},
+        {"720p" : f"yt_{k_id}_720"},
+        {"1080p" : f"yt_{k_id}_1080"},
     ]
 
     try:
@@ -76,21 +79,20 @@ async def yt_handler(_, message: Message):
     & bot.filters.regex('^yt_'),
 )
 async def _(_, query: CallbackQuery):
-    query_data = query.data.split("_")
+    query_data = query.data.split(_SEP_CHAR)
     if len(query_data) != 3:
         return await query.answer(
             "bad callback data",
             show_alert=True,
         )
-        
-    
+
     media_info = __cached_yt_media_infos.get(query_data[1], None)
     if not media_info:
         return await query.answer(
-            "media info not found",
+            "media info not found... please rerun the command",
             show_alert=True,
         )
-    
+
     ydl_opts: dict = {}
     if query_data[2] == "mp3":
         ydl_opts = {
