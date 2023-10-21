@@ -154,7 +154,7 @@ async def _(_, query: CallbackQuery):
 
     if not os.path.exists(file_name) and os.path.exists(the_info['filepath']):
         # just switch over...
-        file_name = media_info['filepath']
+        file_name = the_info['filepath']
     
     # just get rid of the annoying ids in file name
     correct_file_name = file_name.replace(media_id, "").replace("[]", "").replace("()", "")
@@ -164,7 +164,7 @@ async def _(_, query: CallbackQuery):
 
     if not file_name.endswith(f".{media_format}"):
         try:
-            correct_file_name = file_name.replace(file_name.split(".")[-1], media_format)
+            correct_file_name = file_name.replace(file_name.split(".")[-1].strip(), media_format)
             # only mp3 requires re-encoding
             cp_arg = "-c copy" if media_format != "mp3" else ""
             if not os.path.exists(correct_file_name):
