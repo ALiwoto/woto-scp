@@ -53,10 +53,8 @@ async def yt_handler(_, message: Message):
     k_id = f"{_SEP_CHAR}{media_id}{_SEP_CHAR}"
     keyboard = [
         {"Mp3" : f"yt{k_id}mp3"},
-        {"240p" : f"yt_{k_id}_240"},
-        {"360p" : f"yt_{k_id}_360"},
-        {"480p" : f"yt_{k_id}_480"},
-        {"720p" : f"yt_{k_id}_720"},
+        {"240p" : f"yt_{k_id}_240", "360p" : f"yt_{k_id}_360"},
+        {"480p" : f"yt_{k_id}_480", "720p" : f"yt_{k_id}_720"},
         {"1080p" : f"yt_{k_id}_1080"},
     ]
 
@@ -115,7 +113,13 @@ async def _(_, query: CallbackQuery):
         try:
             ydl.process_info(media_info)
         except Exception as err:
-            return await query.message.reply_text(f"error at process_info: {err}", quote=True)
+            txt = user.html_bold("Error at process_info: \n")
+            txt += user.html_mono(f"{err}")
+            return await user.send_message(
+                text=txt,
+                chat_id=media_info["chat_id"],
+                reply_to_message_id=media_info["message_id"],
+            )
     
     if query_data[2] == "mp3":
         # convert the file to mp3 with ffmpeg if it's not mp3
