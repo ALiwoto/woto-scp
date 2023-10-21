@@ -109,24 +109,21 @@ async def _(_, query: CallbackQuery):
     )
     await query.edit_message_reply_markup(reply_markup=None)
 
-    ydl_opts: dict = {}
+    ydl_opts = {
+        'o': '%(title)s.%(ext)s',
+        'quiet': True,
+        'noprogress': True,
+    }
+    
     if media_format == "mp3":
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '320',
-            }],
-            "quiet": True,
-            'noprogress': True,
-        }
+        ydl_opts['format'] = 'bestaudio/best'
+        ydl_opts['postprocessors'] = [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '320',
+        }]
     else:
-        ydl_opts = {
-            "format": f"bestvideo[height<={media_quality}]+bestaudio/best[height<={media_quality}]",
-            "quiet": True,
-            'noprogress': True,
-        }
+        ydl_opts['format'] = f"bestvideo[height<={media_quality}]+bestaudio/best[height<={media_quality}]",
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         file_name = ydl.prepare_filename(media_info)
