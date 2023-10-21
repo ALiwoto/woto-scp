@@ -146,6 +146,10 @@ async def _(_, query: CallbackQuery):
                 thumbnail = await user.download_media(thumbnail.file_id, in_memory=True)
             except: thumbnail = None
 
+    if not os.path.exists(file_name) and os.path.exists(media_info['filepath']):
+        # just switch over...
+        file_name = media_info['filepath']
+    
     # just get rid of the annoying ids in file name
     correct_file_name = file_name.replace(media_id, "").replace("[]", "").replace("()", "")
     correct_file_name = correct_file_name.replace("__", "").strip()
