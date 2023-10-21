@@ -110,7 +110,6 @@ async def _(_, query: CallbackQuery):
     await query.edit_message_reply_markup(reply_markup=None)
 
     ydl_opts = {
-        'o': '%(title)s.%(ext)s',
         'quiet': True,
         'noprogress': True,
     }
@@ -126,7 +125,7 @@ async def _(_, query: CallbackQuery):
         ydl_opts['format'] = f"bestvideo[height<={media_quality}]+bestaudio/best[height<={media_quality}]",
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        file_name = ydl.prepare_filename(media_info)
+        file_name = ydl.prepare_filename(media_info, outtmpl='%(title)s.%(ext)s')
         try:
             ydl.process_info(media_info)
         except Exception as err:
