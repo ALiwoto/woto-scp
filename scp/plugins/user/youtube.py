@@ -11,6 +11,9 @@ __PLUGIN__ = 'youtube'
 
 
 _SEP_CHAR = "+-()-+"
+
+# ffmpeg's args for hiding banner and errors
+_FG_ARGS = "-hide_banner -loglevel error -y"
 __cached_yt_media_infos = {}
 
 @user.on_message(
@@ -150,10 +153,12 @@ async def _(_, query: CallbackQuery):
     if not file_name.endswith(f".{media_format}"):
         try:
             correct_file_name = file_name.replace(file_name.split(".")[-1], media_format)
+            # only mp3 requires re-encoding
+            cp_arg = "-c copy" if media_format != "mp3" else ""
             if not os.path.exists(correct_file_name):
                 await user.shell_base(
                     message=media_info["user_message"],
-                    command=f"{user.ffmpeg_path} -i \"{file_name}\" \"{correct_file_name}\" -hide_banner -loglevel error -y",
+                    command=f"{user.ffmpeg_path} -i \"{file_name}\" {cp_arg} \"{correct_file_name}\" {_FG_ARGS}",
                     silent_on_success=True,
                     throw_on_error=True,
                 )
