@@ -35,5 +35,3 @@ class WotoPyroClient(WotoClientBase):
             progress=progress,
             progress_args=progress_args
         )
-    
-    yt_client: yt_dlp.YoutubeDL = yt_dlp.YoutubeDL(params={"no_color": True})

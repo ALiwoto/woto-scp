@@ -61,13 +61,16 @@ async def yt_handler(_, message: Message):
 
     try:
         if thumbnail:
-            return await message.reply_photo(
+            sent_message = await message.reply_photo(
                 photo=thumbnail,
                 caption=txt,
                 reply_markup=keyboard,
             )
-    except: pass
+            result["sent_message"] = sent_message
+    except Exception as err:
+        print(err)
 
+    # fallback to text
     await message.reply_text(
         text=txt,
         reply_markup=keyboard,
@@ -128,6 +131,15 @@ async def _(_, query: CallbackQuery):
                 reply_to_message_id=media_info["message_id"],
             )
     
+    thumbnail = None
+    if isinstance(media_info["sent_message"], Message):
+        thumbnail = getattr(media_info["sent_message"], "user_photo", None)
+        if thumbnail:
+            try:
+                # we assume here that size of thumbnail is relatively small (<200kb)
+                thumbnail = await user.download_media(thumbnail.file_id, in_memory=True)
+            except: thumbnail = None
+
     if query_data[2] == "mp3":
         # convert the file to mp3 with ffmpeg if it's not mp3
         if not file_name.endswith(".mp3"):
@@ -146,7 +158,7 @@ async def _(_, query: CallbackQuery):
             caption=media_info["title"],
             reply_to_message_id=media_info["message_id"],
             duration=media_info["duration"],
-            # thumb=media_info["thumbnail"],
+            thumb=thumbnail,
         )
 
     # the media is a video
@@ -156,7 +168,7 @@ async def _(_, query: CallbackQuery):
         caption=media_info["title"],
         reply_to_message_id=media_info["message_id"],
         duration=media_info["duration"],
-        # thumb=media_info["thumbnail"],
+        thumb=thumbnail,
     )
-    os.remove(file_name)
+    user.remove_file(file_name)
     del __cached_yt_media_infos[query_data[1]]
