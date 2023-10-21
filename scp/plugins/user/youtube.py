@@ -88,7 +88,7 @@ async def _(_, query: CallbackQuery):
             show_alert=True,
         )
 
-    media_info = __cached_yt_media_infos.get(query_data[1], None)
+    media_info: dict = __cached_yt_media_infos.get(query_data[1], None)
     if not media_info:
         return await query.answer(
             "media info not found... please rerun the command",
@@ -100,7 +100,7 @@ async def _(_, query: CallbackQuery):
         show_alert=True,
     )
     await query.edit_message_reply_markup(reply_markup=None)
-    
+
     ydl_opts: dict = {}
     if query_data[2] == "mp3":
         ydl_opts = {
@@ -134,7 +134,7 @@ async def _(_, query: CallbackQuery):
             )
     
     thumbnail = None
-    if isinstance(getattr(media_info, "sent_message", None), Message):
+    if isinstance(media_info.get("sent_message", None), Message):
         thumbnail = getattr(media_info["sent_message"], "user_photo", None)
         if thumbnail:
             try:
