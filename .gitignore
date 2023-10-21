@@ -135,6 +135,7 @@ scp/plugins/private/*.py
 scp/plugins/private/*.sh
 test.py
 woto_files
+experience_files
 unknown_errors.txt
 bots.json
 

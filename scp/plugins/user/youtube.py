@@ -44,7 +44,7 @@ async def yt_handler(_, message: Message):
     __cached_yt_media_infos[media_id] = result
 
     txt = user.html_bold("💠 Youtube media info\n")
-    txt += user.html_bold("  Title:") + user.html_link(title, result["url"]) + "\n"
+    txt += user.html_bold("  Title:") + user.html_link(title, result["webpage_url"]) + "\n"
     txt += user.html_bold("  Duration:") + f" {duration_string}\n"
     txt += user.html_bold("  Views:") + f" {view_count}\n"
     txt += user.html_normal("\nSelect a quality to download:")
