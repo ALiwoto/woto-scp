@@ -53,10 +53,12 @@ async def yt_handler(_, message: Message):
 
     k_id = f"{_SEP_CHAR}{media_id}{_SEP_CHAR}"
     keyboard = [
-        {"Mp3" : f"ytDl{k_id}mp3"},
-        {"240p" : f"ytDl{k_id}240", "360p" : f"ytDl{k_id}360"},
-        {"480p" : f"ytDl{k_id}480", "720p" : f"ytDl{k_id}720"},
-        {"1080p" : f"ytDl{k_id}1080"},
+        {"Mp3" : f"ytDl{k_id}320_mp3"},
+        {"Mkv 240p" : f"ytDl{k_id}240_mkv", "Mp4 240p" : f"ytDl{k_id}240_mp4"},
+        {"Mkv 360p" : f"ytDl{k_id}360_mkv", "Mp4 360p" : f"ytDl{k_id}360_mp4"},
+        {"Mkv 480p" : f"ytDl{k_id}480_mkv",  "Mp4 480p" : f"ytDl{k_id}480_mp4"},
+        {"Mkv 720p" : f"ytDl{k_id}720_mkv", "Mp4 720p" : f"ytDl{k_id}720_mp4"},
+        {"Mkv 1080p" : f"ytDl{k_id}1080_mkv",  "Mp4 1080p" : f"ytDl{k_id}1080_mp4"}
     ]
 
     try:
@@ -88,7 +90,10 @@ async def _(_, query: CallbackQuery):
             show_alert=True,
         )
 
-    media_info: dict = __cached_yt_media_infos.get(query_data[1], None)
+    media_id = query_data[1]
+    media_quality, media_format = query_data[2].split("_")
+
+    media_info: dict = __cached_yt_media_infos.get(media_id, None)
     if not media_info:
         return await query.answer(
             "media info not found... please rerun the command",
@@ -102,7 +107,7 @@ async def _(_, query: CallbackQuery):
     await query.edit_message_reply_markup(reply_markup=None)
 
     ydl_opts: dict = {}
-    if query_data[2] == "mp3":
+    if media_format == "mp3":
         ydl_opts = {
             'format': 'bestaudio/best',
             'postprocessors': [{
@@ -116,10 +121,6 @@ async def _(_, query: CallbackQuery):
     else:
         ydl_opts = {
             "format": f"bestvideo[height<={query_data[2]}]+bestaudio/best[height<={query_data[2]}]",
-            'postprocessors': [{
-                'key': 'FFmpegVideoConvertor',
-                'preferedformat': 'mkv',
-            }],
             "quiet": True,
             'noprogress': True,
         }
@@ -146,18 +147,17 @@ async def _(_, query: CallbackQuery):
                 thumbnail = await user.download_media(thumbnail.file_id, in_memory=True)
             except: thumbnail = None
 
+    if not file_name.endswith(f".{media_format}"):
+        correct_file_name = file_name.replace(file_name.split(".")[-1], media_format)
+        if not os.path.exists(correct_file_name):
+            await user.shell_base(
+                message=media_info["user_message"],
+                command=f"{user.ffmpeg_path} -i \"{file_name}\" \"{correct_file_name}\" -hide_banner -loglevel error",
+                silent_on_success=True
+            )
+        file_name = correct_file_name
+    
     if query_data[2] == "mp3":
-        # convert the file to mp3 with ffmpeg if it's not mp3
-        if not file_name.endswith(".mp3"):
-            correct_file_name = file_name.replace(file_name.split(".")[-1], "mp3")
-            if not os.path.exists(correct_file_name):
-                await user.shell_base(
-                    message=media_info["user_message"],
-                    command=f"{user.ffmpeg_path} -i \"{file_name}\" \"{correct_file_name}\" -hide_banner -loglevel error",
-                    silent_on_success=True
-                )
-            file_name = correct_file_name
-        
         await user.send_audio(
             chat_id=media_info["chat_id"],
             audio=file_name,
@@ -167,7 +167,6 @@ async def _(_, query: CallbackQuery):
             thumb=thumbnail,
         )
     else:
-        # the media is a video
         await user.send_video(
             chat_id=media_info["chat_id"],
             video=file_name,
