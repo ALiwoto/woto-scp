@@ -45,6 +45,9 @@ __wp_client__: WotoClient = None
 
 
 def __get_wp_client__() -> WotoClient:
+    if not the_config.wp_host or not the_config.wp_username:
+        return None
+    
     global __wp_client__
     if __wp_client__:
         return __wp_client__
@@ -142,7 +145,7 @@ class ScpClient(WotoPyroClient):
             self.scp_config._owner_users.append(self.me.id)
             self.owner |= self.filters.user(self.me.id)
 
-        if not self.is_scp_bot:
+        if not self.is_scp_bot and self.wp:
             try:
                 await self.wp.start()
             except ClientAlreadyInitializedException:
@@ -309,7 +312,7 @@ class ScpClient(WotoPyroClient):
         pass
     
 
-    async def shell_base(self, message, command: str):
+    async def shell_base(self, message, command: str, silent_on_success: bool = False):
         """
         Runs a shell command.
         """

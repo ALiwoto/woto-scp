@@ -41,6 +41,7 @@ async def yt_handler(_, message: Message):
     result["cut_to"] = "00:00.000"
     result["chat_id"] = message.chat.id
     result["message_id"] = message.id
+    result["user_message"] = message
     
     __cached_yt_media_infos[media_id] = result
 
@@ -52,10 +53,10 @@ async def yt_handler(_, message: Message):
 
     k_id = f"{_SEP_CHAR}{media_id}{_SEP_CHAR}"
     keyboard = [
-        {"Mp3" : f"yt{k_id}mp3"},
-        {"240p" : f"yt_{k_id}_240", "360p" : f"yt_{k_id}_360"},
-        {"480p" : f"yt_{k_id}_480", "720p" : f"yt_{k_id}_720"},
-        {"1080p" : f"yt_{k_id}_1080"},
+        {"Mp3" : f"ytDl{k_id}mp3"},
+        {"240p" : f"ytDl{k_id}240", "360p" : f"ytDl{k_id}360"},
+        {"480p" : f"ytDl{k_id}480", "720p" : f"ytDl{k_id}720"},
+        {"1080p" : f"ytDl{k_id}1080"},
     ]
 
     try:
@@ -74,7 +75,7 @@ async def yt_handler(_, message: Message):
 
 @bot.on_callback_query(
     (user.sudo | user.owner) 
-    & bot.filters.regex('^yt_'),
+    & bot.filters.regex(f'^ytDl'),
 )
 async def _(_, query: CallbackQuery):
     query_data = query.data.split(_SEP_CHAR)
@@ -91,6 +92,10 @@ async def _(_, query: CallbackQuery):
             show_alert=True,
         )
 
+    await query.answer(
+        "Now downloading... please wait...",
+        show_alert=True,
+    )
     ydl_opts: dict = {}
     if query_data[2] == "mp3":
         ydl_opts = {
@@ -101,11 +106,13 @@ async def _(_, query: CallbackQuery):
                 'preferredquality': '320',
             }],
             "quiet": True,
+            'noprogress': True,
         }
     else:
         ydl_opts = {
             "format": f"bestvideo[height<={query_data[2]}]+bestaudio/best[height<={query_data[2]}]",
             "quiet": True,
+            'noprogress': True,
         }
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -126,7 +133,11 @@ async def _(_, query: CallbackQuery):
         if not file_name.endswith(".mp3"):
             correct_file_name = file_name.replace(file_name.split(".")[-1], "mp3")
             user.remove_file(file_name)
-            await user.shell_base(f"{user.ffmpeg_path} -i {file_name} {correct_file_name} -hide_banner -loglevel error")
+            await user.shell_base(
+                message=media_info["user_message"],
+                command=f"{user.ffmpeg_path} -i {file_name} {correct_file_name} -hide_banner -loglevel error",
+                silent_on_success=True
+            )
             file_name = correct_file_name
         
         return await user.send_audio(
@@ -135,7 +146,7 @@ async def _(_, query: CallbackQuery):
             caption=media_info["title"],
             reply_to_message_id=media_info["message_id"],
             duration=media_info["duration"],
-            thumb=media_info["thumbnail"],
+            # thumb=media_info["thumbnail"],
         )
 
     # the media is a video
@@ -145,7 +156,7 @@ async def _(_, query: CallbackQuery):
         caption=media_info["title"],
         reply_to_message_id=media_info["message_id"],
         duration=media_info["duration"],
-        thumb=media_info["thumbnail"],
+        # thumb=media_info["thumbnail"],
     )
     os.remove(file_name)
     del __cached_yt_media_infos[query_data[1]]
