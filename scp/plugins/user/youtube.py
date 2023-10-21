@@ -3,6 +3,7 @@ from pyrogram.types import (
     Message,
     CallbackQuery,
 )
+from scp.utils import format_bytes
 import yt_dlp
 import os
 
@@ -17,9 +18,9 @@ _FG_ARGS = "-hide_banner -loglevel error -y"
 __cached_yt_media_infos = {}
 
 @user.on_message(
-    (user.sudo | user.owner) &
+    (user.sudo | user.owner | user.special_users) &
     user.command(
-        ['yt', 'youtube'],
+        ['yt', 'youtube', 'tiktok'],
     ),
 )
 async def yt_handler(_, message: Message):
@@ -56,13 +57,34 @@ async def yt_handler(_, message: Message):
 
     k_id = f"{_SEP_CHAR}{media_id}{_SEP_CHAR}"
     keyboard = [
-        {"Mp3" : f"ytDl{k_id}320_mp3"},
-        {"Mkv 240p" : f"ytDl{k_id}240_mkv", "Mp4 240p" : f"ytDl{k_id}240_mp4"},
-        {"Mkv 360p" : f"ytDl{k_id}360_mkv", "Mp4 360p" : f"ytDl{k_id}360_mp4"},
-        {"Mkv 480p" : f"ytDl{k_id}480_mkv",  "Mp4 480p" : f"ytDl{k_id}480_mp4"},
-        {"Mkv 720p" : f"ytDl{k_id}720_mkv", "Mp4 720p" : f"ytDl{k_id}720_mp4"},
-        {"Mkv 1080p" : f"ytDl{k_id}1080_mkv",  "Mp4 1080p" : f"ytDl{k_id}1080_mp4"}
+        {"Mp3" : f"ytDl{k_id}320#$mp3"},
     ]
+
+    line_limit = 2
+    if len(result["formats"]) >= 40:
+        line_limit = 3
+    
+    current_sub_dict = {}
+    for current_format in result["formats"]:
+        if not isinstance(current_format, dict):
+            continue
+
+        video_ext: str = current_format.get("video_ext", None)
+        if not video_ext or video_ext.lower() == 'none':
+            continue
+        
+        the_size = current_format.get('filesize', None)
+        if not the_size and len(result["formats"]) >= 25:
+            continue
+
+        
+        btn_txt = f"{video_ext},{current_format['width']}"
+        if the_size: btn_txt += f",{format_bytes(the_size)}"
+        current_sub_dict[btn_txt] =  f"ytDl{k_id}{current_format['format_id']}#$key"
+
+        if len(current_sub_dict) == line_limit:
+            keyboard.append(current_sub_dict)
+            current_sub_dict = {}
 
     try:
         if thumbnail:
@@ -73,7 +95,8 @@ async def yt_handler(_, message: Message):
             )
             result["sent_message"] = sent_message
             return
-    except: pass
+    except Exception as ex:
+        print(f"failed to send photo: {ex}")
 
     # fallback to text
     await message.reply_text(
@@ -82,7 +105,7 @@ async def yt_handler(_, message: Message):
     )
 
 @bot.on_callback_query(
-    (user.sudo | user.owner) 
+    (user.sudo | user.owner | user.special_users) 
     & bot.filters.regex(f'^ytDl'),
 )
 async def _(_, query: CallbackQuery):
@@ -94,7 +117,8 @@ async def _(_, query: CallbackQuery):
         )
 
     media_id = query_data[1]
-    media_quality, media_format = query_data[2].split("_")
+    media_quality, media_format = query_data[2].split("#$")
+    is_from_key = media_format == "key"
 
     media_info: dict = __cached_yt_media_infos.get(media_id, None)
     if not media_info:
@@ -117,6 +141,12 @@ async def _(_, query: CallbackQuery):
                 'preferredcodec': 'mp3',
                 'preferredquality': '320',
             }],
+            "quiet": True,
+            'noprogress': True,
+        }
+    elif is_from_key:
+        ydl_opts = {
+            "format": media_quality,
             "quiet": True,
             'noprogress': True,
         }
@@ -162,6 +192,9 @@ async def _(_, query: CallbackQuery):
     os.rename(file_name, correct_file_name)
     file_name = correct_file_name
 
+    if is_from_key:
+        media_format = the_info.get("video_ext", None) or the_info.get("ext", "mp3")
+    
     if not file_name.endswith(f".{media_format}"):
         try:
             correct_file_name = file_name.replace(file_name.split(".")[-1].strip(), media_format)
@@ -193,7 +226,7 @@ async def _(_, query: CallbackQuery):
             video=file_name,
             caption=media_info["title"],
             reply_to_message_id=media_info["message_id"],
-            duration=media_info["duration"],
+            duration=int(media_info["duration"]),
             thumb=thumbnail,
         )
     

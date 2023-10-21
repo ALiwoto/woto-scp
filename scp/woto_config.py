@@ -107,7 +107,7 @@ class WotoConfig:
             logging.warning(e, stacklevel=3)
     
     def load_sibyl_config(self) -> None:
-        self._special_users = list_map(int, self._the_config.get('sibyl-system', 'enforcers').split())
+        self._enforcers = list_map(int, self._the_config.get('sibyl-system', 'enforcers').split())
         self._inspectors = list_map(int, self._the_config.get('sibyl-system', 'enforcers').split())
         self.sibyl_token = self._the_config.get('sibyl-system', 'token')
         self.public_listener = self._the_config.getint('sibyl-system', 'public_listener')
