@@ -140,6 +140,7 @@ async def _(_, query: CallbackQuery):
                 thumbnail = await user.download_media(thumbnail.file_id, in_memory=True)
             except: thumbnail = None
 
+    await query.edit_message_reply_markup(reply_markup=None)
     if query_data[2] == "mp3":
         # convert the file to mp3 with ffmpeg if it's not mp3
         if not file_name.endswith(".mp3"):
@@ -152,7 +153,7 @@ async def _(_, query: CallbackQuery):
                 )
             file_name = correct_file_name
         
-        return await user.send_audio(
+        await user.send_audio(
             chat_id=media_info["chat_id"],
             audio=file_name,
             caption=media_info["title"],
@@ -160,15 +161,16 @@ async def _(_, query: CallbackQuery):
             duration=media_info["duration"],
             thumb=thumbnail,
         )
-
-    # the media is a video
-    await user.send_video(
-        chat_id=media_info["chat_id"],
-        video=file_name,
-        caption=media_info["title"],
-        reply_to_message_id=media_info["message_id"],
-        duration=media_info["duration"],
-        thumb=thumbnail,
-    )
+    else:
+        # the media is a video
+        await user.send_video(
+            chat_id=media_info["chat_id"],
+            video=file_name,
+            caption=media_info["title"],
+            reply_to_message_id=media_info["message_id"],
+            duration=media_info["duration"],
+            thumb=thumbnail,
+        )
+    
     user.remove_file(file_name)
     del __cached_yt_media_infos[query_data[1]]
