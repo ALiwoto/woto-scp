@@ -120,7 +120,7 @@ async def _(_, query: CallbackQuery):
         }
     else:
         ydl_opts = {
-            "format": f"bestvideo[height<={query_data[2]}]+bestaudio/best[height<={query_data[2]}]",
+            "format": f"bestvideo[height<={media_quality}]+bestaudio/best[height<={media_quality}]",
             "quiet": True,
             'noprogress': True,
         }
