@@ -953,3 +953,31 @@ class WotoClientBase(Client):
         writer.close()
         await writer.wait_closed()
         return data
+    
+    async def get_parsed_updates(self, updates, filter_type) -> list:
+        if not isinstance(updates, list):
+            updates = [updates]
+        
+        all_parsed_updates = []
+        for current_updates in updates:
+            chats = getattr(current_updates, "chats", [])
+            chats = {c.id: c for c in chats}
+            users = getattr(current_updates, "users", [])
+            users = {u.id: u for u in users}
+                    
+            for update in current_updates.updates:
+                parser = self.dispatcher.update_parsers.get(type(update), None)
+                if not parser:
+                   continue
+                parsed_update, _ = (
+                    await parser(update, users, chats)
+                    if parser is not None
+                    else (None, type(None))
+                )
+
+                if filter_type and not isinstance(parsed_update, filter_type):
+                    continue
+
+                all_parsed_updates.append(parsed_update)
+        
+        return all_parsed_updates

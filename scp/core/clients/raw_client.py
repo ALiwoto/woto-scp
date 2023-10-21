@@ -368,15 +368,28 @@ class ScpClient(WotoPyroClient):
             self.the_bot.me.username,
             container.unique_id,
         )
+
+
+
+        all_updates = []
         for current_result in inline_response.results:
-            await self.send_inline_bot_result(
+            the_update = await self.send_inline_bot_result(
                 chat_id=chat_id,
                 query_id=inline_response.query_id,
                 result_id=current_result.id,
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id
             )
+            all_updates.append(the_update)
 
+        all_messages = await self.get_parsed_updates(all_updates, types.Message)
+        if not all_messages:
+            return None
+        elif len(all_messages) == 1:
+            return all_messages[0]
+        else:
+            return all_messages
+    
     async def send_photo(
         self,
         chat_id: typing.Union[int, str],
@@ -436,14 +449,27 @@ class ScpClient(WotoPyroClient):
             container.unique_id,
         )
 
+        all_updates = []
         for current_result in inline_response.results:
-            await self.send_inline_bot_result(
+            the_update = await self.send_inline_bot_result(
                 chat_id=chat_id,
                 query_id=inline_response.query_id,
                 result_id=current_result.id,
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id
             )
+            all_updates.append(the_update)
+
+        all_messages = await self.get_parsed_updates(all_updates, types.Message)
+        if not all_messages:
+            return None
+        elif len(all_messages) == 1:
+            setattr(all_messages[0], "user_photo", sent_message.photo)
+            return all_messages[0]
+        else:
+            for current in all_messages:
+                setattr(current, "user_photo", sent_message.photo)
+            return all_messages
 
     async def send_inline_bot_result(
         self,
