@@ -131,6 +131,7 @@ async def shell_base(
     message: Message = None, 
     command: str = None, 
     silent_on_success: bool = False,
+    throw_on_error: bool = False,
 ):
     reply = await message.reply_text('Executing...', quote=True)
     process = await asyncio.create_subprocess_shell(
@@ -141,9 +142,12 @@ async def shell_base(
     )
 
     stdout, _ = await process.communicate()
-    returncode = process.returncode
+    returnCode = process.returncode
+    if throw_on_error and returnCode != 0:
+        raise Exception(stdout.decode())
+    
     doc = user.md.KanTeXDocument()
-    sec = user.md.Section(f'ExitCode: {returncode}')
+    sec = user.md.Section(f'ExitCode: {returnCode}')
     stdout = stdout.decode().replace('\r', '').strip('\n').rstrip()
     if stdout:
         sec.append(user.md.Code(stdout))
@@ -155,12 +159,12 @@ async def shell_base(
             reply.delete(),
             message.reply_document(
                 f,
-                caption=f'ExitCode: {returncode}',
+                caption=f'ExitCode: {returnCode}',
                 quote=True,
             ),
         )
     else:
-        if silent_on_success and returncode == 0:
+        if silent_on_success and returnCode == 0:
             await reply.delete()
         else:
             await reply.edit_text(doc)

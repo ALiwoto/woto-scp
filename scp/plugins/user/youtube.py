@@ -148,14 +148,17 @@ async def _(_, query: CallbackQuery):
             except: thumbnail = None
 
     if not file_name.endswith(f".{media_format}"):
-        correct_file_name = file_name.replace(file_name.split(".")[-1], media_format)
-        if not os.path.exists(correct_file_name):
-            await user.shell_base(
-                message=media_info["user_message"],
-                command=f"{user.ffmpeg_path} -i \"{file_name}\" \"{correct_file_name}\" -hide_banner -loglevel error",
-                silent_on_success=True
-            )
-        file_name = correct_file_name
+        try:
+            correct_file_name = file_name.replace(file_name.split(".")[-1], media_format)
+            if not os.path.exists(correct_file_name):
+                await user.shell_base(
+                    message=media_info["user_message"],
+                    command=f"{user.ffmpeg_path} -i \"{file_name}\" \"{correct_file_name}\" -hide_banner -loglevel error",
+                    silent_on_success=True,
+                    throw_on_error=True,
+                )
+            file_name = correct_file_name
+        except: pass # fallback to just sending original file
     
     if query_data[2] == "mp3":
         await user.send_audio(
