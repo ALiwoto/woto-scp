@@ -118,7 +118,7 @@ async def _(_, query: CallbackQuery):
             "format": f"bestvideo[height<={query_data[2]}]+bestaudio/best[height<={query_data[2]}]",
             'postprocessors': [{
                 'key': 'FFmpegVideoConvertor',
-                'preferredcodec': 'mkv',
+                'preferedformat': 'mkv',
             }],
             "quiet": True,
             'noprogress': True,
