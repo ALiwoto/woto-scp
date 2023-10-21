@@ -153,7 +153,7 @@ async def _(_, query: CallbackQuery):
             if not os.path.exists(correct_file_name):
                 await user.shell_base(
                     message=media_info["user_message"],
-                    command=f"{user.ffmpeg_path} -i \"{file_name}\" \"{correct_file_name}\" -hide_banner -loglevel error",
+                    command=f"{user.ffmpeg_path} -i \"{file_name}\" \"{correct_file_name}\" -hide_banner -loglevel error -y",
                     silent_on_success=True,
                     throw_on_error=True,
                 )
