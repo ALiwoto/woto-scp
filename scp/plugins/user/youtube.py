@@ -122,7 +122,7 @@ async def _(_, query: CallbackQuery):
             'preferredquality': '320',
         }]
     else:
-        ydl_opts['format'] = f"bestvideo[height<={media_quality}p]+bestaudio/best[height<={media_quality}p]"
+        ydl_opts['format'] = f"video[height<={media_quality}]+audio/best[height<={media_quality}]"
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         file_name = ydl.prepare_filename(media_info)
