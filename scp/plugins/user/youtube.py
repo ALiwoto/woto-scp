@@ -15,6 +15,8 @@ _SEP_CHAR = "+-()-+"
 
 # ffmpeg's args for hiding banner and errors
 _FG_ARGS = "-hide_banner -loglevel error -y"
+# the output file name template.
+_OUT_TML = "%(title).200B.%(ext)s"
 __cached_yt_media_infos = {}
 
 @user.on_message(
@@ -143,21 +145,21 @@ async def _(_, query: CallbackQuery):
             }],
             "quiet": True,
             'noprogress': True,
-            "outtmpl": "%(id)s.%(ext)s",
+            "outtmpl": _OUT_TML,
         }
     elif is_from_key:
         ydl_opts = {
             "format": media_quality,
             "quiet": True,
             'noprogress': True,
-            "outtmpl": "%(id)s.%(ext)s",
+            "outtmpl": _OUT_TML,
         }
     else:
         ydl_opts = {
             "format": f"bestvideo[height<={media_quality}]+bestaudio/best[height<={media_quality}]",
             "quiet": True,
             'noprogress': True,
-            "outtmpl": "%(id)s.%(ext)s",
+            "outtmpl": _OUT_TML,
         }
     
     the_info: dict = None
