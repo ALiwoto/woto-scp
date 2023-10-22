@@ -79,8 +79,9 @@ async def yt_handler(_, message: Message):
         if not the_size and len(result["formats"]) >= 25:
             continue
 
-        
-        btn_txt = f"{video_ext},{current_format['width']}"
+        vid_width = current_format.get('width', None)
+        btn_txt = f"{video_ext}"
+        if vid_width: btn_txt += f",{vid_width}"
         if the_size: btn_txt += f",{format_bytes(the_size)}"
         current_sub_dict[btn_txt] =  f"ytDl{k_id}{current_format['format_id']}#$key"
 
