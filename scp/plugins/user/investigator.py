@@ -12,6 +12,9 @@ from pyrogram.errors import(
     EncryptedMessageInvalid,
     MediaCaptionTooLong,
 )
+from shortuuid import ShortUUID
+
+_operations_stats = {}
 
 @user.on_message(
 	~user.filters.forwarded &
@@ -117,19 +120,27 @@ async def pirate_handler(_, message: Message):
     except Exception as e:
         return await message.reply_text(user.html_mono(e))
 
+    unique_id = str(ShortUUID().random(length=8))
+    operation_info = {"canceled": False}
+    _operations_stats[unique_id] = operation_info
+
+    keyboard = [
+        {"refresh": "pirateRefresh_"},
+        {"cancel": f"pirateCancel_{unique_id}"},
+    ]
     link_pre = f'https://t.me/c/{str(the_chat.id)[4:]}/'
     channel_text = f'🥂 getting some stuff from ({from_id}) to ({to_id}) in 🏷{the_chat.title}\n'
-    channel_text += '✌️ target username is @' + the_chat.username + '📌 \n'
-    channel_text += f'📝 formoewt => @{the_chat.username} [' + user.html_mono(the_chat.id) + ']: '
+    channel_text += '✌️ the awesome uname is -> @' + the_chat.username + '<- \n'
+    channel_text += f'📝 formoewtt => @{the_chat.username} [' + user.html_mono(the_chat.id) + ']: '
     channel_text += user.html_link(from_id, link_pre + f'{from_id}') + '=>'
     channel_text += user.html_link(to_id, link_pre + f'{to_id}')
     channel_post: Message = await user.send_message(
         chat_id=user.private_resources,
         text=channel_text,
+        reply_markup=keyboard,
     )
 
     await channel_post.pin()
-    
     
     current_bot_index: int = 0
     done: int = 0
@@ -143,6 +154,7 @@ async def pirate_handler(_, message: Message):
                 message_id=index,
             )
             done += 1
+            await asyncio.sleep(0.5)
         except:
             failed += 1
             continue
@@ -152,6 +164,7 @@ async def pirate_handler(_, message: Message):
     text += user.html_mono(done, ' messages were pirated successfully.\n')
     text += user.html_mono(failed, ' messages were not pirated.')
     await message.reply_text(text, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
+
 
 @user.on_message(
 	~user.filters.forwarded &
