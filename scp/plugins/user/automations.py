@@ -64,7 +64,7 @@ async def gautoread_handler(_, message: Message):
 )
 async def auto_remove_bluetext_handler(_, message: Message):
     if not user.scp_config.auto_read_mode:
-        return await message.reply_text('Auto read is disabled globally in config.')
+        return
     
     if not user.auto_read_enabled or \
         message.chat.title.lower().find('test') != -1:
