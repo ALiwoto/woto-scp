@@ -143,18 +143,21 @@ async def _(_, query: CallbackQuery):
             }],
             "quiet": True,
             'noprogress': True,
+            "outtmpl": "%(id)s.%(ext)s",
         }
     elif is_from_key:
         ydl_opts = {
             "format": media_quality,
             "quiet": True,
             'noprogress': True,
+            "outtmpl": "%(id)s.%(ext)s",
         }
     else:
         ydl_opts = {
             "format": f"bestvideo[height<={media_quality}]+bestaudio/best[height<={media_quality}]",
             "quiet": True,
             'noprogress': True,
+            "outtmpl": "%(id)s.%(ext)s",
         }
     
     the_info: dict = None
