@@ -59,7 +59,7 @@ async def yt_handler(_, message: Message):
 
     k_id = f"{_SEP_CHAR}{media_id}{_SEP_CHAR}"
     keyboard = [
-        {"Mp3" : f"ytDl{k_id}320#$mp3"},
+        {"mp4 720p" : f"ytDl{k_id}720#$mp4", "Best" : f"ytDl{k_id}2500#$mp4", "Mp3" : f"ytDl{k_id}320#$mp3"},
     ]
 
     line_limit = 2
