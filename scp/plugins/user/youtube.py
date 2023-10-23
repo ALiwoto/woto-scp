@@ -1,4 +1,5 @@
 from scp import user, bot
+from typing import List
 from pyrogram.types import (
     Message,
     CallbackQuery,
@@ -63,18 +64,17 @@ async def yt_handler(_, message: Message):
         {"mp4 720p" : f"ytDl{k_id}720#$mp4", "Best" : f"ytDl{k_id}2500#$mp4", "Mp3" : f"ytDl{k_id}320#$mp3"},
     ]
 
-    correct_formats = []
+    correct_formats: List[dict] = []
     for current_format in result["formats"]:
         if not isinstance(current_format, dict):
             continue
 
         video_ext: str = current_format.get("video_ext", None)
         if not video_ext or video_ext.lower() == 'none':
-            continue
-
-        audio_ext: str = current_format.get("audio_ext", None)
-        if not audio_ext or audio_ext.lower() == 'none':
-            continue
+            video_ext = current_format.get("ext", None)
+            if not video_ext or not video_ext.lower().endswith("mp4"):
+                #TODO: maybe add a list as allowed formats here later?
+                continue
         
         correct_formats.append(current_format)
 
@@ -166,7 +166,7 @@ async def _(_, query: CallbackQuery):
         }
     elif is_from_key:
         ydl_opts = {
-            "format": media_quality,
+            "format": f"{media_quality}+bestaudio",
             "quiet": True,
             'noprogress': True,
             "outtmpl": _OUT_TML,
