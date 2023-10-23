@@ -3,6 +3,7 @@ from pyrogram.types import (
     Message,
     CallbackQuery,
 )
+from io import BytesIO
 from scp.utils import format_bytes
 import yt_dlp
 import os
@@ -32,7 +33,7 @@ async def yt_handler(_, message: Message):
         txt += user.html_mono("   .yt <url>")
         return await message.reply_text(txt, quote=True)
     
-    with yt_dlp.YoutubeDL() as ydl:
+    with yt_dlp.YoutubeDL({"extract_audio": True, "extract-audio": True}) as ydl:
         try:
             result = ydl.extract_info(user_input, download=False)
         except Exception as err:
@@ -62,11 +63,7 @@ async def yt_handler(_, message: Message):
         {"mp4 720p" : f"ytDl{k_id}720#$mp4", "Best" : f"ytDl{k_id}2500#$mp4", "Mp3" : f"ytDl{k_id}320#$mp3"},
     ]
 
-    line_limit = 2
-    if len(result["formats"]) >= 40:
-        line_limit = 3
-    
-    current_sub_dict = {}
+    correct_formats = []
     for current_format in result["formats"]:
         if not isinstance(current_format, dict):
             continue
@@ -74,9 +71,21 @@ async def yt_handler(_, message: Message):
         video_ext: str = current_format.get("video_ext", None)
         if not video_ext or video_ext.lower() == 'none':
             continue
+
+        audio_ext: str = current_format.get("audio_ext", None)
+        if not audio_ext or audio_ext.lower() == 'none':
+            continue
         
+        correct_formats.append(current_format)
+
+    line_limit = 2
+    if len(correct_formats) >= 20:
+        line_limit = 3
+    
+    current_sub_dict = {}
+    for current_format in correct_formats:
         the_size = current_format.get('filesize', None)
-        if not the_size and len(result["formats"]) >= 25:
+        if not the_size and len(correct_formats) >= 25:
             continue
 
         vid_width = current_format.get('width', None)
@@ -88,9 +97,16 @@ async def yt_handler(_, message: Message):
         if len(current_sub_dict) == line_limit:
             keyboard.append(current_sub_dict)
             current_sub_dict = {}
-
+            
     try:
         if thumbnail:
+            if not isinstance(thumbnail, BytesIO):
+                async with user.aioclient.get(
+                    url=thumbnail
+                ) as response:
+                    thumbnail = BytesIO(await response.read())
+                    result["thumbnail"] = thumbnail
+            
             sent_message = await message.reply_photo(
                 photo=thumbnail,
                 caption=txt,
@@ -154,6 +170,7 @@ async def _(_, query: CallbackQuery):
             "quiet": True,
             'noprogress': True,
             "outtmpl": _OUT_TML,
+            "extract_audio": True,
         }
     else:
         ydl_opts = {
