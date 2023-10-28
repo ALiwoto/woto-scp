@@ -550,6 +550,7 @@ class WotoClientBase(Client):
         disable_web_page_preview: bool = None,
         disable_notification: bool = None,
         reply_to_message_id: int = None,
+        message_thread_id: int = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
         reply_markup: Union[
@@ -571,6 +572,7 @@ class WotoClientBase(Client):
                 disable_web_page_preview=disable_web_page_preview,
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
+                message_thread_id=message_thread_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 reply_markup=reply_markup
@@ -585,10 +587,12 @@ class WotoClientBase(Client):
                 disable_web_page_preview=disable_web_page_preview,
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
+                message_thread_id=message_thread_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 reply_markup=reply_markup
             )
+
 
     def get_non_cmd(self, message: types.Message) -> str:
         my_strs = split_some(message.text or message.caption, 1, ' ', '\n')

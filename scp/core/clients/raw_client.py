@@ -340,6 +340,7 @@ class ScpClient(WotoPyroClient):
         reply_to_message_id: int = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
         reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup",
                                    "types.ReplyKeyboardRemove", "types.ForceReply"] = None
     ) -> "types.Message":
@@ -352,11 +353,12 @@ class ScpClient(WotoPyroClient):
                 disable_web_page_preview=disable_web_page_preview,
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
+                message_thread_id=message_thread_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 reply_markup=reply_markup,
             )
-
+        
         # if this is a user and is trying to send a message with keyboard buttons, automate
         # sending it with using inline through bot.
         if isinstance(reply_markup, (dict, list)):
