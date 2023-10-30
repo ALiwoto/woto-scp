@@ -93,8 +93,9 @@ CHARACTER_QUERY = '''query ($id: Int, $search: String) {
     }
 }'''
 
-def hide_spoiler(match):
-    return re.sub(r'\S', '█', match.group(1))
+def hide_spoiler(match: re.Match):
+    # return re.sub(r'\S', '█', match.group(1))
+    return f"<spoiler>{match.group(1)}</spoiler>"
 
 async def generate_media(anilist):
     title_romaji = anilist['title']['romaji']
