@@ -6,7 +6,8 @@ from datetime import datetime
 from typing import (
     NoReturn,
     Union,
-    Callable
+    Callable,
+    List
 )
 from pyrogram import (
     filters,
@@ -341,6 +342,9 @@ class ScpClient(WotoPyroClient):
         schedule_date: datetime = None,
         protect_content: bool = None,
         message_thread_id: int = None,
+        reply_to_story_id: int = None,
+        quote_text: str = None,
+        quote_entities: List["types.MessageEntity"] = None,
         reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup",
                                    "types.ReplyKeyboardRemove", "types.ForceReply"] = None
     ) -> "types.Message":
@@ -356,6 +360,9 @@ class ScpClient(WotoPyroClient):
                 message_thread_id=message_thread_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
+                reply_to_story_id=reply_to_story_id,
+                quote_text=quote_text,
+                quote_entities=quote_entities,
                 reply_markup=reply_markup,
             )
         
@@ -376,8 +383,6 @@ class ScpClient(WotoPyroClient):
             self.the_bot.me.username,
             container.unique_id,
         )
-
-
 
         all_updates = []
         for current_result in inline_response.results:
@@ -411,6 +416,10 @@ class ScpClient(WotoPyroClient):
         reply_to_message_id: int = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
+        reply_to_story_id: int = None,
+        message_thread_id: int = None,
+        quote_text: str = None,
+        quote_entities: List["types.MessageEntity"] = None,
         reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup",
                                    "types.ReplyKeyboardRemove", "types.ForceReply"] = None,
         progress: Callable = None,
@@ -429,6 +438,10 @@ class ScpClient(WotoPyroClient):
                 reply_to_message_id=reply_to_message_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
+                message_thread_id=message_thread_id,
+                reply_to_story_id=reply_to_story_id,
+                quote_text=quote_text,
+                quote_entities=quote_entities,
                 reply_markup=reply_markup,
                 progress=progress,
                 progress_args=progress_args
@@ -485,6 +498,7 @@ class ScpClient(WotoPyroClient):
         query_id: int,
         result_id: str,
         disable_notification: bool = None,
+        message_thread_id: int = None,
         reply_to_message_id: int = None
     ):
         try:
@@ -493,6 +507,7 @@ class ScpClient(WotoPyroClient):
                 query_id=query_id,
                 result_id=result_id,
                 disable_notification=disable_notification,
+                message_thread_id=message_thread_id,
                 reply_to_message_id=reply_to_message_id
             )
         except errors.SlowmodeWait as e:

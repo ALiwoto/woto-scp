@@ -552,6 +552,9 @@ class WotoClientBase(Client):
         reply_to_message_id: int = None,
         message_thread_id: int = None,
         schedule_date: datetime = None,
+        reply_to_story_id: int = None,
+        quote_text: str = None,
+        quote_entities: List["types.MessageEntity"] = None,
         protect_content: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
@@ -575,6 +578,10 @@ class WotoClientBase(Client):
                 message_thread_id=message_thread_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
+                message_thread_id=message_thread_id,
+                reply_to_story_id=reply_to_story_id,
+                quote_text=quote_text,
+                quote_entities=quote_entities,
                 reply_markup=reply_markup
             )
         except errors.SlowmodeWait as e:
