@@ -575,7 +575,6 @@ class WotoClientBase(Client):
                 disable_web_page_preview=disable_web_page_preview,
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
-                message_thread_id=message_thread_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 message_thread_id=message_thread_id,

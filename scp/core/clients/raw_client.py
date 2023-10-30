@@ -7,7 +7,8 @@ from typing import (
     NoReturn,
     Union,
     Callable,
-    List
+    List,
+    Optional
 )
 from pyrogram import (
     filters,
@@ -499,7 +500,10 @@ class ScpClient(WotoPyroClient):
         result_id: str,
         disable_notification: bool = None,
         message_thread_id: int = None,
-        reply_to_message_id: int = None
+        reply_to_message_id: int = None,
+        quote_text: str = None,
+        parse_mode: Optional["enums.ParseMode"] = None,
+        quote_entities: List["types.MessageEntity"] = None
     ):
         try:
             return await super().send_inline_bot_result(
@@ -507,6 +511,9 @@ class ScpClient(WotoPyroClient):
                 query_id=query_id,
                 result_id=result_id,
                 disable_notification=disable_notification,
+                quote_text=quote_text,
+                quote_entities=quote_entities,
+                parse_mode=parse_mode,
                 message_thread_id=message_thread_id,
                 reply_to_message_id=reply_to_message_id
             )
@@ -517,6 +524,10 @@ class ScpClient(WotoPyroClient):
                 query_id=query_id,
                 result_id=result_id,
                 disable_notification=disable_notification,
+                quote_text=quote_text,
+                quote_entities=quote_entities,
+                parse_mode=parse_mode,
+                message_thread_id=message_thread_id,
                 reply_to_message_id=reply_to_message_id
             )
 
