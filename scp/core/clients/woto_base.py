@@ -594,6 +594,9 @@ class WotoClientBase(Client):
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
                 message_thread_id=message_thread_id,
+                reply_to_story_id=reply_to_story_id,
+                quote_text=quote_text,
+                quote_entities=quote_entities,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 reply_markup=reply_markup
