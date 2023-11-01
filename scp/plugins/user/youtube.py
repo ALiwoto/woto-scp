@@ -34,7 +34,12 @@ async def yt_handler(_, message: Message):
         txt += user.html_mono("   .yt <url>")
         return await message.reply_text(txt, quote=True)
     
-    with yt_dlp.YoutubeDL({"extract_audio": True, "extract-audio": True}) as ydl:
+    primary_opts = {
+        "extract_audio": True, 
+        "extract-audio": True, 
+        "cookies": user.scp_config.yt_cookies_file
+    }
+    with yt_dlp.YoutubeDL(primary_opts) as ydl:
         try:
             result = ydl.extract_info(user_input, download=False)
         except Exception as err:
@@ -180,6 +185,7 @@ async def _(_, query: CallbackQuery):
             "outtmpl": _OUT_TML,
         }
     
+    ydl_opts["cookies"] = user.scp_config.yt_cookies_file
     the_info: dict = None
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:

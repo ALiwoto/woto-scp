@@ -28,6 +28,7 @@ class WotoConfig:
     shared_channel: int = 0
     auto_read_mode: int =  0
     gdrive_upload_folder_id: str = None
+    yt_cookies_file: str = None
 
     _enforcers = []
     _inspectors = []
@@ -75,6 +76,7 @@ class WotoConfig:
         self.shared_channel = self._the_config.getint('woto-scp', 'shared_channel', fallback=self.private_resources)
         self.auto_read_mode = self._the_config.getint('woto-scp', 'auto_read_mode', fallback=0)
         self.gdrive_upload_folder_id = self._the_config.get('woto-scp', 'gdrive_upload_folder_id', fallback='')
+        self.yt_cookies_file = self._the_config.get('woto-scp', 'yt_cookies_file', fallback=None)
 
         # sibyl configuration
         try:
