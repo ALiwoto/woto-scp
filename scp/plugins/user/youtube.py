@@ -24,7 +24,7 @@ __cached_yt_media_infos = {}
 @user.on_message(
     (user.sudo | user.owner | user.special_users) &
     user.command(
-        ['yt', 'youtube', 'tiktok'],
+        ['yt', 'youtube', 'tiktok', 'insta', 'instagram'],
     ),
 )
 async def yt_handler(_, message: Message):
