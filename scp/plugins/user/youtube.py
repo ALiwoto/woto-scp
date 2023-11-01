@@ -182,13 +182,13 @@ async def _(_, query: CallbackQuery):
     
     the_info: dict = None
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        # the info but this time has our desired format and stuff -_-
-        the_info = ydl.extract_info(media_info["webpage_url"], download=False)
-        file_name = ydl.prepare_filename(the_info)
         try:
+            # the info but this time has our desired format and stuff -_-
+            the_info = ydl.extract_info(media_info["webpage_url"], download=False)
+            file_name = ydl.prepare_filename(the_info)
             ydl.process_info(the_info)
         except Exception as err:
-            txt = user.html_bold("Error at process_info: \n")
+            txt = user.html_bold("Error while fetching media: \n")
             txt += user.html_mono(f"{err}")
             return await user.send_message(
                 text=txt,
