@@ -334,20 +334,26 @@ class ScpClient(WotoPyroClient):
     
     async def send_message(
         self,
-        chat_id: typing.Union[int, str],
-        text: str, parse_mode: typing.Optional["enums.ParseMode"] = None,
-        entities: typing.List["types.MessageEntity"] = None,
+        chat_id: Union[int, str],
+        text: str,
+        parse_mode: Optional["enums.ParseMode"] = None,
+        entities: List["types.MessageEntity"] = None,
         disable_web_page_preview: bool = None,
         disable_notification: bool = None,
-        reply_to_message_id: int = None,
-        schedule_date: datetime = None,
-        protect_content: bool = None,
         message_thread_id: int = None,
+        reply_to_message_id: int = None,
+        reply_to_chat_id: int = None,
         reply_to_story_id: int = None,
         quote_text: str = None,
         quote_entities: List["types.MessageEntity"] = None,
-        reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup",
-                                   "types.ReplyKeyboardRemove", "types.ForceReply"] = None
+        schedule_date: datetime = None,
+        protect_content: bool = None,
+        reply_markup: Union[
+            "types.InlineKeyboardMarkup",
+            "types.ReplyKeyboardMarkup",
+            "types.ReplyKeyboardRemove",
+            "types.ForceReply"
+        ] = None
     ) -> "types.Message":
         if self.me.is_bot or not isinstance(reply_markup, (types.InlineKeyboardMarkup, dict, list)):
             return await super().send_message(
@@ -361,6 +367,7 @@ class ScpClient(WotoPyroClient):
                 message_thread_id=message_thread_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
+                reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
                 quote_entities=quote_entities,
