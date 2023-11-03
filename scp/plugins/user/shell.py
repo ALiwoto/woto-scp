@@ -481,7 +481,7 @@ async def postStory_handler(_, message: Message):
     scale_value = "-vf \"scale='min(iw,1280)':'min(ih,720)'\"" if not no_scale else ''
     times_value = f'-ss {start_t} -to {end_t}' if start_t and end_t else ''
     sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error {times_value} -i "{user_file_name}"'
-    sh_txt += f' {scale_value} -c:v libx265 -crf 22 "{outfile}" '
+    sh_txt += f' {scale_value} -c:v copy -crf 22 "{outfile}" '
     
     await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
 
