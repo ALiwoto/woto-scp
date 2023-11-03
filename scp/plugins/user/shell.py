@@ -490,14 +490,14 @@ async def postStory_handler(_, message: Message):
     vf_value = "-vf 'split[original][copy];[copy]scale=-1:ih*(16/9)*(16/9),crop=w=ih*9/16,\
         gblur=sigma=20[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2'"
     sh_txt = f"ffmpeg -i {input_file} {vf_value} -c:v libx265 -crf 22 {output_file} -hide_banner -loglevel error -y"
-    await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
+    await shell_base(message, sh_txt, throw_on_error=True)
 
     user.remove_file(input_file)
     input_file = output_file
     scale_value = "-vf \"scale='min(iw,720)':'min(ih,1280)'\"" if not no_scale else ''
     output_file = f'output{ShortUUID().random(length=8)}.mp4'
     sh_txt = f"ffmpeg -i ok.mp4 {scale_value} -c:v libx265 -crf 22 {output_file} -hide_banner -loglevel error -y"
-    await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
+    await shell_base(message, sh_txt, throw_on_error=True)
 
     try:
         await user.send_story(output_file, privacy='all' if is_everyone else 'friends')
