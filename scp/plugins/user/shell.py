@@ -481,7 +481,7 @@ async def postStory_handler(_, message: Message):
     scale_value = "-vf \"scale='min(iw,1280)':'min(ih,720)'\"" if not no_scale else ''
     times_value = f'-ss {start_t} -to {end_t}' if start_t and end_t else ''
     sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error {times_value} -i "{user_file_name}"'
-    sh_txt += f' {scale_value} -c:v libx265 "{outfile}" '
+    sh_txt += f' {scale_value} -c:v libx265 -crf 22 "{outfile}" '
     
     await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
 
@@ -489,13 +489,14 @@ async def postStory_handler(_, message: Message):
     output_file = f'output{ShortUUID().random(length=8)}.mp4'
     vf_value = "-vf 'split[original][copy];[copy]scale=-1:ih*(16/9)*(16/9),crop=w=ih*9/16,\
         gblur=sigma=20[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2'"
-    sh_txt = f"ffmpeg -i {input_file} {vf_value} -c:v libx265 {output_file} -hide_banner -loglevel error -y"
+    sh_txt = f"ffmpeg -i {input_file} {vf_value} -c:v libx265 -crf 22 {output_file} -hide_banner -loglevel error -y"
     await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
 
     user.remove_file(input_file)
     input_file = output_file
+    scale_value = "-vf \"scale='min(iw,720)':'min(ih,1280)'\"" if not no_scale else ''
     output_file = f'output{ShortUUID().random(length=8)}.mp4'
-    sh_txt = f"ffmpeg -i ok.mp4 {scale_value} -c:v libx265 {output_file} -hide_banner -loglevel error -y"
+    sh_txt = f"ffmpeg -i ok.mp4 {scale_value} -c:v libx265 -crf 22 {output_file} -hide_banner -loglevel error -y"
     await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
 
     try:
