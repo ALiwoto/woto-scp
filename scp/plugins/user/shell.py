@@ -461,6 +461,18 @@ async def postStory_handler(_, message: Message):
         return await message.reply_text('Invalid command format!')
     
     user_file_name = os.path.abspath(os.path.expanduser(my_strs[1]))
+    if not os.path.exists(user_file_name):
+        # download the file to the destination
+        if not message.reply_to_message:
+            return await message.reply_text(f'reply to a file to download it to {user_file_name}')
+        reply = await message.reply_text('Downloading...')
+        await user.download_media(
+            message.reply_to_message, 
+            file_name=user_file_name,
+            progress=progress_callback, 
+            progress_args=(reply, 'Downloading...', False),
+        )
+
     outfile = f'aliwoto-output-cutVid{ShortUUID().random(length=8)}.mp4'
     sh_txt = f'rm "{outfile}" -f'
     scale_value = "-vf \"scale='min(iw,1280)':'min(ih,720)'\"" if not no_scale else ''
