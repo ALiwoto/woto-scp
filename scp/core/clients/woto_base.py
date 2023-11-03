@@ -606,6 +606,15 @@ class WotoClientBase(Client):
 
 
     def get_non_cmd(self, message: types.Message) -> str:
+        """
+        Extracts the second word from a given message text or caption.
+
+        Args:
+            message (telegram.types.Message): The message to extract the second word from.
+
+        Returns:
+            str: The second word from the message, or an empty string if there are less than two words.
+        """
         my_strs = split_some(message.text or message.caption, 1, ' ', '\n')
         if len(my_strs) < 2:
             return ''
@@ -615,10 +624,31 @@ class WotoClientBase(Client):
         return split_some(value, max_count, *delimiters)
 
     def split_message(self, message: types.Message, max_count: int = 0) -> typing.List[str]:
+        """
+        Splits a given Telegram message into a list of strings, using spaces and newlines as delimiters.
+
+        Args:
+            message (telegram.Message): The message to split.
+            max_count (int, optional): The maximum number of splits to perform. If 0, all possible splits are performed.
+
+        Returns:
+            List[str]: A list of strings resulting from the split operation.
+        """
         return split_some(message.text, max_count, ' ', '\n')
 
     def split_timestamped_message(self, message: types.Message, max_count: int = 0) -> typing.List[str]:
-        return split_some(message.text, max_count,  ' -> ', ' ', '\n')
+        """
+        Splits a timestamped message into a list of strings, using the ' -> ' separator between the timestamp and the message
+        and the ' ' and '\n' separators between words.
+
+        Args:
+            message (types.Message): The message to split.
+            max_count (int, optional): The maximum number of splits to perform. Defaults to 0 (unlimited).
+
+        Returns:
+            typing.List[str]: A list of strings containing the split message.
+        """
+        return split_some(message.text, max_count,  ' -> ', ' ', '\n', '->')
 
     def html_mono(self, value, *argv) -> str:
         return html_mono(value, *argv)
