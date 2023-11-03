@@ -11,6 +11,7 @@ from pyrogram.types import (
 from scp.utils import progress_callback
 from scp import user
 from scp.utils.parser import html_mono, split_some
+from shortuuid import ShortUUID
 
 BACKUP_SHELL_SCRIPT = (
     "rm -r -f 'my-backup' &&"
@@ -132,8 +133,9 @@ async def shell_base(
     command: str = None, 
     silent_on_success: bool = False,
     throw_on_error: bool = False,
+    absolute_silent: bool = False
 ):
-    reply = await message.reply_text('Executing...', quote=True)
+    reply = await message.reply_text('Executing...', quote=True) if not absolute_silent else None
     process = await asyncio.create_subprocess_shell(
         command,
         stdin=asyncio.subprocess.PIPE,
@@ -145,6 +147,8 @@ async def shell_base(
     returnCode = process.returncode
     if throw_on_error and returnCode != 0:
         raise Exception(stdout.decode())
+    elif absolute_silent:
+        return returnCode, stdout
     
     doc = user.md.KanTeXDocument()
     sec = user.md.Section(f'ExitCode: {returnCode}')
@@ -419,5 +423,71 @@ async def makeVid_handler(_, message: Message):
         await reply.delete()
     
 
+@user.on_message(
+    ~user.filters.scheduled
+    & ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & user.sudo
+    & user.command(
+        'postStory',
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def postStory_handler(_, message: Message):
+    no_scale = message.text.find('--no-scale') != -1
+    if no_scale:
+        message.text = message.text.replace('--no-scale', '').strip()
+    
+    is_everyone = message.text.find('--everyone') != -1
+    if is_everyone:
+        message.text = message.text.replace('--everyone', '').strip()
+    
+    # command format is:
+    # .makeVid postStory 22:45.0 -> 22:49.0
+    my_strs = user.split_timestamped_message(message)
+    start_t: str = None
+    end_t: str = None
+    if not my_strs:
+        txt = user.html_bold('Usage:\n\t')
+        txt += user.html_mono('.makeVid FILE_NAME [00:01.0 -> 01:00.0] [--no-scale] [--everyone]')
+        return await message.reply_text(txt)
+    elif len(my_strs) == 2:
+        pass
+    elif len(my_strs) == 4:
+        start_t = my_strs[2]
+        end_t = my_strs[3]
+    else:
+        return await message.reply_text('Invalid command format!')
+    
+    user_file_name = os.path.abspath(os.path.expanduser(my_strs[1]))
+    outfile = f'aliwoto-output-cutVid{ShortUUID().random(length=8)}.mp4'
+    sh_txt = f'rm "{outfile}" -f'
+    scale_value = "-vf \"scale='min(iw,1280)':'min(ih,720)'\"" if not no_scale else ''
+    times_value = f'-ss {start_t} -to {end_t}' if start_t and end_t else ''
+    sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error {times_value} -i "{user_file_name}"'
+    sh_txt += f' {scale_value} -c:v libx265 "{outfile}" '
+    
+    await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
 
+    input_file = outfile
+    output_file = f'output{ShortUUID().random(length=8)}.mp4'
+    vf_value = "-vf 'split[original][copy];[copy]scale=-1:ih*(16/9)*(16/9),crop=w=ih*9/16,\
+        gblur=sigma=20[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2'"
+    sh_txt = f"ffmpeg -i {input_file} {vf_value} -c:v libx265 {output_file} -hide_banner -loglevel error -y"
+    await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
+
+    user.remove_file(input_file)
+    input_file = output_file
+    output_file = f'output{ShortUUID().random(length=8)}.mp4'
+    sh_txt = f"ffmpeg -i ok.mp4 {scale_value} -c:v libx265 {output_file} -hide_banner -loglevel error -y"
+    await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
+
+    try:
+        await user.send_story(output_file, privacy='all' if is_everyone else 'friends')
+    except Exception as e:
+        await user.reply_exception(message, e)
+    
+    user.remove_file(input_file)
+    user.remove_file(output_file)
 
