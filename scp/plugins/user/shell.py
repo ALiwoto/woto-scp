@@ -317,6 +317,7 @@ async def makeGif_handler(_, message: Message):
             progress=progress_callback, 
             progress_args=(reply, 'Downloading...', False),
         )
+        await reply.delete()
     
     
     outfile = 'aliwoto-output-cutGif.mp4'
@@ -387,6 +388,7 @@ async def makeVid_handler(_, message: Message):
             progress=progress_callback, 
             progress_args=(reply, 'Downloading...', False),
         )
+        await reply.delete()
     
     
     outfile = 'aliwoto-output-cutVid.mp4'
@@ -472,6 +474,7 @@ async def postStory_handler(_, message: Message):
             progress=progress_callback, 
             progress_args=(reply, 'Downloading...', False),
         )
+        await reply.delete()
 
     outfile = f'aliwoto-output-cutVid{ShortUUID().random(length=8)}.mp4'
     sh_txt = f'rm "{outfile}" -f'
