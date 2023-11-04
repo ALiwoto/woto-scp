@@ -110,7 +110,7 @@ async def gitpull(_, message: Message):
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot &
-	user.owner & 
+	(user.owner | user.sudo) & 
 	user.command(
         ['ul', 'upload', 'uld'],
         prefixes=user.cmd_prefixes,
@@ -160,7 +160,7 @@ async def upload_handler(_, message: Message):
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot &
-	user.owner & 
+	(user.owner | user.sudo) & 
 	user.command(
         ['ulv', 'upload_video', 'ulvd'],
         prefixes=user.cmd_prefixes,
