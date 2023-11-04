@@ -22,7 +22,7 @@ from scp.utils.parser import (
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot &
-	(user.owner | user.sudo ),
+	(user.owner | user.sudo ) &
 	user.command(
         ['ls', 'hls', 'hiddenls'],
         prefixes=user.cmd_prefixes,
