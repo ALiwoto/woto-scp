@@ -450,7 +450,7 @@ async def postStory_handler(_, message: Message):
     my_strs = user.split_timestamped_message(message)
     start_t: str = None
     end_t: str = None
-    if not my_strs:
+    if not my_strs or len(my_strs) < 2:
         txt = user.html_bold('Usage:\n\t')
         txt += user.html_mono('.makeVid FILE_NAME [00:01.0 -> 01:00.0] [--no-scale] [--everyone]')
         return await message.reply_text(txt)
@@ -480,7 +480,7 @@ async def postStory_handler(_, message: Message):
     sh_txt = f'rm "{outfile}" -f'
     times_value = f'-ss {start_t} -to {end_t}' if start_t and end_t else ''
     sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error {times_value} -i "{user_file_name}"'
-    sh_txt += f' -c:v copy -crf 22 "{outfile}" '
+    sh_txt += f' -c:v copy "{outfile}" '
     
     await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
 
@@ -488,14 +488,14 @@ async def postStory_handler(_, message: Message):
     output_file = f'output{ShortUUID().random(length=8)}.mp4'
     vf_value = "-vf 'split[original][copy];[copy]scale=-1:ih*(16/9)*(16/9),crop=w=ih*9/16,\
         gblur=sigma=20[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2'"
-    sh_txt = f"ffmpeg -i {input_file} {vf_value} -c:v libx265 -crf 22 {output_file} -hide_banner -loglevel error -y"
+    sh_txt = f"ffmpeg -i {input_file} {vf_value} -c:v libx265 -crf 26 {output_file} -hide_banner -loglevel error -y"
     await shell_base(message, sh_txt, throw_on_error=True)
 
     user.remove_file(input_file)
     input_file = output_file
     scale_value = "-vf \"scale='min(iw,720)':'min(ih,1280)'\"" if not no_scale else ''
     output_file = f'output{ShortUUID().random(length=8)}.mp4'
-    sh_txt = f"ffmpeg -i ok.mp4 {scale_value} -c:v libx265 -crf 22 {output_file} -hide_banner -loglevel error -y"
+    sh_txt = f"ffmpeg -i ok.mp4 {scale_value} -c:v libx265 {output_file} -hide_banner -loglevel error -y"
     await shell_base(message, sh_txt, throw_on_error=True)
 
     try:
