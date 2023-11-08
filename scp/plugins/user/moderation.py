@@ -750,7 +750,7 @@ async def ban_handler(_, message: Message):
     
     output = ''
     try:
-        done = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
+        done = await user.ban_chat_member(chat_id=target_chat, user_id=target_user)
         output = html_mono('done.' if done else f'impossible to ban {target_user}.')
     except Exception as e:
         output = html_mono(str(e)[:4095])
