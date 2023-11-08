@@ -752,7 +752,7 @@ async def ban_handler(_, message: Message):
     try:
         done = await user.ban_chat_member(chat_id=target_chat, user_id=target_user)
         if is_silent:
-            return
+            return await message.delete()
         
         output = html_mono('done.' if done else f'impossible to ban {target_user}.')
     except Exception as e:
@@ -821,7 +821,7 @@ async def mute_handler(_, message: Message):
             )
         )
         if is_silent:
-            return
+            return await message.delete()
         
         output = html_mono('done.' if done else f'impossible to mute {target_user}.')
     except Exception as e:
@@ -890,7 +890,7 @@ async def mute_handler(_, message: Message):
             )
         )
         if is_silent:
-            return
+            return await message.delete()
         
         output = html_mono('done.' if done else f'impossible to mute {target_user}.')
     except Exception as e:
@@ -987,7 +987,7 @@ async def kick_handler(_, message: Message):
     try:
         done = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
         if is_silent:
-            return
+            return await message.delete()
         
         output = html_mono('done.' if done else f'impossible to kick {target_user}.')
     except Exception as e:
@@ -1040,7 +1040,7 @@ async def unban_handler(_, message: Message):
     try:
         done = await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
         if is_silent:
-            return
+            return await message.delete()
         
         output = html_mono('done.' if done else f'impossible to unban {target_user}.')
     except Exception as e:
