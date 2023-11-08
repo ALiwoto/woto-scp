@@ -30,7 +30,6 @@ from scp.utils.parser import (
 
 STARTER = html_mono("• \u200D") 
 
-
 @user.on_message(
     ~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -721,7 +720,7 @@ async def remSpec_handler(_, message: Message):
 	~user.filters.via_bot &
 	user.owner & 
 	user.command(
-        ['ban'],
+        ['ban', 'sban'],
         prefixes=user.cmd_prefixes,
     ),
 )
@@ -749,8 +748,12 @@ async def ban_handler(_, message: Message):
         target_user = all_strs[2]
     
     output = ''
+    is_silent = user.is_silent(message) or message.text.startswith("s")
     try:
         done = await user.ban_chat_member(chat_id=target_chat, user_id=target_user)
+        if is_silent:
+            return
+        
         output = html_mono('done.' if done else f'impossible to ban {target_user}.')
     except Exception as e:
         output = html_mono(str(e)[:4095])
@@ -770,7 +773,7 @@ async def ban_handler(_, message: Message):
 	~user.filters.via_bot &
 	user.owner & 
 	user.command(
-        ['mute'],
+        ['mute', 'smute'],
         prefixes=user.cmd_prefixes,
     ),
 )
@@ -798,6 +801,7 @@ async def mute_handler(_, message: Message):
         target_user = all_strs[2]
     
     output = ''
+    is_silent = user.is_silent(message) or message.text.startswith("s")
     try:
         done = await user.restrict_chat_member(
             chat_id=target_chat, 
@@ -816,6 +820,9 @@ async def mute_handler(_, message: Message):
                 can_use_inline_bots=False,
             )
         )
+        if is_silent:
+            return
+        
         output = html_mono('done.' if done else f'impossible to mute {target_user}.')
     except Exception as e:
         output = html_mono(str(e)[:4095])
@@ -835,7 +842,7 @@ async def mute_handler(_, message: Message):
 	~user.filters.via_bot &
 	user.owner & 
 	user.command(
-        ['unmute'],
+        ['unmute', 'sunmute'],
         prefixes=user.cmd_prefixes,
     ),
 )
@@ -863,6 +870,7 @@ async def mute_handler(_, message: Message):
         target_user = all_strs[2]
     
     output = ''
+    is_silent = user.is_silent(message) or message.text.startswith("s")
     try:
         done = await user.restrict_chat_member(
             chat_id=target_chat, 
@@ -881,6 +889,9 @@ async def mute_handler(_, message: Message):
                 can_use_inline_bots=True,
             )
         )
+        if is_silent:
+            return
+        
         output = html_mono('done.' if done else f'impossible to mute {target_user}.')
     except Exception as e:
         output = html_mono(str(e)[:4095])
@@ -943,7 +954,7 @@ async def aban_handler(_, message: Message):
 	~user.filters.via_bot &
 	user.owner & 
 	user.command(
-        ['kick'],
+        ['kick', 'skick'],
         prefixes=user.cmd_prefixes,
     ),
 )
@@ -972,9 +983,12 @@ async def kick_handler(_, message: Message):
     else: return
 
     output = ''
+    is_silent = user.is_silent(message) or message.text.startswith("s")
     try:
         done = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
-        await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
+        if is_silent:
+            return
+        
         output = html_mono('done.' if done else f'impossible to kick {target_user}.')
     except Exception as e:
         output = html_mono(str(e)[:4095])
@@ -993,7 +1007,7 @@ async def kick_handler(_, message: Message):
 	~user.filters.via_bot &
 	user.owner & 
 	user.command(
-        ['unban'],
+        ['unban', 'sunban'],
         prefixes=user.cmd_prefixes,
     ),
 )
@@ -1022,8 +1036,12 @@ async def unban_handler(_, message: Message):
     else: return
     
     output = ''
+    is_silent = user.is_silent(message) or message.text.startswith("s")
     try:
         done = await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
+        if is_silent:
+            return
+        
         output = html_mono('done.' if done else f'impossible to unban {target_user}.')
     except Exception as e:
         output = html_mono(str(e)[:4095])
@@ -1035,142 +1053,6 @@ async def unban_handler(_, message: Message):
             disable_web_page_preview=True,
         )
     except: return
-
-
-@user.on_message(~user.filters.scheduled & 
-	~user.filters.forwarded & 
-	~user.filters.sticker & 
-	~user.filters.via_bot &
-	user.owner & 
-	user.command(
-        ['sban'],
-        prefixes=user.cmd_prefixes,
-    ),
-)
-async def sBan_handler(_, message: Message):
-    all_strs = split_all(message.text, ' ', '\n')
-    target_user = 0
-    target_chat = 0
-
-    if len(all_strs) == 1:
-        if message.reply_to_message is None:
-            return
-        
-        replied = message.reply_to_message
-        target_user = (
-            replied.sender_chat.id 
-            if replied.sender_chat != None 
-            else replied.from_user.id
-        )
-        target_chat = message.chat.id
-    elif len(all_strs) == 2:
-        target_user = all_strs[1]
-        target_chat = message.chat.id
-    elif len(all_strs) >= 3:
-        target_chat = all_strs[1]
-        target_user = all_strs[2]
-    else: return
-    
-    try:
-        await message.delete()
-    except Exception: pass
-
-    try:
-        message = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
-        if isinstance(message, Message):
-            await message.delete()
-    except Exception: pass
-
-@user.on_message(~user.filters.scheduled & 
-	~user.filters.forwarded & 
-	~user.filters.sticker & 
-	~user.filters.via_bot &
-	user.owner & 
-	user.command(
-        ['skick'],
-        prefixes=user.cmd_prefixes,
-    ),
-)
-async def skick_handler(_, message: Message):
-    all_strs = split_all(message.text, ' ', '\n')
-    target_user = 0
-    target_chat = 0
-
-    if len(all_strs) == 1:
-        if message.reply_to_message is None:
-            return
-        
-        replied = message.reply_to_message
-        target_user = (
-            replied.sender_chat.id 
-            if replied.sender_chat != None 
-            else replied.from_user.id
-        )
-        target_chat = message.chat.id
-    elif len(all_strs) == 2:
-        target_user = all_strs[1]
-        target_chat = message.chat.id
-    elif len(all_strs) == 3:
-        target_chat = all_strs[1]
-        target_user = all_strs[2]
-    else: return
-
-    try:
-        await message.delete()
-    except Exception: pass
-    
-    try:
-        message = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
-        if isinstance(message, Message):
-            await message.delete()
-        await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
-    except Exception: pass
-
-@user.on_message(~user.filters.scheduled & 
-	~user.filters.forwarded & 
-	~user.filters.sticker & 
-	~user.filters.via_bot &
-	user.owner & 
-	user.command(
-        ['sunban'],
-        prefixes=user.cmd_prefixes,
-    ),
-)
-async def unban_handler(_, message: Message):
-    all_strs = split_all(message.text, ' ', '\n')
-    target_user = 0
-    target_chat = 0
-
-    if len(all_strs) == 1:
-        if message.reply_to_message is None:
-            return
-        
-        replied = message.reply_to_message
-        target_user = (
-            replied.sender_chat.id 
-            if replied.sender_chat != None 
-            else replied.from_user.id
-        )
-        target_chat = message.chat.id
-    elif len(all_strs) == 2:
-        target_user = all_strs[1]
-        target_chat = message.chat.id
-    elif len(all_strs) == 3:
-        target_chat = all_strs[1]
-        target_user = all_strs[2]
-    else: return
-
-    try:
-        await message.delete()
-    except Exception: pass
-
-    try:
-        await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
-    except Exception: pass
-
-
-
-
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -1191,7 +1073,7 @@ async def getlinks_handler(_, message: Message):
         return await message.reply_text(txt)
     
     reply = await message.reply_text(user.html_mono('fetching messages links...'))
-    my_strs: list[str] = split_some(message.text, 3, ' ', '\n')
+    my_strs: typing.List[str] = split_some(message.text, 3, ' ', '\n')
     group_id = my_strs[1]
     msg_ids = my_strs[2].split('-')
     
@@ -1353,7 +1235,4 @@ async def cachedScan_handler(_, message: Message):
         html_mono('Cymatic scan request has been sent to Sibyl.'), 
         parse_mode=ParseMode.HTML,
     )
-
-
-
 
