@@ -748,7 +748,7 @@ async def ban_handler(_, message: Message):
         target_user = all_strs[2]
     
     output = ''
-    is_silent = user.is_silent(message) or message.text.startswith("s")
+    is_silent = user.is_silent(message) or message.text[1] == 's'
     try:
         done = await user.ban_chat_member(chat_id=target_chat, user_id=target_user)
         if is_silent:
@@ -801,7 +801,7 @@ async def mute_handler(_, message: Message):
         target_user = all_strs[2]
     
     output = ''
-    is_silent = user.is_silent(message) or message.text.startswith("s")
+    is_silent = user.is_silent(message) or message.text[1] == 's'
     try:
         done = await user.restrict_chat_member(
             chat_id=target_chat, 
@@ -870,7 +870,7 @@ async def mute_handler(_, message: Message):
         target_user = all_strs[2]
     
     output = ''
-    is_silent = user.is_silent(message) or message.text.startswith("s")
+    is_silent = user.is_silent(message) or message.text[1] == 's'
     try:
         done = await user.restrict_chat_member(
             chat_id=target_chat, 
@@ -983,7 +983,7 @@ async def kick_handler(_, message: Message):
     else: return
 
     output = ''
-    is_silent = user.is_silent(message) or message.text.startswith("s")
+    is_silent = user.is_silent(message) or message.text[1] == 's'
     try:
         done = await user.kick_chat_member(chat_id=target_chat, user_id=target_user)
         if is_silent:
@@ -1036,7 +1036,7 @@ async def unban_handler(_, message: Message):
     else: return
     
     output = ''
-    is_silent = user.is_silent(message) or message.text.startswith("s")
+    is_silent = user.is_silent(message) or message.text[1] == 's'
     try:
         done = await user.unban_chat_member(chat_id=target_chat, user_id=target_user)
         if is_silent:
