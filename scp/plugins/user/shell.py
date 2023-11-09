@@ -441,6 +441,10 @@ async def postStory_handler(_, message: Message):
     if no_scale:
         message.text = message.text.replace('--no-scale', '').strip()
     
+    no_pin = message.text.find('--no-pin') != -1
+    if no_pin:
+        message.text = message.text.replace('--no-pin', '').strip()
+    
     is_everyone = message.text.find('--everyone') != -1
     if is_everyone:
         message.text = message.text.replace('--everyone', '').strip()
@@ -451,6 +455,12 @@ async def postStory_handler(_, message: Message):
     start_t: str = None
     end_t: str = None
     if not my_strs or len(my_strs) < 2:
+        if message.reply_to_message and message.reply_to_message.photo:
+            return await user.send_story(
+                message.reply_to_message.photo.file_id,
+                privacy='all' if is_everyone else 'friends',
+                pinned=not no_pin,
+            )
         txt = user.html_bold('Usage:\n\t')
         txt += user.html_mono('.makeVid FILE_NAME [00:01.0 -> 01:00.0] [--no-scale] [--everyone]')
         return await message.reply_text(txt)
