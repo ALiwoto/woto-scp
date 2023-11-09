@@ -449,6 +449,10 @@ async def postStory_handler(_, message: Message):
     if is_everyone:
         message.text = message.text.replace('--everyone', '').strip()
     
+    is_silent = message.text.find('--silent') != -1 or user.is_silent(message)
+    if is_silent:
+        message.text = message.text.replace('--silent', '').strip()
+    
     # command format is:
     # .makeVid postStory 22:45.0 -> 22:49.0
     my_strs = user.split_timestamped_message(message)
@@ -456,11 +460,14 @@ async def postStory_handler(_, message: Message):
     end_t: str = None
     if not my_strs or len(my_strs) < 2:
         if message.reply_to_message and message.reply_to_message.photo:
-            return await user.send_story(
+            await user.send_story(
                 message.reply_to_message.photo.file_id,
                 privacy='all' if is_everyone else 'friends',
                 pinned=not no_pin,
             )
+            if not is_silent:
+                return await message.delete()
+            return await message.reply_text('Done!')
         txt = user.html_bold('Usage:\n\t')
         txt += user.html_mono('.makeVid FILE_NAME [00:01.0 -> 01:00.0] [--no-scale] [--everyone]')
         return await message.reply_text(txt)
