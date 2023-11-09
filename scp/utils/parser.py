@@ -283,6 +283,9 @@ def html_link(value, link: str, *argv) -> str:
         return html_mono(value, *argv)
     return f"<a href={html.escape(link)}>{html.escape(str(value))}</a>" +  get_html_normal(*argv)
 
+def html_code_snippets (type,value):
+    return f'```{type}\n{value}\n```'
+
 async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
     if not isinstance(chat, Chat):
         return html_mono(value, *argv)
