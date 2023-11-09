@@ -125,9 +125,9 @@ async def get_message_content(message: Message) -> str:
         return user.html_normal(message.text[:1024])
     elif message.contact:
         c = message.contact
-        return f"{c.first_name if c.first_name else ''} \
-            {c.last_name if c.last_name else ''} \
-            {f'({c.user_id})' if c.user_id else ''} - {c.phone_number}"
+        return f"{c.first_name.strip() if c.first_name else ''} \
+            {c.last_name.strip() if c.last_name else ''} \
+            {f'({c.user_id})' if c.user_id else ''} - {c.phone_number.strip()}"
     elif message.media:
         return user.html_mono(await user.get_media_file_id(
             message=message,
