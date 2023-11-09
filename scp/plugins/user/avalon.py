@@ -125,9 +125,10 @@ async def get_message_content(message: Message) -> str:
         return user.html_normal(message.text[:1024])
     elif message.contact:
         c = message.contact
+        mentioned = f'({user.html_mention(c.user_id, str(c.user_id))})' if c.user_id else ''
         return f"{c.first_name.strip() if c.first_name else ''}" \
             f"{c.last_name.strip() if c.last_name else ''}" \
-            f"{f'({c.user_id})' if c.user_id else ''} - {c.phone_number.strip()}"
+            f"{mentioned} - {user.html_mono(c.phone_number.strip())}"
     elif message.media:
         return user.html_mono(await user.get_media_file_id(
             message=message,
