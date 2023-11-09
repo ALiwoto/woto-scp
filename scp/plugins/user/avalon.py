@@ -123,6 +123,10 @@ async def tags_log_handler(_, message: Message):
 async def get_message_content(message: Message) -> str:
     if message.text:
         return user.html_normal(message.text[:1024])
+    elif message.contact:
+        c = message.contact
+        return f"{c.first_name} {c.last_name if c.first_name else c.last_name} \
+            {f'({c.user_id})' if c.user_id else ''} - {c.phone_number}"
     elif message.media:
         return user.html_mono(await user.get_media_file_id(
             message=message,
