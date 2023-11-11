@@ -13,7 +13,8 @@ from scp import user, bot
 from scp.utils.selfInfo import info
 from scp.utils.parser import(
     get_media_attr, 
-    html_bold, 
+    html_bold,
+    html_code_snippets,
     html_mono, 
     to_output_file,
 )
@@ -47,6 +48,10 @@ async def input(prompt=None, **kwargs):
 )
 async def eval_handler(_, message: Message):
     code = user.get_non_cmd(message)
+    await user.edit_message_text(
+        chat_id=message.chat.id,
+        message_id=message.id,
+        text=html_code_snippets("py",code))
     if len(code) == 0:
         if not message.reply_to_message:
             return
