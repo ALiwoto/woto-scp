@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import Union
+from typing import Union, List
 from pyrogram import types
 import html
 import re
@@ -219,11 +219,11 @@ def fix_encoding(value: str) -> str:
     except: return ""
 
 
-def split_all(value: str, *delimiters) -> list:
+def split_all(value: str, *delimiters) -> List[str]:
     regP = '|'.join(map(re.escape, delimiters))
     return remove_empty_strs(re.split(regP, value))
 
-def split_some(value: str, max_count: int = 0, *delimiters) -> list:
+def split_some(value: str, max_count: int = 0, *delimiters) -> List[str]:
     regP = '|'.join(map(re.escape, delimiters))
     return remove_empty_strs(re.split(regP, value, max_count))
 
@@ -264,7 +264,7 @@ def to_output_file(value: Union[str, bytes], file_name: str = "output.txt") -> B
 
 
 def html_mono(value, *argv) -> str:
-    return f"<code>{html.escape(str(value))}</code>" +  get_html_normal(*argv)
+    return f"<code>{html.escape(str(value))}</code>" + get_html_normal(*argv)
 
 def html_in_parenthesis(value) -> str:
     if not value:
@@ -281,10 +281,13 @@ def html_italic(value, *argv) -> str:
 def html_link(value, link: str, *argv) -> str:
     if not isinstance(link, str) or len(link) == 0:
         return html_mono(value, *argv)
-    return f"<a href={html.escape(link)}>{html.escape(str(value))}</a>" +  get_html_normal(*argv)
+    return f"<a href={html.escape(link)}>{html.escape(str(value))}</a>" + get_html_normal(*argv)
 
-def html_code_snippets (type,value):
-    return f'```{type}\n{value}\n```'
+def html_code_snippets(value, language: str, *argv):
+    return html_pre(value, language, *argv)
+
+def html_pre(value, language: str, *argv):
+    return f"<pre language={html.escape(language)}>{html.escape(str(value))}</pre>" + get_html_normal(*argv)
 
 async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
     if not isinstance(chat, Chat):
