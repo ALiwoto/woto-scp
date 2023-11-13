@@ -988,9 +988,8 @@ async def aban_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def aban_handler(_, message: Message):
+async def delMeAll_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n', ',')
-    chat_ids = []
 
     if len(all_strs) == 1:
         if message.reply_to_message is None:
@@ -1006,6 +1005,7 @@ async def aban_handler(_, message: Message):
         try:
             await user.delete_user_history(chat_id=current, user_id=message.from_user.id)
         except Exception: pass
+        await asyncio.sleep(5)
 
 
 @user.on_message(~user.filters.scheduled & 
