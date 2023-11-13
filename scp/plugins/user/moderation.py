@@ -718,7 +718,7 @@ async def remSpec_handler(_, message: Message):
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot &
-	user.owner & 
+	(user.owner | user.sudo) & 
 	user.command(
         ['ban', 'sban'],
         prefixes=user.cmd_prefixes,
@@ -766,6 +766,37 @@ async def ban_handler(_, message: Message):
         )
     except: return
 
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot &
+	(user.owner | user.sudo) & 
+	user.command(
+        ['del'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def ban_handler(_, message: Message):
+    all_strs = split_all(message.text, ' ', '\n')
+    target_message: Message = None
+
+    if message.reply_to_message:
+        target_message = message.reply_to_message
+    elif len(all_strs) == 2:
+        target_message = await user.get_message_by_link(all_strs[1])
+    elif len(all_strs) == 3:
+        # 1: chat-id 
+        # 2: message-id
+        target_message = await user.get_messages(
+            chat_id=all_strs[1],
+            message_ids=all_strs[2],
+            replies=0,
+        )
+
+    try:
+        await message.delete()
+        await target_message.delete()
+    except Exception: pass
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 

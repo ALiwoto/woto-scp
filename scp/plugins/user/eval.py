@@ -13,9 +13,6 @@ from scp import user, bot
 from scp.utils.selfInfo import info
 from scp.utils.parser import(
     get_media_attr, 
-    html_bold,
-    html_code_snippets,
-    html_mono, 
     to_output_file,
 )
 from pyrogram.client import Client as pClient
@@ -48,14 +45,18 @@ async def input(prompt=None, **kwargs):
 )
 async def eval_handler(_, message: Message):
     code = user.get_non_cmd(message)
-    await user.edit_message_text(
-        chat_id=message.chat.id,
-        message_id=message.id,
-        text=html_code_snippets("py",code))
     if len(code) == 0:
         if not message.reply_to_message:
             return
         code = message.reply_to_message.text
+    
+    try:
+        await user.edit_message_text(
+            chat_id=message.chat.id,
+            message_id=message.id,
+            text=user.html_pre("python", code)
+        )
+    except: pass
     
     await eval_base(user, message, code)
     
@@ -108,14 +109,14 @@ async def eval_base(client: pClient, message: Message, code: str, silent: bool =
             if len(str_err) > 4000:
                 await message.reply_document(to_output_file(str_err))
                 return
-            txt = html_mono(str_err)
+            txt = user.html_mono(str_err)
             return await message.reply_text(txt, parse_mode=ParseMode.HTML)
         exx = _gf(o_body)
     rnd_id = '#' + str(ShortUUID().random(length=8))
     reply: Message = None
     if message != None and not silent:
         reply = await message.reply_text(
-            html_bold('Executing task ') + html_mono(rnd_id, '...'),
+            user.html_bold('Executing task ') + user.html_mono(rnd_id, '...'),
             quote=True,
             disable_notification=True,
             disable_web_page_preview=True,
@@ -162,9 +163,9 @@ async def eval_base(client: pClient, message: Message, code: str, silent: bool =
         if len(str_err) > 4096:
             await asyncio.gather(reply.delete(), message.reply_document(to_output_file(str_err)))
             return
-        txt = html_bold('Error for task')
-        txt += html_mono(f' {rnd_id} ', ':\n')
-        txt += html_mono(f' {str(e)} ')
+        txt = user.html_bold('Error for task')
+        txt += user.html_mono(f' {rnd_id} ', ':\n')
+        txt += user.html_mono(f' {str(e)} ')
         return await reply.edit_text(
             text=txt,
             parse_mode=ParseMode.HTML,
@@ -198,8 +199,8 @@ async def eval_base(client: pClient, message: Message, code: str, silent: bool =
         f.name = f'output-{rnd_id}.txt'
         await asyncio.gather(reply.delete(), message.reply_document(f))
     else:
-        txt = html_bold('Output for') + html_mono(' ' + rnd_id, ':\n    ')
-        txt += html_mono(output)
+        txt = user.html_bold('Output for') + user.html_mono(' ' + rnd_id, ':\n    ')
+        txt += user.html_mono(output)
         await reply.edit_text(
             txt, 
             parse_mode=ParseMode.HTML,

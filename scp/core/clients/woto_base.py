@@ -41,6 +41,7 @@ from scp.utils.parser import (
     html_bold,
     html_italic,
     html_link,
+    html_pre,
     split_some,
     html_normal,
     html_mention,
@@ -664,6 +665,9 @@ class WotoClientBase(Client):
 
     def html_link(self, value, link: str, *argv) -> str:
         return html_link(value, link, *argv)
+    
+    def html_pre(self, value, language: str, *argv) -> str:
+        return html_pre(value, language, *argv)
 
     async def reply_exception(self, message: types.Message, e: Exception, limit: int = 4, is_private: bool = False):
         ex_str = "".join(format_exception(e, limit=limit, chain=True))
