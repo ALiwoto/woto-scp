@@ -978,6 +978,35 @@ async def aban_handler(_, message: Message):
         await message.delete()
     except Exception: pass
 
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot &
+	(user.owner | user.sudo) &
+	user.command(
+        ['delMeAll'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def aban_handler(_, message: Message):
+    all_strs = split_all(message.text, ' ', '\n', ',')
+    chat_ids = []
+
+    if len(all_strs) == 1:
+        if message.reply_to_message is None:
+            return await message.reply_text(
+                text=html_bold('Usage:\n\t\t:') + html_mono('.delMeAll <chat-id(s)>'),
+                disable_notification=True, 
+                disable_web_page_preview=True,
+            )
+        
+    chat_ids = all_strs[1:]
+    
+    for current in chat_ids:
+        try:
+            await user.delete_user_history(chat_id=current, user_id=message.from_user.id)
+        except Exception: pass
+
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 

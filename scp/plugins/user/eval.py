@@ -54,7 +54,7 @@ async def eval_handler(_, message: Message):
         await user.edit_message_text(
             chat_id=message.chat.id,
             message_id=message.id,
-            text=user.html_pre("python", code)
+            text=user.html_pre(code, "python")
         )
     except: pass
     
