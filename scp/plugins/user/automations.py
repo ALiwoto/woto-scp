@@ -75,7 +75,10 @@ async def auto_remove_bluetext_handler(_, message: Message):
         await message.delete()
     except Exception: return
 
-
+@user.on_edited_message(
+    user.filters.bot,
+    group=100,
+)
 @user.on_message(
     user.filters.bot,
     group=100,
