@@ -994,7 +994,7 @@ async def delMeAll_handler(_, message: Message):
     if len(all_strs) == 1:
         if message.reply_to_message is None:
             return await message.reply_text(
-                text=html_bold('Usage:\n\t\t:') + html_mono('.delMeAll <chat-id(s)>'),
+                text=html_bold('Usage:\n\t\t') + html_mono('.delMeAll <chat-id(s)>'),
                 disable_notification=True, 
                 disable_web_page_preview=True,
             )
