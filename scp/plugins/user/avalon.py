@@ -178,6 +178,14 @@ async def get_txt_and_keyboard(message: Message, mode: AvalonMode = AvalonMode.P
         txt += user.html_normal(sender.first_name[:16], " (")
     txt += user.html_mono(sender.id, ")")
 
+    if message.chat.id != sender.id:
+        txt += user.html_bold("\n• CHAT: ")
+        if message.chat.username:
+            txt += user.html_link(message.chat.title, f"https://t.me/{message.chat.username}", " (")
+        else:
+            txt += user.html_normal(message.chat.title, " (")
+        txt += user.html_mono(message.chat.id, ")")
+
     if mode == AvalonMode.TAG:
         txt += user.html_bold("\n• LINK: ")
         txt += user.html_link("here", message.link)
