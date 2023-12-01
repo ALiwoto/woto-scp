@@ -87,5 +87,6 @@ async def auto_sff_handler(_, message: Message):
     msg_text = message.text.lower()
     if msg_text.find("have finished their work") != -1 or \
         msg_text.find("work options for the worker") != -1:
+        await asyncio.sleep(3)
         return await message.click(0)
     
