@@ -75,3 +75,17 @@ async def auto_remove_bluetext_handler(_, message: Message):
         await message.delete()
     except Exception: return
 
+
+@user.on_message(
+    user.filters.bot,
+    group=100,
+)
+async def auto_sff_handler(_, message: Message):
+    """
+    sff is short for "send-friend-fac".
+    """
+    msg_text = message.text.lower()
+    if msg_text.find("have finished their work") != -1 or \
+        msg_text.find("work options for the worker") != -1:
+        return await message.click(0)
+    
