@@ -87,6 +87,7 @@ async def auto_sff_handler(_, message: Message):
     """
     sff is short for "send-friend-fac".
     """
+    if not message.text: return
     msg_text = message.text.lower()
     if msg_text.find("have finished their work") != -1 or \
         msg_text.find("work options for the worker") != -1:
