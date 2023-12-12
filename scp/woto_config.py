@@ -118,8 +118,8 @@ class WotoConfig:
         self.private_logger = self._the_config.get('sibyl-system', 'private_logger')
     
     def load_wp_config(self) -> None:
-        self.wp_username = self._the_config.get('woto-platform', 'username')
-        self.wp_password = self._the_config.get('woto-platform', 'password')
+        self.wp_username = self._the_config.get('woto-platform', 'username', None)
+        self.wp_password = self._the_config.get('woto-platform', 'password', None)
         self.wp_host = self._the_config.get(
             'woto-platform', 
             'host', 
