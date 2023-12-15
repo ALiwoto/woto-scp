@@ -173,14 +173,27 @@ async def pinterest_handler(_, message: Message):
         print(f"failed to send thumbnail: {ex}") # not a big deal, just falls back to text
     
     try:
-        await message.reply_document(
-            document=file_name,
-            duration=int(result["duration"] or 0),
-            thumb=thumbnail,
-            caption=result.get("title", "Unknown Title"),
-            quote=True,
-            force_document=False,
-        )
+        if user.guess_mime_type(file_name).startswith("video"):
+            await message.reply_video(
+                document=file_name,
+                duration=int(result["duration"] or 0),
+                thumb=thumbnail,
+                caption=result.get("title", "Unknown Title"),
+                quote=True,
+                force_document=False,
+            )
+        elif user.guess_mime_type(file_name).startswith("image"):
+            await message.reply_photo(
+                photo=file_name,
+                caption=result.get("title", "Unknown Title"),
+                quote=True,
+            )
+        else:
+            await message.reply_document(
+                document=file_name,
+                caption=result.get("title", "Unknown Title"),
+                quote=True,
+            )
     except Exception as err:
         return await message.reply_text(f"failed to send the media: {err}", quote=True)
 
