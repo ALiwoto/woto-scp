@@ -186,7 +186,6 @@ async def pinterest_handler(_, message: Message):
             duration=int(result["duration"] or 0),
             thumb=thumbnail,
             caption=result.get("title", "Unknown Title"),
-            quote=True,
             force_document=False,
             reply_to_message_id=message.message_id,
         )
