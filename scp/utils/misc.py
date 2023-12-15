@@ -153,7 +153,11 @@ def restart_scp(update_req: bool = False, hard: bool = False) -> bool:
         c_p = psutil.Process(os.getpid())
         for handler in c_p.open_files() + c_p.connections():
             try:
+                # check if handler is stdin or stdout or stderr
+                if handler.fd == 0 or handler.fd == 1 or handler.fd == 2:
+                    continue
                 os.close(handler.fd)
+                
             except Exception:
                 continue
         os.execl(sys.executable, sys.executable, '-m', 'scp')  # nosec
