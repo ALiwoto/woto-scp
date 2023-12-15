@@ -181,7 +181,7 @@ async def pinterest_handler(_, message: Message):
             quote=True,
             force_document=False,
         )
-    except Exception as ex:
+    except Exception as err:
         return await message.reply_text(f"failed to send the media: {err}", quote=True)
 
     
