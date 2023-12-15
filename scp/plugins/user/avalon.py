@@ -79,7 +79,7 @@ async def pm_log_handler(_, message: Message):
 @user.on_message(
     user.filters.bot &
     user.filters.private,
-    group=100,
+    group=101,
 )
 async def bots_log_handler(_, message: Message):
     if not user.scp_config.avalon_bots or not user.avalon_system_enabled:
@@ -101,7 +101,7 @@ async def bots_log_handler(_, message: Message):
         user.filters.me |
         user.owner
     ),
-    group=101,
+    group=100,
 )
 async def tags_log_handler(_, message: Message):
     if not user.scp_config.avalon_tags or not user.avalon_system_enabled:
