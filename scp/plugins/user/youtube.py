@@ -8,6 +8,7 @@ from io import BytesIO
 from scp.utils import format_bytes
 import yt_dlp
 import os
+from pyrogram.enums.message_media_type import MessageMediaType
 
 
 __PLUGIN__ = 'youtube'
@@ -173,27 +174,22 @@ async def pinterest_handler(_, message: Message):
         print(f"failed to send thumbnail: {ex}") # not a big deal, just falls back to text
     
     try:
-        if user.guess_mime_type(file_name).startswith("video"):
-            await message.reply_video(
-                document=file_name,
-                duration=int(result["duration"] or 0),
-                thumb=thumbnail,
-                caption=result.get("title", "Unknown Title"),
-                quote=True,
-                force_document=False,
-            )
-        elif user.guess_mime_type(file_name).startswith("image"):
-            await message.reply_photo(
-                photo=file_name,
-                caption=result.get("title", "Unknown Title"),
-                quote=True,
-            )
-        else:
-            await message.reply_document(
-                document=file_name,
-                caption=result.get("title", "Unknown Title"),
-                quote=True,
-            )
+        mime_type = user.guess_mime_type(file_name)
+        media_type: MessageMediaType = \
+            MessageMediaType.VIDEO if mime_type.startswith("video") else \
+            MessageMediaType.PHOTO if mime_type.startswith("image") else \
+            MessageMediaType.DOCUMENT
+        await user.send_specified_media(
+            chat_id=message.chat.id,
+            media_type=media_type,
+            media=file_name,
+            duration=int(result["duration"] or 0),
+            thumb=thumbnail,
+            caption=result.get("title", "Unknown Title"),
+            quote=True,
+            force_document=False,
+            reply_to_message_id=message.message_id,
+        )
     except Exception as err:
         return await message.reply_text(f"failed to send the media: {err}", quote=True)
 
