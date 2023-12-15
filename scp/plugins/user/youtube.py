@@ -49,6 +49,11 @@ async def yt_handler(_, message: Message):
         except Exception as err:
             return await message.reply_text(f"error at extract_info from url: {err}", quote=True)
 
+    platform_name = result.get('extractor_key', 'Unknown')
+    if platform_name == "Pinterest":
+        # Pinterest media is really simple tbh, just send it directly
+        return await pinterest_handler(_, message)
+
     media_id = result["id"]
     title = result.get("title", "Unknown Title")
     thumbnail = result.get("thumbnail", None)
@@ -62,7 +67,7 @@ async def yt_handler(_, message: Message):
     
     __cached_yt_media_infos[media_id] = result
 
-    txt = user.html_bold(f"💠 {result.get('extractor_key', 'Unknown')} media info\n")
+    txt = user.html_bold(f"💠 {platform_name} media info\n")
     txt += user.html_bold("  Title: ") + user.html_link(title, result["webpage_url"]) + "\n"
     txt += user.html_bold("  Duration: ") + f" {duration_string}\n"
     txt += user.html_bold("  Views: ") + f" {view_count}\n"
