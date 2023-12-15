@@ -77,11 +77,11 @@ async def auto_remove_bluetext_handler(_, message: Message):
 
 @user.on_edited_message(
     user.filters.bot,
-    group=100,
+    group=101,
 )
 @user.on_message(
     user.filters.bot,
-    group=100,
+    group=101,
 )
 async def auto_sff_handler(_, message: Message):
     """
@@ -92,5 +92,7 @@ async def auto_sff_handler(_, message: Message):
     if msg_text.find("have finished their work") != -1 or \
         msg_text.find("work options for the worker") != -1:
         await asyncio.sleep(3)
-        return await message.click(0)
+        try:
+            return await message.click(0)
+        except Exception: return
     
