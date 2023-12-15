@@ -29,9 +29,12 @@ __cached_yt_media_infos = {}
 )
 async def yt_handler(_, message: Message):
     user_input = user.get_non_cmd(message)
+    if not user_input and message.reply_to_message:
+        user_input = message.reply_to_message.text
+    
     if not user_input:
         txt = user.html_bold("Usage:") + "\n"
-        txt += user.html_mono("   .yt <url>")
+        txt += user.html_mono(f"   .{message.command[0]} <url>")
         return await message.reply_text(txt, quote=True)
     
     primary_opts = {
@@ -120,7 +123,7 @@ async def yt_handler(_, message: Message):
             result["sent_message"] = sent_message
             return
     except Exception as ex:
-        print(f"failed to send photo: {ex}")
+        print(f"failed to send thumbnail: {ex}") # not a big deal, just falls back to text
 
     # fallback to text
     await message.reply_text(
@@ -128,6 +131,60 @@ async def yt_handler(_, message: Message):
         reply_markup=keyboard,
     )
 
+@user.on_message(
+    (user.sudo | user.owner | user.special_users) &
+    user.command(
+        ['pinterest'],
+    ),
+)
+async def pinterest_handler(_, message: Message):
+    user_input = user.get_non_cmd(message)
+    if not user_input and message.reply_to_message:
+        user_input = message.reply_to_message.text
+    
+    if not user_input:
+        txt = user.html_bold("Usage:") + "\n"
+        txt += user.html_mono(f"   .{message.command[0]} <url>")
+        return await message.reply_text(txt, quote=True)
+    
+    result: dict = None
+    file_name: str = None
+    with yt_dlp.YoutubeDL() as ydl:
+        try:
+            result = ydl.extract_info(user_input, download=False)
+            file_name = ydl.prepare_filename(result)
+            ydl.process_info(result)
+        except Exception as err:
+            return await message.reply_text(f"error at downloading from url: {err}", quote=True)
+
+    if not os.path.exists(file_name) and os.path.exists(result['filepath']):
+        # just switch over...
+        file_name = result['filepath']
+    
+    thumbnail = result.get("thumbnail", None)
+    try:
+        if thumbnail:
+            if not isinstance(thumbnail, BytesIO):
+                async with user.aioclient.get(
+                    url=thumbnail
+                ) as response:
+                    thumbnail = BytesIO(await response.read())
+    except Exception as ex:
+        print(f"failed to send thumbnail: {ex}") # not a big deal, just falls back to text
+    
+    try:
+        await message.reply_document(
+            document=file_name,
+            duration=int(result["duration"] or 0),
+            thumb=thumbnail,
+            caption=result.get("title", "Unknown Title"),
+            quote=True,
+            force_document=False,
+        )
+    except Exception as ex:
+        return await message.reply_text(f"failed to send the media: {err}", quote=True)
+
+    
 @bot.on_callback_query(
     (user.sudo | user.owner | user.special_users) 
     & bot.filters.regex(f'^ytDl'),
