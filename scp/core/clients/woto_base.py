@@ -81,6 +81,7 @@ class WotoClientBase(Client):
         chat_id: Union[int, str],
         from_chat_id: Union[int, str],
         message_ids: Union[int, Iterable[int]],
+        message_thread_id: int = None,
         disable_notification: bool = None,
         schedule_date: datetime = None,
         protect_content: bool = None
@@ -91,6 +92,7 @@ class WotoClientBase(Client):
                 chat_id=chat_id,
                 from_chat_id=from_chat_id,
                 message_ids=message_ids,
+                message_thread_id=message_thread_id,
                 disable_notification=disable_notification,
                 schedule_date=schedule_date,
                 protect_content=protect_content
@@ -149,6 +151,7 @@ class WotoClientBase(Client):
         self,
         chat_id: Union[int, str],
         message_link: str,
+        message_thread_id: int = None,
         disable_notification: bool = None,
         schedule_date: datetime = None,
         protect_content: bool = None
@@ -161,6 +164,7 @@ class WotoClientBase(Client):
             chat_id=chat_id,
             from_chat_id=the_message.chat.id,
             message_ids=the_message.id,
+            message_thread_id=message_thread_id,
             disable_notification=disable_notification,
             schedule_date=schedule_date,
             protect_content=protect_content
@@ -251,7 +255,6 @@ class WotoClientBase(Client):
         ttl_seconds: int = None,
     ) -> "types.Message":
         if media_type == MessageMediaType.ANIMATION:
-            self.send_animation
             return await self.send_animation(
                 chat_id=chat_id,
                 animation=media,
@@ -972,6 +975,7 @@ class WotoClientBase(Client):
         chat_id: Union[int, str],
         from_chat_id: Union[int, str],
         message_ids: int,
+        message_thread_id: int = None,
         disable_notification: bool = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
@@ -982,6 +986,7 @@ class WotoClientBase(Client):
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_ids=message_ids,
+            message_thread_id=message_thread_id,
             disable_notification=disable_notification,
             schedule_date=schedule_date,
             protect_content=protect_content,
