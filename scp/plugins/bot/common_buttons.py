@@ -50,9 +50,16 @@ async def read_button_handler(_, query: CallbackQuery):
         user.owner | user.sudo
     ) & filters.regex("^sendMedia_")
 )
+@bot.on_callback_query(
+    (
+        user.owner | user.sudo
+    ) & filters.regex("^sendBotMedia_")
+)
 async def send_media_button_handler(_, query: CallbackQuery):
     target_chat_id = user.scp_config.avalon_pms
     my_strs = query.data.split("_")
+    is_bot = my_strs[0].find("sendBotMedia") != -1
+    the_client = bot if is_bot else user
     from_chat_id = int(my_strs[1])
     message_id = int(my_strs[2])
     if len(my_strs) > 3:
@@ -66,23 +73,23 @@ async def send_media_button_handler(_, query: CallbackQuery):
         my_strs = message_field[0].split(") ")
         media_type = my_strs[0]
         file_id = my_strs[1]
-        send_method = getattr(user, f"send_{media_type}", None)
+        send_method = getattr(the_client, f"send_{media_type}", None)
         if not send_method:
             return await query.answer(f"Couldn't find send method for {media_type}.")
         
         return await send_method(user, target_chat_id, file_id, reply_to_message_id=query.message.id)
     
-    
-
     # second way around: no message is passed
     try:
-        await user.forward_messages(
+        await the_client.forward_messages(
             chat_id=target_chat_id,
             from_chat_id=from_chat_id,
             message_ids=message_id
         )
     except Exception as e:
-        await query.answer(f"Failed due to: {str(e)[:60]}")
+        if is_bot:
+            return await query.answer(f"Is bot present in the channel?\n{str(e)[:40]}")
+        return await query.answer(f"Failed due to: {str(e)[:40]}")
 
 
     
