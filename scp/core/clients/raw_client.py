@@ -548,6 +548,37 @@ class ScpClient(WotoPyroClient):
         except Exception:
             pass
 
+    async def get_bot_perspective(
+        self, 
+        message: types.Message, 
+        delay: float = 2,
+        max_tries: int = 10,
+        allow_text: bool = True,
+    ):
+        """
+            Returns a message from the bot's perspective.
+        """
+        if not message.media and not allow_text:
+            return None
+        
+        if self.me.is_bot:
+            return message
+        
+        asyncio.create_task(self.forward_messages_with_delay(
+            chat_id=self.the_bot.me.username or self.the_bot.me.id,
+            from_chat_id=message.chat.id,
+            message_ids=message.id,
+            disable_notification=False,
+            delay=delay,
+        ))
+        message_from_bot: types.Message = None
+        for _ in range(max_tries):
+            message_from_bot = await self.the_bot.scp_listen(chat_id=self.me.id)
+            if message_from_bot.media == message.media:
+                break
+        
+        return message_from_bot
+        
     async def get_media_file_id(
         self, 
         message: types.Message, 
@@ -560,28 +591,7 @@ class ScpClient(WotoPyroClient):
             no point in getting the id that belongs to the user.
             If the message is not a media message, it returns None.
         """
-        if not message.media:
-            return None
-        
-        if self.me.is_bot:
-            return getattr(getattr(message, message.media.name.lower(), None), 
-                       "file_id", None)
-        
-        asyncio.create_task(self.forward_messages_with_delay(
-            chat_id=self.the_bot.me.id,
-            from_chat_id=message.chat.id,
-            message_ids=message.id,
-            disable_notification=False,
-            delay=delay,
-        ))
-        message_from_bot: types.Message = None
-        for _ in range(10):
-            message_from_bot = await self.the_bot.scp_listen(chat_id=self.me.id)
-            if message_from_bot.media == message.media:
-                break
-        else:
-            return None
-        
+        message_from_bot = await self.get_bot_perspective(message, delay, allow_text=False)
         return getattr(getattr(message_from_bot, message_from_bot.media.name.lower(), None), 
                        "file_id", None)
     

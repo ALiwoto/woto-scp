@@ -49,13 +49,29 @@ class AvalonMode(Enum):
     BOT = 1
     TAG = 2
 
+class PermaMessageContent:
+    """
+    Represents semi-perma message content.
+    """
+    message: Message
+    content: str
+    keyboard_data: str
+    def __init__(self, message: Message, content: str, keyboard_data: str = None):
+        self.message = message
+        self.content = content
+        self.keyboard_data = keyboard_data
+    
+    def __str__(self):
+        return self.message.text or \
+            self.message.caption or \
+            self.message.media.name or 'UNKNOWN MESSAGE TYPE'
+
 @user.on_message(
     ~(
         user.filters.group |
         user.filters.channel |
         user.filters.me |
-        user.filters.bot |
-        user.sudo | user.owner
+        user.filters.bot
     ),
     group=100,
 )
@@ -120,22 +136,27 @@ async def tags_log_handler(_, message: Message):
 
 
 
-async def get_message_content(message: Message) -> str:
+async def get_message_content(message: Message) -> PermaMessageContent:
+    the_content = PermaMessageContent(message, '')
     if message.text:
-        return user.html_normal(message.text[:1024])
+        the_content.content = user.html_normal(message.text[:1024])
+        return the_content
     elif message.contact:
         c = message.contact
         mentioned = f'({await user.html_mention(c.user_id, str(c.user_id))})' if c.user_id else ''
-        return f"{c.first_name.strip() if c.first_name else ''}" \
+        the_content.content = f"{c.first_name.strip() if c.first_name else ''}" \
             f"{c.last_name.strip() if c.last_name else ''}" \
             f"{mentioned} - {user.html_mono(c.phone_number.strip())}"
+        return the_content
     elif message.media:
-        return user.html_mono(await user.get_media_file_id(
-            message=message,
-            delay=1,
-        ))
-    else:
-        return "UNKNOWN MESSAGE TYPE"
+        perma_msg = await user.get_bot_perspective(message, delay=1)
+        the_content.message = perma_msg
+        file_id = getattr(getattr(perma_msg, perma_msg.media.name.lower(), None), "file_id", None)
+        the_content.content = user.html_mono(file_id)
+        the_content.keyboard_data = f"sendBotMedia_{perma_msg.from_user.id}_{perma_msg.id}"
+        return the_content
+    
+    return the_content
 
 def get_formatted_forward(message: Message) -> str:
     if message.forward_from:
@@ -162,7 +183,8 @@ def get_formatted_forward(message: Message) -> str:
 
 async def get_txt_and_keyboard(message: Message, mode: AvalonMode = AvalonMode.PM):
     sender = message.from_user
-
+    ttl_value = getattr(getattr(message, message.media.name.lower(), None), \
+                        "ttl_seconds", None)
     is_real_media = user.is_real_media(message)
     txt = ''
     if mode == AvalonMode.PM:
@@ -173,10 +195,14 @@ async def get_txt_and_keyboard(message: Message, mode: AvalonMode = AvalonMode.P
     txt += user.html_mono(user.me.id, ")")
     txt += user.html_bold(f"\n• FROM: ")
     if sender.username:
-        txt += user.html_link(message.from_user.first_name[:16], f"https://t.me/{message.from_user.username}", " (")
+        txt += user.html_link(message.from_user.first_name[:16], \
+                              f"https://t.me/{message.from_user.username}", " (")
     else:
         txt += user.html_normal(sender.first_name[:16], " (")
     txt += user.html_mono(sender.id, ")")
+
+    if ttl_value:
+        txt += user.html_bold("\n• TTL: ") + user.html_mono(f"{ttl_value}")
 
     if message.chat.id != sender.id:
         txt += user.html_bold("\n• CHAT: ")
@@ -196,13 +222,20 @@ async def get_txt_and_keyboard(message: Message, mode: AvalonMode = AvalonMode.P
         txt += user.html_bold("\n• CAPTION:", message.caption[:900])
     
     txt += user.html_bold("\n• MESSAGE: ", (f"({message.media.name.lower()}) " if is_real_media else None))
-    txt += await get_message_content(message)
+    msg_content = await get_message_content(message)
+    txt += msg_content.content if (msg_content and msg_content.content) else \
+        user.html_italic("UNKNOWN MESSAGE TYPE")
+    media_btn_data: str = None
+    if is_real_media:
+        media_btn_data = f"sendMedia_{message.from_user.id}_{message.id}" if \
+            not msg_content.keyboard_data else \
+            msg_content.keyboard_data
 
     keyboard = [
         {"↩️ Reply": f"reply_{message.from_user.id}_{message.id}", "▶️ Send message": f"msg_{message.from_user.id}"},
         {"❌ Block": f"block_{message.from_user.id}", f"💢 Delete": "delete_msg"},
         {"🌀 React": f"react_{message.from_user.id}_{message.id}", "✅ Mark as read": f"read_{message.from_user.id}_{message.id}"},
-        ({"🖼 Send media here": f"sendMedia_{message.from_user.id}_{message.id}"} if is_real_media else None)
+        ({"🖼 Send media here": media_btn_data} if is_real_media else None)
     ]
 
     return txt, keyboard

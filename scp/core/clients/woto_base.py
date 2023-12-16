@@ -30,6 +30,7 @@ from pyrogram import (
     session,
     filters as pyroFilters
 )
+from pyrogram.errors.exceptions.bad_request_400 import MessageIdInvalid
 from pyrogram.raw.functions.channels import GetFullChannel
 from pyrogram.raw.functions.phone import EditGroupCallTitle
 from pyrogram.raw.types.messages.chat_full import ChatFull
@@ -88,15 +89,18 @@ class WotoClientBase(Client):
     ) -> Union["types.Message", List["types.Message"]]:
         target_chat = await self.get_chat(from_chat_id)
         if not target_chat.has_protected_content:
-            return await super().forward_messages(
-                chat_id=chat_id,
-                from_chat_id=from_chat_id,
-                message_ids=message_ids,
-                message_thread_id=message_thread_id,
-                disable_notification=disable_notification,
-                schedule_date=schedule_date,
-                protect_content=protect_content
-            )
+            try:
+                return await super().forward_messages(
+                    chat_id=chat_id,
+                    from_chat_id=from_chat_id,
+                    message_ids=message_ids,
+                    message_thread_id=message_thread_id,
+                    disable_notification=disable_notification,
+                    schedule_date=schedule_date,
+                    protect_content=protect_content
+                )
+            except MessageIdInvalid:
+                pass # let it pass actually
 
         is_iterable = not isinstance(message_ids, int)
         message_ids = list(message_ids) if is_iterable else [message_ids]
