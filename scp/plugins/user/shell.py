@@ -200,7 +200,8 @@ async def cat(_, message: Message):
     reply = rfile = None
     try:
         if not isinstance(media, str):
-            rfile = tempfile.NamedTemporaryFile(mode='w')
+            rfile = tempfile.NamedTemporaryFile(mode='w', delete=False)
+            rfile.close()
             reply = await message.reply_text('Downloading...')
             await user.download_media(
                 media, 
