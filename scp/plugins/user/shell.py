@@ -200,7 +200,7 @@ async def cat(_, message: Message):
     reply = rfile = None
     try:
         if not isinstance(media, str):
-            rfile = tempfile.NamedTemporaryFile()
+            rfile = tempfile.NamedTemporaryFile(mode='w')
             reply = await message.reply_text('Downloading...')
             await user.download_media(
                 media, 
@@ -222,8 +222,7 @@ async def cat(_, message: Message):
                     await getattr(reply, 'edit_text', message.reply_text)(html_mono(chunk))
                     done = True
     finally:
-        if rfile:
-            rfile.close()
+        user.remove_file(media)
 
 
 @user.on_message(
