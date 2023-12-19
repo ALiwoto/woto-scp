@@ -184,7 +184,7 @@ def get_formatted_forward(message: Message) -> str:
 async def get_txt_and_keyboard(message: Message, mode: AvalonMode = AvalonMode.PM):
     sender = message.from_user
     ttl_value = getattr(getattr(message, message.media.name.lower(), None), \
-                        "ttl_seconds", None)
+                        "ttl_seconds", None) if is_real_media else None
     is_real_media = user.is_real_media(message)
     txt = ''
     if mode == AvalonMode.PM:
