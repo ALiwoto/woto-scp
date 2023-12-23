@@ -319,7 +319,7 @@ async def tPurge_handler(_, message: Message):
 	~user.filters.via_bot &
 	user.sudo & 
 	user.command(
-        ['deadaccs'],
+        ['deadaccs', 'dedaccs'],
         prefixes=user.cmd_prefixes,
     ),
 )
@@ -342,7 +342,7 @@ async def deadaccs_handler(_, message: Message):
             found_count += 1
             if should_kick:
                 try:
-                    await user.kick_chat_member(
+                    await user.ban_chat_member(
                         chat_id=message.chat.id,
                         user_id=current.user.id,
                     )
