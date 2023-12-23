@@ -5,6 +5,7 @@ import logging
 
 
 def list_map(func, iterator):
+    if not iterator: return []
     return list(map(func, iterator))
 
 class WotoConfig:
@@ -21,6 +22,7 @@ class WotoConfig:
     _special_users: typing.List[int] = []
     prefixes: typing.List[str] = []
     log_channel: int = 0
+    chat_join_shield: typing.List[int] = []
     avalon_pms: int = 0
     avalon_bots: int = 0
     avalon_tags: int = 0
@@ -68,6 +70,7 @@ class WotoConfig:
         self._owner_users = list_map(int, self._the_config.get('woto-scp', 'owner_list').split())
         self._sudo_users = list_map(int, self._the_config.get('woto-scp', 'sudo_list').split())
         self._special_users = list_map(int, self._the_config.get('woto-scp', 'special_users').split())
+        self.chat_join_shield = list_map(int, self._the_config.get('woto-scp', 'chat_join_shield', fallback="").split())
         
         self.prefixes = (
             self._the_config.get('woto-scp', 'Prefixes').split() or ['!', '.']
