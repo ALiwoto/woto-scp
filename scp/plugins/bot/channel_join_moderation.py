@@ -82,11 +82,10 @@ async def validate_member(_, update: ChatMemberUpdated):
         return
     
     # check if the last online date is within 10 minutes
-    if (datetime.datetime.now() - the_target.last_online_date).seconds < 600:
+    if (datetime.datetime.now() - the_target.last_online_date).seconds > 600:
+        # user has been offline for more than 10 minutes and have joined the channel
+        # right now. sounds wrong.
+        await bot.ban_chat_member(chat_id=update.chat.id, user_id=the_target.id)
         return
     
-    # user has been offline for more than 10 minutes and have joined the channel
-    # right now. sounds wrong.
-    await bot.ban_chat_member(chat_id=update.chat.id, user_id=the_target.id)
-    return
-    
+    # add more conditions here in the future
