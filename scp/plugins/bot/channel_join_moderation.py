@@ -64,14 +64,17 @@ async def validate_member(_, update: ChatMemberUpdated):
                 continue
             all_recently_joined_users.append(current.user)
     
+    whole_name = f"{the_target.first_name or ''} {the_target.last_name or ''}".strip()
+    if not whole_name.isnumeric():
+        await bot.ban_chat_member(chat_id=update.chat.id, user_id=the_target.id)
+        return
+
     if not the_target or not the_target.last_online_date:
         return
     
     # check if the last online date is within 10 minutes
     if (datetime.datetime.now() - the_target.last_online_date).seconds < 600:
-        whole_name = f"{the_target.first_name or ''} {the_target.last_name or ''}".strip()
-        if not whole_name.isnumeric():
-            return
+        return
     
     # user has been offline for more than 10 minutes and have joined the channel
     # right now. sounds wrong.
