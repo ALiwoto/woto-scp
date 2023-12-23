@@ -25,7 +25,8 @@ async def start_bot():
     await user.start()
     await updateInfo()
     #await InitializeDatabase()
-    asyncio.create_task(shell())
+    if not user.scp_config.no_input:
+        asyncio.create_task(shell())
     await asyncio.gather(
         load_bot_plugins(),
         load_user_plugins(),
