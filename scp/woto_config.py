@@ -14,6 +14,7 @@ class WotoConfig:
     api_hash: str = ''
     device_model: str = ''
     app_version: str = ''
+    no_input: bool = False
 
     _sudo_users: typing.List[int] = []
     _owner_users: typing.List[int] = []
@@ -62,6 +63,7 @@ class WotoConfig:
         self.api_hash = self._the_config.get('pyrogram', 'api_hash')
         self.device_model = self._the_config.get('pyrogram', 'device_model', fallback='Kaizoku v1.2')
         self.app_version = self._the_config.get('pyrogram', 'app_version', fallback='woto-scp v0.0.1')
+        self.no_input = self._the_config.getboolean('pyrogram', 'no_input', fallback=False)
 
         self._owner_users = list_map(int, self._the_config.get('woto-scp', 'owner_list').split())
         self._sudo_users = list_map(int, self._the_config.get('woto-scp', 'sudo_list').split())
