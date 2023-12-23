@@ -325,9 +325,17 @@ async def tPurge_handler(_, message: Message):
 )
 async def deadaccs_handler(_, message: Message):
     should_kick = message.text.find('kick') > 0
+    if should_kick:
+        message.text = message.text.replace("kick", "").strip()
+    
+    target_chat = user.get_non_cmd(message)
+    if not target_chat:
+        target_chat = message.chat.id
+    else: target_chat = int(target_chat)
+
     found_count = 0
     kicked_count = 0
-    async for current in user.iter_chat_members(chat_id=message.chat.id):
+    async for current in user.iter_chat_members(chat_id=target_chat):
         if not isinstance(current, ChatMember) or current.status == ChatMemberStatus.LEFT:
             continue
         if current.user.is_deleted:
