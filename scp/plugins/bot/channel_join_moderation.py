@@ -52,7 +52,7 @@ async def validate_member(_, update: ChatMemberUpdated):
         async for current in user.get_chat_event_log(
             chat_id=update.chat.id, 
             filters=ChatEventFilter(new_members=True),
-            limit=1
+            limit=5
         ):
             if not isinstance(current, ChatEvent):
                 continue
@@ -63,6 +63,9 @@ async def validate_member(_, update: ChatMemberUpdated):
             if current.user.id in all_recently_joined_users_id:
                 continue
             all_recently_joined_users.append(current.user)
+    
+    if not the_target:
+        the_target = await user.get_users(update.new_chat_member.user.id)
     
     whole_name = f"{the_target.first_name or ''} {the_target.last_name or ''}".strip()
     if not whole_name.isnumeric():
