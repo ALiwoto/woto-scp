@@ -17,7 +17,7 @@ all_recently_joined_users_id = []
 join_check_lock = asyncio.Lock()
 
 @bot.on_chat_member_updated(
-    filters=user.filters.chat(user.scp_config.chat_join_shield)
+    # filters=user.filters.chat(user.scp_config.chat_join_shield)
 )
 async def chatMember_handler(_, update: ChatMemberUpdated):
     if not update.new_chat_member or \
@@ -64,15 +64,21 @@ async def validate_member(_, update: ChatMemberUpdated):
                 continue
             all_recently_joined_users.append(current.user)
     
+    # 1. user object validation
     if not the_target:
-        the_target = await user.get_users(update.new_chat_member.user.id)
+        try:
+            the_target = await user.get_users(update.new_chat_member.user.id)
+        except: 
+            the_target = update.new_chat_member.user
     
+    # 2. name validation
     whole_name = f"{the_target.first_name or ''} {the_target.last_name or ''}".strip()
-    if not whole_name.isnumeric():
+    if whole_name.isnumeric():
         await bot.ban_chat_member(chat_id=update.chat.id, user_id=the_target.id)
         return
 
-    if not the_target or not the_target.last_online_date:
+    # last seen validation
+    if not the_target.last_online_date:
         return
     
     # check if the last online date is within 10 minutes
