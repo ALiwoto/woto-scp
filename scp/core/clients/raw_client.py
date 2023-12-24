@@ -615,6 +615,7 @@ class ScpClient(WotoPyroClient):
     sudo = (filters.me | filters.user(the_config._sudo_users))
     owner = (filters.me | filters.user(the_config._owner_users))
     special_users = (filters.me | filters.user(the_config._special_users))
+    special_channels = filters.chat(the_config._special_channels)
     azure_sudo_users = filters.user(the_config._azure_sudo_users)
     enforcer = (filters.me | filters.user(the_config._enforcers))
     inspector = (filters.me | filters.user(the_config._inspectors))

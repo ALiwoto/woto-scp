@@ -12,7 +12,7 @@ from pyrogram.enums.chat_member_status import ChatMemberStatus
 from pyrogram.enums.chat_members_filter import ChatMembersFilter
 from SibylSystem.types import MultiBanInfo
 from pyrogram.types.user_and_chats.chat_permissions import ChatPermissions
-from scp import user
+from scp import user, bot
 from scp.utils.misc import can_member_match, remove_special_chars
 from scp.utils.parser import (
     BasicFlagContainer,
@@ -247,6 +247,13 @@ async def by_channels_handler(_, message: Message):
         await from_message.delete()
 
 
+@bot.on_message(
+    user.special_channels &
+    user.command(
+        ['purge'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
@@ -258,16 +265,22 @@ async def by_channels_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def purge_handler(_, message: Message):
+async def purge_handler(client, message: Message):
     first = message.reply_to_message.id
     current = message.id
     # messages between first and current
     messages = [m for m in range(first, current + 1)]
-
-    await user.delete_all_messages(
-        chat_id=message.chat.id,
-        message_ids=messages,
-    )
+    
+    if client == bot:
+        await bot.delete_all_messages(
+            chat_id=message.chat.id,
+            message_ids=messages,
+        )
+    else:
+        await user.delete_all_messages(
+            chat_id=message.chat.id,
+            message_ids=messages,
+        )
 
 
 @user.on_message(~user.filters.scheduled & 
