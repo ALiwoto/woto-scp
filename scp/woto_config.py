@@ -20,6 +20,7 @@ class WotoConfig:
     _sudo_users: typing.List[int] = []
     _owner_users: typing.List[int] = []
     _special_users: typing.List[int] = []
+    _special_channels: typing.List[int] = []
     prefixes: typing.List[str] = []
     log_channel: int = 0
     chat_join_shield: typing.List[int] = []
@@ -70,7 +71,7 @@ class WotoConfig:
         self._owner_users = list_map(int, self._the_config.get('woto-scp', 'owner_list').split())
         self._sudo_users = list_map(int, self._the_config.get('woto-scp', 'sudo_list').split())
         self._special_users = list_map(int, self._the_config.get('woto-scp', 'special_users').split())
-        self.chat_join_shield = list_map(int, self._the_config.get('woto-scp', 'chat_join_shield', fallback="").split())
+        self._special_channels = list_map(int, self._the_config.get('woto-scp', 'special_channels').split())
         
         self.prefixes = (
             self._the_config.get('woto-scp', 'Prefixes').split() or ['!', '.']

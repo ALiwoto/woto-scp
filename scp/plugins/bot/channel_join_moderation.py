@@ -18,7 +18,7 @@ join_check_lock = asyncio.Lock()
 last_time_check: datetime.datetime = None
 
 @bot.on_chat_member_updated(
-    filters=user.filters.chat(user.scp_config.chat_join_shield)
+    filters=user.special_channels
 )
 async def chatMember_handler(_, update: ChatMemberUpdated):
     if not update.new_chat_member or \
