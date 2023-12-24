@@ -15,9 +15,10 @@ from pyrogram.types.user_and_chats.chat_event import ChatEvent
 all_recently_joined_users = []
 all_recently_joined_users_id = []
 join_check_lock = asyncio.Lock()
+last_time_check: datetime.datetime = None
 
 @bot.on_chat_member_updated(
-    # filters=user.filters.chat(user.scp_config.chat_join_shield)
+    filters=user.filters.chat(user.scp_config.chat_join_shield)
 )
 async def chatMember_handler(_, update: ChatMemberUpdated):
     if not update.new_chat_member or \
@@ -33,12 +34,18 @@ async def chatMember_handler(_, update: ChatMemberUpdated):
     join_check_lock.release()
 
 async def validate_member(_, update: ChatMemberUpdated):
+    global last_time_check
+    if last_time_check and \
+        (datetime.datetime.now() - last_time_check).seconds > 200:
+        await asyncio.sleep(5)
+    
+    last_time_check = datetime.datetime.now()
     the_target: User = None
     if not all_recently_joined_users:
         async for current in user.get_chat_event_log(
             chat_id=update.chat.id, 
             filters=ChatEventFilter(new_members=True),
-            limit=25,
+            limit=250,
         ):
             if not isinstance(current, ChatEvent):
                 continue
@@ -52,7 +59,7 @@ async def validate_member(_, update: ChatMemberUpdated):
         async for current in user.get_chat_event_log(
             chat_id=update.chat.id, 
             filters=ChatEventFilter(new_members=True),
-            limit=5
+            limit=70
         ):
             if not isinstance(current, ChatEvent):
                 continue
@@ -67,7 +74,10 @@ async def validate_member(_, update: ChatMemberUpdated):
     # 1. user object validation
     if not the_target:
         try:
-            the_target = await user.get_users(update.new_chat_member.user.id)
+            target_id = update.new_chat_member.user.username \
+                if update.new_chat_member.user.username \
+                else update.new_chat_member.user.id
+            the_target = await user.get_users(user_ids=target_id)
         except: 
             the_target = update.new_chat_member.user
     
