@@ -58,6 +58,9 @@ class WotoConfig:
     proxy_username : str = ''
     proxy_password : str = ''
 
+    pixiv_access_token : str = ''
+    pixiv_refresh_token : str = ''
+
     def __init__(self, config_file='config.ini') -> None:
         self._the_config = ConfigParser()
         self._the_config.read(config_file)
@@ -71,7 +74,7 @@ class WotoConfig:
         self._owner_users = list_map(int, self._the_config.get('woto-scp', 'owner_list').split())
         self._sudo_users = list_map(int, self._the_config.get('woto-scp', 'sudo_list').split())
         self._special_users = list_map(int, self._the_config.get('woto-scp', 'special_users').split())
-        self._special_channels = list_map(int, self._the_config.get('woto-scp', 'special_channels').split())
+        self._special_channels = list_map(int, self._the_config.get('woto-scp', 'special_channels', fallback='').split())
         
         self.prefixes = (
             self._the_config.get('woto-scp', 'Prefixes').split() or ['!', '.']
@@ -113,6 +116,12 @@ class WotoConfig:
             self.load_proxy()
         except Exception as e:
             logging.warning(e, stacklevel=3)
+        
+        # pixiv configuration
+        try:
+            self.load_pixiv()
+        except Exception as e:
+            logging.warning(e, stacklevel=3)
     
     def load_sibyl_config(self) -> None:
         self._enforcers = list_map(int, self._the_config.get('sibyl-system', 'enforcers').split())
@@ -151,6 +160,10 @@ class WotoConfig:
         self.proxy_port = self._the_config.getint('proxy', 'port', fallback=0)
         self.proxy_username = self._the_config.get('proxy', 'username', fallback=None)
         self.proxy_password = self._the_config.get('proxy', 'password', fallback=None)
+    
+    def load_pixiv(self) -> None:
+        self.pixiv_access_token = self._the_config.get('pixiv', 'access_token', fallback='')
+        self.pixiv_refresh_token = self._the_config.get('pixiv', 'refresh_token', fallback='')
 
 
     def is_sudo(self, user: int) -> bool:

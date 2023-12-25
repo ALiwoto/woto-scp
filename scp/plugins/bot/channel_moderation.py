@@ -9,7 +9,6 @@ from pyrogram.types import (
     ChatEventFilter,
     User
 )
-
 from pyrogram.types.user_and_chats.chat_event import ChatEvent
 
 all_recently_joined_users = []
