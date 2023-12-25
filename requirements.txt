@@ -22,3 +22,4 @@ wotoplatform==0.0.25
 azure-cognitiveservices-speech==1.27.0
 PyDrive==1.3.1
 yt-dlp==2023.10.13
+pydantic==1.10.8

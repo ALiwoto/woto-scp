@@ -119,3 +119,21 @@ async def tagged_filter(_, client:'pyrogram.Client', m: types.Message) -> bool:
 tagged = filters.create(tagged_filter)
 """Filter messages that are tagging you in some ways."""
 
+async def pixiv_filter(_, __, m: types.Message) -> bool:
+    # use a regex to match pixiv urls
+    # https://www.pixiv.net/artworks/12345678
+    # https://www.pixiv.net/en/artworks/12345678
+    # https://www.pixiv.net/member_illust.php?mode=medium&illust_id=12345678
+    # https://www.pixiv.net/en/member_illust.php?mode=medium&illust_id=12345678
+    # https://www.pixiv.net/member_illust.php?mode=big&illust_id=12345678
+    # https://www.pixiv.net/en/member_illust.php?mode=big&illust_id=12345678
+
+    if not m or not m.text:
+        return False
+    my_text = m.text.lower()
+    if my_text.find('pixiv.net') == -1:
+        return False
+    
+    return True
+
+pixiv = filters.create(pixiv_filter)
