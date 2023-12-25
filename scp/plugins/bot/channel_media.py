@@ -26,6 +26,12 @@ async def pixiv_handler(_, message: Message):
     if not isinstance(pixiv_api, AppPixivAPI):
         return
     
+    # parse the url
+    url = message.text
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    await message.delete()
+
     if not pixiv_api.access_token and user.scp_config.pixiv_access_token:
         try:
             pixiv_api.set_auth(
@@ -34,11 +40,7 @@ async def pixiv_handler(_, message: Message):
             )
             pixiv_api.auth()
         except: pass
-    # parse the url
-    url = message.text
-    parsed_url = urlparse(url)
-    query_params = parse_qs(parsed_url.query)
-
+    
     illust_id: str = None
     try:
         # get the illust id
@@ -62,7 +64,7 @@ async def pixiv_handler(_, message: Message):
     if not pixiv_api.download(illust.illust.image_urls.large, path='.', name=file_path):
         return
     
-    await message.delete()
+    
     caption = user.html_link("Artist", url)
     caption += "\n@" + user.html_normal(message.chat.username) \
         if message.chat.username \
