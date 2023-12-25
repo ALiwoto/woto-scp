@@ -68,7 +68,7 @@ async def pixiv_handler(_, message: Message):
     caption = user.html_link("Artist", url)
     caption += "\n@" + user.html_normal(message.chat.username) \
         if message.chat.username \
-        else (message.chat.usernames[0] if message.chat.usernames else "")
+        else (message.chat.usernames[0].username if message.chat.usernames else "")
     # send the picture
     sent_photo_msg: Message = None
     try:
