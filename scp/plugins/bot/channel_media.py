@@ -1,3 +1,4 @@
+from io import BytesIO
 import re
 import time
 import json
@@ -15,6 +16,8 @@ from pyrogram.types import (
 from scp.utils.media_utils import PixivIllustInfo
 from urllib.parse import parse_qs, urlparse
 from pixivpy3 import AppPixivAPI
+from gallery_dl.extractor import find as find_extractor
+from gallery_dl.extractor.message import Message as ExtractorMessage
 
 pixiv_api = AppPixivAPI()
 setattr(user, 'pixiv_api', pixiv_api)
@@ -47,16 +50,6 @@ def do_pixiv_auth(pixiv_api: AppPixivAPI):
         # expired, so we need to re-auth, with recursive
         pixiv_api.access_token = None
         return do_pixiv_auth(pixiv_api)
-
-def has_single_meta_page_url(illust) -> bool:
-    try:
-        return bool(illust.illust.meta_single_page.original_image_url)
-    except: return False
-
-def has_multiple_meta_pages(illust) -> bool:
-    try:
-        return bool(illust.illust.meta_pages)
-    except: return False
 
 @bot.on_message(
     user.wfilters.pixiv &
@@ -178,5 +171,50 @@ async def pixiv_handler(_, message: Message):
         )
         user.remove_file(file_path)
 
+@bot.on_message(
+    user.wfilters.twitter &
+    user.special_channels
+)
+async def twitter_handler(_, message: Message):
+    parsed_url = urlparse(message.text)
+    extractor = find_extractor(message.text)
+    if not extractor:
+        return
     
+    await message.delete()
+    direct_url: str = None
+    # extractor is found
+    for msg in extractor:
+        if not isinstance(msg, tuple):
+            # unexpected, should be checked in the future
+            continue
+
+        if msg[0] == ExtractorMessage.Url:
+            direct_url = msg[1]
+            break
+    
+    if not direct_url:
+        return
+    
+    caption = user.html_link("Artist", message.text)
+    caption += "\n@" + (user.html_normal(message.chat.username) \
+        if message.chat.username \
+        else (message.chat.usernames[0].username if message.chat.usernames else ""))
+    
+    async with user.aioclient.get(
+        url=direct_url
+    ) as response:
+        my_pic = BytesIO(await response.read())
+        setattr(my_pic, 'name', f"{parsed_url.path.split('/')[-1]}.jpg")
+    
+    sent_photo = await bot.send_photo(
+        chat_id=message.chat.id,
+        photo=my_pic,
+        caption=caption,
+    )
+    await bot.send_document(
+        chat_id=message.chat.id,
+        document=my_pic,
+        reply_to_message_id=sent_photo.message_id,
+    )
 

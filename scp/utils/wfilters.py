@@ -120,7 +120,6 @@ tagged = filters.create(tagged_filter)
 """Filter messages that are tagging you in some ways."""
 
 async def pixiv_filter(_, __, m: types.Message) -> bool:
-    # use a regex to match pixiv urls
     # https://www.pixiv.net/artworks/12345678
     # https://www.pixiv.net/en/artworks/12345678
     # https://www.pixiv.net/member_illust.php?mode=medium&illust_id=12345678
@@ -137,3 +136,17 @@ async def pixiv_filter(_, __, m: types.Message) -> bool:
     return True
 
 pixiv = filters.create(pixiv_filter)
+
+async def twitter_filter(_, __, m: types.Message) -> bool:
+    # filter for finding twitter urls
+
+    if not m or not m.text:
+        return False
+    my_text = m.text.lower()
+    if my_text.find('twitter.com') != -1 or my_text.find('x.com') != -1:
+        return False
+    
+    # handle more stuff here in future
+    return True
+
+twitter = filters.create(pixiv_filter)
