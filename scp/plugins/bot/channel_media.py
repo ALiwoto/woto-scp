@@ -13,6 +13,7 @@ from pyrogram.types import (
     InputMediaPhoto,
     InputMediaDocument,
 )
+from pyrogram.enums import ParseMode
 from scp.utils.media_utils import PixivIllustInfo
 from urllib.parse import parse_qs, urlparse
 from pixivpy3 import AppPixivAPI
@@ -117,7 +118,8 @@ async def pixiv_handler(_, message: Message):
             pixiv_api.download(large_url, path='.', name=file_path)
             all_files_input.append(InputMediaPhoto(
                 media=file_path,
-                caption=(caption if current_counter == 1 else "")
+                caption=(caption if current_counter == 1 else ""),
+                parse_mode=ParseMode.HTML,
             ))
             if len(all_files_input) >= 10:
                 break
@@ -148,7 +150,8 @@ async def pixiv_handler(_, message: Message):
             sent_photo_msg = await bot.send_photo(
                 chat_id=message.chat.id, 
                 photo=file_path,
-                caption=caption
+                caption=caption,
+                parse_mode=ParseMode.HTML,
             )
         except:
             medium_file_path = f'pic_medium_{illust_id}.jpg'
@@ -211,6 +214,7 @@ async def twitter_handler(_, message: Message):
         chat_id=message.chat.id,
         photo=my_pic,
         caption=caption,
+        parse_mode=ParseMode.HTML,
     )
     await bot.send_document(
         chat_id=message.chat.id,
