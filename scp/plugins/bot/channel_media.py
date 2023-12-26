@@ -1,10 +1,11 @@
 from io import BytesIO
+from typing import List
 import re
 import time
 import json
 import asyncio
 import datetime
-from scp import bot, user
+from scp import bot, user, ScpClient
 from pyrogram.types import (
     ChatMemberUpdated, 
     ChatEventFilter,
@@ -121,14 +122,16 @@ async def pixiv_handler(_, message: Message):
                 caption=(caption if current_counter == 1 else ""),
                 parse_mode=ParseMode.HTML,
             ))
-            if len(all_files_input) >= 10:
-                break
             
             file_path = original_url.split('/')[-1]
             pixiv_api.download(original_url, path='.', name=file_path)
             all_large_inputs.append(InputMediaDocument(
                 media=file_path
             ))
+
+            # telegram's limit is 10
+            if len(all_files_input) >= 10:
+                break
             
         sent_album = await bot.send_media_group(
             chat_id=message.chat.id, 
@@ -174,18 +177,36 @@ async def pixiv_handler(_, message: Message):
         )
         user.remove_file(file_path)
 
-@bot.on_message(
-    user.wfilters.twitter &
-    user.special_channels
+@user.on_message(
+    ~user.filters.scheduled
+    & ~user.filters.forwarded
+    & ~user.filters.sticker
+    & ~user.filters.via_bot
+    & (user.owner | user.sudo)
+    # & user.wfilters.twitter
+    & user.command(
+        ['tw', 'twitter'],
+        prefixes=user.cmd_prefixes,
+    ),
 )
-async def twitter_handler(_, message: Message):
-    parsed_url = urlparse(message.text)
-    extractor = find_extractor(message.text)
+@bot.on_message(
+    user.wfilters.twitter
+    & user.special_channels
+)
+async def twitter_handler(client: "ScpClient", message: Message):
+    url = message.text
+    non_cmd = user.get_non_cmd(message)
+    if non_cmd:
+        url = non_cmd
+    parsed_url = urlparse(url)
+    extractor = find_extractor(url)
     if not extractor:
         return
     
-    await message.delete()
-    direct_url: str = None
+    if not non_cmd:
+        # not a command
+        await message.delete()
+    direct_urls: List[str] = []
     # extractor is found
     for msg in extractor:
         if not isinstance(msg, tuple):
@@ -193,32 +214,79 @@ async def twitter_handler(_, message: Message):
             continue
 
         if msg[0] == ExtractorMessage.Url:
-            direct_url = msg[1]
-            break
+            direct_urls.append(msg[1])
     
-    if not direct_url:
+    if not direct_urls:
+        # couldn't fetch any direct url...
+        # perhaps add a log or something in here in the future
         return
     
-    caption = user.html_link("Artist", message.text)
-    caption += "\n@" + (user.html_normal(message.chat.username) \
-        if message.chat.username \
-        else (message.chat.usernames[0].username if message.chat.usernames else ""))
-    
-    async with user.aioclient.get(
-        url=direct_url
-    ) as response:
-        my_pic = BytesIO(await response.read())
-        setattr(my_pic, 'name', f"{parsed_url.path.split('/')[-1]}.jpg")
-    
-    sent_photo = await bot.send_photo(
-        chat_id=message.chat.id,
-        photo=my_pic,
-        caption=caption,
-        parse_mode=ParseMode.HTML,
-    )
-    await bot.send_document(
-        chat_id=message.chat.id,
-        document=my_pic,
-        reply_to_message_id=sent_photo.message_id,
-    )
+    caption = user.html_link("Artist", url)
+    if not non_cmd:
+        caption += "\n@" + (user.html_normal(message.chat.username) \
+            if message.chat.username \
+            else (message.chat.usernames[0].username if message.chat.usernames else ""))
+
+    if len(direct_urls) == 1:
+        # single pic
+        async with user.aioclient.get(
+            url=direct_urls[0]
+        ) as response:
+            my_pic = BytesIO(await response.read())
+            setattr(my_pic, 'name', f"{parsed_url.path.split('/')[-1]}.jpg")
+        
+        sent_photo = await client.send_photo(
+            chat_id=message.chat.id,
+            photo=my_pic,
+            caption=caption,
+            parse_mode=ParseMode.HTML,
+        )
+        await client.send_document(
+            chat_id=message.chat.id,
+            document=my_pic,
+            reply_to_message_id=sent_photo.message_id,
+        )
+        my_pic.close()
+    else:
+        # we have to send them as album
+        all_files_input = []
+        all_large_inputs = []
+        all_memory_files: List[BytesIO] = []
+        current_counter = 0
+        for current_url in direct_urls:
+            current_counter += 1
+            async with user.aioclient.get(
+                url=current_url
+            ) as response:
+                my_pic = BytesIO(await response.read())
+                setattr(my_pic, 'name', f"{parsed_url.path.split('/')[-1]}_{current_counter}.jpg")
+                all_memory_files.append(my_pic)
+            
+            all_files_input.append(InputMediaPhoto(
+                media=my_pic,
+                caption=(caption if current_counter == 1 else ""),
+                parse_mode=ParseMode.HTML,
+            ))
+            
+            all_large_inputs.append(InputMediaDocument(
+                media=my_pic
+            ))
+
+            if len(all_files_input) >= 10:
+                break
+        
+        sent_album = await client.send_media_group(
+            chat_id=message.chat.id, 
+            media=all_files_input,
+        )
+        await client.send_media_group(
+            chat_id=message.chat.id, 
+            media=all_large_inputs,
+            reply_to_message_id=sent_album[0].message_id,
+        )
+
+        # clean up the memory
+        for current_file in all_memory_files:
+            current_file.close()
+
 
