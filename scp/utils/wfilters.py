@@ -130,10 +130,10 @@ async def pixiv_filter(_, __, m: types.Message) -> bool:
     if not m or not m.text:
         return False
     my_text = m.text.lower()
-    if my_text.find('pixiv.net') == -1:
-        return False
+    if my_text.find('pixiv.net') != -1:
+        return True
     
-    return True
+    return False
 
 pixiv = filters.create(pixiv_filter)
 
@@ -144,9 +144,9 @@ async def twitter_filter(_, __, m: types.Message) -> bool:
         return False
     my_text = m.text.lower()
     if my_text.find('twitter.com') != -1 or my_text.find('x.com') != -1:
-        return False
+        return True
     
     # handle more stuff here in future
-    return True
+    return False
 
-twitter = filters.create(pixiv_filter)
+twitter = filters.create(twitter_filter)

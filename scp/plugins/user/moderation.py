@@ -249,6 +249,7 @@ async def by_channels_handler(_, message: Message):
 
 @bot.on_message(
     user.special_channels &
+    ~user.filters.outgoing &
     user.command(
         ['purge'],
         prefixes=user.cmd_prefixes,
@@ -266,6 +267,9 @@ async def by_channels_handler(_, message: Message):
     ),
 )
 async def purge_handler(client, message: Message):
+    if not message.reply_to_message:
+        return
+    
     first = message.reply_to_message.id
     current = message.id
     # messages between first and current
