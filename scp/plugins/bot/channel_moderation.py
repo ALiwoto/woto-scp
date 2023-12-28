@@ -20,7 +20,8 @@ last_time_check: datetime.datetime = None
     filters=user.special_channels
 )
 async def chatMember_handler(_, update: ChatMemberUpdated):
-    if not update.new_chat_member or \
+    if not user.check_inactive_users or \
+        not update.new_chat_member or \
         update.new_chat_member.invited_by or \
         update.new_chat_member.user.is_bot:
         return
