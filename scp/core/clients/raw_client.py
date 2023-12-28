@@ -624,6 +624,7 @@ class ScpClient(WotoPyroClient):
     db: DatabaseClient = None
     log_channel = the_config.log_channel
     private_resources = the_config.private_resources
+    check_inactive_users = False
 
     # sibyl configuration stuff:
     public_sibyl_filter = filters.chat(
