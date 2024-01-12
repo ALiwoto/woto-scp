@@ -56,7 +56,7 @@ class NcInfoContainer(BaseContainer):
     app_refresher_obj: object = None
     app_refresher: Callable = None
     src_url: str = ""
-    click_amount = 150
+    click_amount = 14
 
     pe_token: str = None
     access_token: str = None
@@ -162,8 +162,25 @@ class NcInfoContainer(BaseContainer):
                     await r(self.src_url)
                 
                 await asyncio.sleep(10)
-    
-    async def do_click(self, amount: int = 300, q_response: int = None):
+
+    async def do_click(
+        self, 
+        amount: int = 300, 
+        q_response: int = None,
+        retry_times: int = 3
+    ):
+        for _ in range(retry_times):
+            last_ex = None
+            try:
+                return await self._do_click(
+                    amount=amount,
+                    q_response=q_response
+                )
+            except Exception as ex:
+                last_ex = ex
+        raise last_ex
+        
+    async def _do_click(self, amount: int = 300, q_response: int = None):
         if q_response:
             self.last_q_answer = q_response
         
