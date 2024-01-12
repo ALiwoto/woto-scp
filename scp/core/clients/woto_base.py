@@ -17,6 +17,8 @@ from io import BytesIO
 from typing import Union
 import typing
 from attrify import Attrify as Atr
+from pyrogram.raw.types.web_view_result_url import WebViewResultUrl
+from pyrogram.raw.functions.messages import RequestWebView
 from pyrogram import (
     Client,
     types,
@@ -55,6 +57,8 @@ from scp.utils.unpack import unpackInlineMessage
 
 class WotoClientBase(Client):
     HTTP_URL_MATCHING = r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*"
+    web_platform = "android"
+    web_theme = "{\"accent_text_color\":\"#6ab2f2\",\"bg_color\":\"#17212b\",\"button_color\":\"#5288c1\",\"button_text_color\":\"#ffffff\",\"destructive_text_color\":\"#ec3942\",\"header_bg_color\":\"#17212b\",\"hint_color\":\"#708499\",\"link_color\":\"#6ab3f3\",\"secondary_bg_color\":\"#232e3c\",\"section_bg_color\":\"#17212b\",\"section_header_text_color\":\"#6ab3f3\",\"subtitle_text_color\":\"#708499\",\"text_color\":\"#f5f5f5\"}"
 
     filters = pyroFilters
     __my_all_dialogs__: typing.List[types.Dialog] = None
@@ -231,6 +235,35 @@ class WotoClientBase(Client):
 
         return None
 
+    async def click_web_button_by_message_link(self, msg_url: str) -> WebViewResultUrl:
+        target_message = await self.get_message_by_link(msg_url)
+        correct_button: types.InlineKeyboardButton = None
+        # go through the buttons and find the web app button
+        for button in target_message.reply_markup.inline_keyboard:
+            for btn in button:
+                if btn.web_app:
+                    correct_button = btn
+                    break
+
+        if not correct_button:
+            raise ValueError('No web app button found.')
+
+        raw_bot = await self.resolve_peer(target_message.from_user.id)
+        my_request = RequestWebView(
+            peer=raw.types.InputPeerUser(
+                user_id=raw_bot.user_id, 
+                access_hash=raw_bot.access_hash
+            ),
+            bot=raw.types.InputUser(
+                user_id=raw_bot.user_id,
+                access_hash=raw_bot.access_hash
+            ),
+            platform='android',
+            url=correct_button.web_app.url,
+            theme_params=raw.types.DataJSON(data=self.web_theme)
+        )
+        return await self.invoke(my_request)
+
     async def send_specified_media(
         self,
         chat_id: Union[int, str],
@@ -241,6 +274,8 @@ class WotoClientBase(Client):
         caption_entities: List["types.MessageEntity"] = None,
         disable_notification: bool = None,
         reply_to_message_id: int = None,
+        reply_to_chat_id: Union[int, str] = None,
+        reply_to_story_id: int = None,
         schedule_date: datetime = None,
         reply_markup: "types.InlineKeyboardMarkup" = None,
         progress: callable = None,
@@ -268,6 +303,8 @@ class WotoClientBase(Client):
                 parse_mode=parse_mode,
                 caption_entities=caption_entities,
                 reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
                 reply_markup=reply_markup,
                 progress=progress,
                 progress_args=progress_args,
@@ -294,6 +331,8 @@ class WotoClientBase(Client):
                 thumb=thumb,
                 parse_mode=parse_mode,
                 reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
                 reply_markup=reply_markup,
                 progress=progress,
                 progress_args=progress_args,
@@ -315,6 +354,8 @@ class WotoClientBase(Client):
                 progress=progress,
                 progress_args=progress_args,
                 reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
                 reply_markup=reply_markup,
                 protect_content=protect_content
             )
@@ -333,6 +374,8 @@ class WotoClientBase(Client):
                 protect_content=protect_content,
                 reply_markup=reply_markup,
                 reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
                 ttl_seconds=ttl_seconds
             )
         elif media_type == MessageMediaType.VIDEO:
@@ -353,6 +396,8 @@ class WotoClientBase(Client):
                 protect_content=protect_content,
                 reply_markup=reply_markup,
                 reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
                 thumb=thumb,
                 ttl_seconds=ttl_seconds,
                 width=width
@@ -368,6 +413,8 @@ class WotoClientBase(Client):
                 protect_content=protect_content,
                 thumb=thumb,
                 reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
                 progress=progress,
                 progress_args=progress_args,
                 reply_markup=reply_markup,
@@ -387,6 +434,8 @@ class WotoClientBase(Client):
                 protect_content=protect_content,
                 reply_markup=reply_markup,
                 reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
             )
         elif media_type == MessageMediaType.STICKER:
             return await self.send_sticker(
@@ -399,6 +448,8 @@ class WotoClientBase(Client):
                 protect_content=protect_content,
                 reply_markup=reply_markup,
                 reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
             )
         else:
             raise ValueError("Unknown media type!")
@@ -558,11 +609,13 @@ class WotoClientBase(Client):
         disable_web_page_preview: bool = None,
         disable_notification: bool = None,
         message_thread_id: int = None,
+        invert_media: bool = None,
         reply_to_message_id: int = None,
-        reply_to_chat_id: int = None,
+        reply_to_chat_id: Union[int, str] = None,
         reply_to_story_id: int = None,
         quote_text: str = None,
         quote_entities: List["types.MessageEntity"] = None,
+        quote_offset: int = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
         reply_markup: Union[
