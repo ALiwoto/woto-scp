@@ -65,6 +65,7 @@ class NcInfoContainer(BaseContainer):
     last_q_answer: str = None
     log_q_answers: bool = True
     log_balance: bool = True
+    last_click_data: dict = None
 
     http_client: httpx.AsyncClient = None
     x_requested_with: str = "org.telegram.messenger.web"
@@ -137,6 +138,7 @@ class NcInfoContainer(BaseContainer):
                 click_data = await self.do_click(amount=self.click_amount)
                 available_bl = click_data[0]['availableCoins']
                 limit_bl = click_data[0]['limitCoins']
+                self.last_click_data = click_data
                 if self.log_balance:
                     print(f"balance: {click_data[0]['balanceCoins']} | {available_bl}")
                 
