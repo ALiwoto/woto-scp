@@ -4,6 +4,7 @@ import json
 import uuid
 from datetime import datetime
 from typing import (
+    BinaryIO,
     NoReturn,
     Union,
     Callable,
@@ -341,11 +342,13 @@ class ScpClient(WotoPyroClient):
         disable_web_page_preview: bool = None,
         disable_notification: bool = None,
         message_thread_id: int = None,
+        invert_media: bool = None,
         reply_to_message_id: int = None,
-        reply_to_chat_id: int = None,
+        reply_to_chat_id: Union[int, str] = None,
         reply_to_story_id: int = None,
         quote_text: str = None,
         quote_entities: List["types.MessageEntity"] = None,
+        quote_offset: int = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
         reply_markup: Union[
@@ -365,12 +368,14 @@ class ScpClient(WotoPyroClient):
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
                 message_thread_id=message_thread_id,
+                invert_media=invert_media,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
                 quote_entities=quote_entities,
+                quote_offset=quote_offset,
                 reply_markup=reply_markup,
             )
         
@@ -413,27 +418,35 @@ class ScpClient(WotoPyroClient):
     
     async def send_photo(
         self,
-        chat_id: typing.Union[int, str],
-        photo: typing.Union[str, typing.BinaryIO],
+        chat_id: Union[int, str],
+        photo: Union[str, BinaryIO],
         caption: str = "",
-        parse_mode: typing.Optional["enums.ParseMode"] = None,
-        caption_entities: typing.List["types.MessageEntity"] = None,
-        ttl_seconds: int = None,
+        parse_mode: Optional["enums.ParseMode"] = None,
+        caption_entities: List["types.MessageEntity"] = None,
         has_spoiler: bool = None,
+        ttl_seconds: int = None,
         disable_notification: bool = None,
-        reply_to_message_id: int = None,
-        schedule_date: datetime = None,
-        protect_content: bool = None,
-        reply_to_story_id: int = None,
         message_thread_id: int = None,
+        reply_to_message_id: int = None,
+        reply_to_chat_id: Union[int, str] = None,
+        reply_to_story_id: int = None,
         quote_text: str = None,
         quote_entities: List["types.MessageEntity"] = None,
-        reply_markup: typing.Union["types.InlineKeyboardMarkup", "types.ReplyKeyboardMarkup",
-                                   "types.ReplyKeyboardRemove", "types.ForceReply"] = None,
+        quote_offset: int = None,
+        schedule_date: datetime = None,
+        protect_content: bool = None,
+        reply_markup: Union[
+            "types.InlineKeyboardMarkup",
+            "types.ReplyKeyboardMarkup",
+            "types.ReplyKeyboardRemove",
+            "types.ForceReply"
+        ] = None,
         progress: Callable = None,
         progress_args: tuple = ()
     ) -> typing.Optional["types.Message"]:
-        if self.me.is_bot or not isinstance(reply_markup, (types.InlineKeyboardMarkup, dict, list)) or not the_config.shared_channel:
+        if self.me.is_bot or \
+            not isinstance(reply_markup, 
+                           (types.InlineKeyboardMarkup, dict, list)) or not the_config.shared_channel:
             return await super().send_photo(
                 chat_id=chat_id,
                 photo=photo,
@@ -444,12 +457,14 @@ class ScpClient(WotoPyroClient):
                 ttl_seconds=ttl_seconds,
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 message_thread_id=message_thread_id,
                 reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
                 quote_entities=quote_entities,
+                quote_offset=quote_offset,
                 reply_markup=reply_markup,
                 progress=progress,
                 progress_args=progress_args
@@ -508,9 +523,11 @@ class ScpClient(WotoPyroClient):
         disable_notification: bool = None,
         message_thread_id: int = None,
         reply_to_message_id: int = None,
+        reply_to_chat_id: Union[int, str] = None,
+        reply_to_story_id: int = None,
         quote_text: str = None,
-        parse_mode: Optional["enums.ParseMode"] = None,
-        quote_entities: List["types.MessageEntity"] = None
+        quote_entities: List["types.MessageEntity"] = None,
+        parse_mode: Optional["enums.ParseMode"] = None
     ):
         try:
             return await super().send_inline_bot_result(
@@ -518,11 +535,13 @@ class ScpClient(WotoPyroClient):
                 query_id=query_id,
                 result_id=result_id,
                 disable_notification=disable_notification,
+                message_thread_id=message_thread_id,
+                reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
                 quote_entities=quote_entities,
                 parse_mode=parse_mode,
-                message_thread_id=message_thread_id,
-                reply_to_message_id=reply_to_message_id
             )
         except errors.SlowmodeWait as e:
             await asyncio.sleep(e.x)
@@ -531,11 +550,13 @@ class ScpClient(WotoPyroClient):
                 query_id=query_id,
                 result_id=result_id,
                 disable_notification=disable_notification,
+                message_thread_id=message_thread_id,
+                reply_to_message_id=reply_to_message_id,
+                reply_to_chat_id=reply_to_chat_id,
+                reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
                 quote_entities=quote_entities,
                 parse_mode=parse_mode,
-                message_thread_id=message_thread_id,
-                reply_to_message_id=reply_to_message_id
             )
 
     async def read_all_mentions(self, chat_id: typing.Union[str, int]) -> None:
