@@ -10,6 +10,7 @@ import base64
 import httpx
 import json
 import math
+import logging
 
 math.abs = abs
 math.min = min
@@ -57,6 +58,9 @@ class NcInfoContainer(BaseContainer):
     app_refresher: Callable = None
     src_url: str = ""
     click_amount = 14
+    max_fail_amount = 16
+
+    logger = logging.getLogger("NcInfoContainer")
 
     pe_token: str = None
     access_token: str = None
@@ -81,6 +85,25 @@ class NcInfoContainer(BaseContainer):
         refresher: Callable = None,
         src_url: str = ""
     ) -> None:
+        self.parse_url_stuff(url)
+        self.app_refresher_obj = refresher_obj
+        self.app_refresher = refresher
+        self.src_url = src_url
+        self.http_client = httpx.AsyncClient()
+    
+    async def refresh_container(self):
+        refresher_result = await self.app_refresher(self.src_url)
+        the_url = getattr(refresher_result, "url", None)
+        if not the_url:
+            self.parse_url_stuff(self.src_url)
+        
+        # do not allow the start task to start its own loop,
+        # because refresh_container might be called from within a loop
+        # itself. Starting a loop after this is up to the caller.
+        await self._start_task(no_loop=True)
+
+
+    def parse_url_stuff(self, url: str):
         self.initial_url = url
         self.parsed_url = urlparse(url)
         self.url_qs = parse_qs(self.parsed_url.fragment)
@@ -89,10 +112,19 @@ class NcInfoContainer(BaseContainer):
         self.app_data = self.url_qs['tgWebAppData'][0]
         self.platform = self.url_qs['tgWebAppPlatform'][0]
         self.app_version = self.url_qs['tgWebAppVersion'][0]
-        self.app_refresher_obj = refresher_obj
-        self.app_refresher = refresher
-        self.src_url = src_url
-        self.http_client = httpx.AsyncClient()
+
+    async def aclose(self):
+        await self.http_client.aclose()
+    
+    def __str__(self) -> str:
+        if self.is_cancel_requested:
+            return "Being canceled NcContainer"
+        elif self.is_task_completed:
+            return f"Completed NcContainer {self.task_finished_reason}"
+        elif self.last_click_data:
+            return f"Running NcContainer {self.last_click_data[0]['availableCoins']}"
+        else:
+            return "Running NcContainer"
     
     def find_pe_token(self, content: str) -> str:
         all_lines = content.split("\n")
@@ -113,7 +145,7 @@ class NcInfoContainer(BaseContainer):
         except Exception as e:
             return self.mark_as_incomplete(f'failed to start task: {e}')
         
-    async def _start_task(self):
+    async def _start_task(self, no_loop: bool = False):
         index_content = await self.invoke_get_request(self.parsed_url.path)
         if not index_content:
             return self.mark_as_incomplete('failed to get index content')
@@ -121,17 +153,20 @@ class NcInfoContainer(BaseContainer):
         try:
             self.find_pe_token(index_content.decode("utf-8"))
         except Exception as e:
-            print(f"failed to load pe token: {e}")
+            self.logger.warning(f"failed to load pe token: {e}")
             # return self.mark_as_incomplete(f'failed to find pe token: {e}')
 
         await self.notify_api_event()
         # authorize the client
         await self.authorize_client()
 
+        if no_loop:
+            return
+        
         failed_count = -1
         while not self.is_cancel_requested and not self.is_task_completed:
-            if failed_count > 15:
-                return self.mark_as_incomplete("failed to do click")
+            if failed_count > self.max_fail_amount:
+                return self.mark_as_incomplete("Too many failed attempts to click. Stopping.")
             
             try:
                 # do the job here
@@ -140,7 +175,7 @@ class NcInfoContainer(BaseContainer):
                 limit_bl = click_data[0]['limitCoins']
                 self.last_click_data = click_data
                 if self.log_balance:
-                    print(f"balance: {click_data[0]['balanceCoins']} | {available_bl}")
+                    logging.info(f"balance: {click_data[0]['balanceCoins']} | {available_bl}")
                 
                 if available_bl < self.click_amount:
                     await asyncio.sleep(60)
@@ -150,16 +185,17 @@ class NcInfoContainer(BaseContainer):
                     await asyncio.sleep(20)
                 
                 failed_count = 0
-                await asyncio.sleep(20)
+                raise ValueError("hello")
+                await asyncio.sleep(30)
+            except httpx.ReadTimeout:
+                # read timeouts aren't important much, retry after few seconds...
+                await asyncio.sleep(3)
+                continue
             except Exception as ex:
-                print(f"failed to do click: {ex}")
+                logging.warning(f"failed to do click: {ex}")
                 failed_count += 1
-                if self.app_refresher_obj and self.app_refresher:
-                    r = self.app_refresher
-                    await r(self.app_refresher_obj, self.src_url)
-                elif self.app_refresher:
-                    r = self.app_refresher
-                    await r(self.src_url)
+                if self.app_refresher:
+                    await self.refresh_container()
                 
                 await asyncio.sleep(10)
 
@@ -204,7 +240,7 @@ class NcInfoContainer(BaseContainer):
         try:
             self.last_q_answer = self.calculate_q_answer(self.last_q)
             if self.log_q_answers:
-                print(f"q: {self.last_q}, answer: {self.last_q_answer}")
+                self.logger.info(f"q: {self.last_q}, answer: {self.last_q_answer}")
         except Exception as e:
             print(f"failed to calculate q answer: {e}")
             # return self.mark_as_incomplete(f'failed to calculate q answer: {e}')
