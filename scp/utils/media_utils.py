@@ -137,6 +137,9 @@ class NcInfoContainer(BaseContainer):
                 click_data = await self.do_click(amount=self.click_amount)
                 available_bl = click_data[0]['availableCoins']
                 limit_bl = click_data[0]['limitCoins']
+                if self.log_balance:
+                    print(f"balance: {click_data[0]['balanceCoins']} | {available_bl}")
+                
                 if available_bl < self.click_amount:
                     await asyncio.sleep(60)
                 elif available_bl < 1000:
@@ -144,8 +147,6 @@ class NcInfoContainer(BaseContainer):
                         await asyncio.sleep(60)
                     await asyncio.sleep(20)
                 
-                if self.log_balance:
-                    print(f"balance: {click_data[0]['balanceCoins']} | {available_bl}")
                 failed_count = 0
                 await asyncio.sleep(20)
             except Exception as ex:
