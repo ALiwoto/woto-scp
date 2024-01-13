@@ -158,7 +158,7 @@ class NcInfoContainer(BaseContainer):
 
         await self.notify_api_event()
         # authorize the client
-        await self.authorize_client()
+        await self.authorize_client(token=self.refresh_token)
 
         if no_loop:
             return
@@ -289,7 +289,7 @@ class NcInfoContainer(BaseContainer):
         )
         return response.decode("utf-8")
     
-    async def authorize_client(self):
+    async def authorize_client(self, token: str = None):
         # need to request access to the method first
         await self.invoke_options_request(
             path="auth/webapp-session",
@@ -303,6 +303,7 @@ class NcInfoContainer(BaseContainer):
         response = await self.invoke_request(
             "auth/webapp-session", 
             data=data,
+            token=token,
             override_host="clicker-api.joincommunity.xyz",
             override_url="https://clicker-api.joincommunity.xyz"
         )
