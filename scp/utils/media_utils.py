@@ -185,7 +185,6 @@ class NcInfoContainer(BaseContainer):
                     await asyncio.sleep(20)
                 
                 failed_count = 0
-                raise ValueError("hello")
                 await asyncio.sleep(30)
             except httpx.ReadTimeout:
                 # read timeouts aren't important much, retry after few seconds...
