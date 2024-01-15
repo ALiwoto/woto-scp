@@ -45,6 +45,10 @@ class PixivIllustInfo:
     def get_original_image_url(self) -> str:
         pass
 
+class NcResponseException(Exception):
+    def __init__(self, message: str, data: str = None) -> None:
+        super().__init__(message)
+        
 class NcInfoContainer(BaseContainer):
     initial_url: str = None
     parsed_url: UrlParseResult = None
@@ -124,7 +128,7 @@ class NcInfoContainer(BaseContainer):
         elif self.is_task_completed:
             return f"Completed NcContainer {self.task_finished_reason}"
         elif self.last_click_data:
-            return f"Running NcContainer {self.last_click_data[0]['availableCoins']}"
+            return f"Running NcContainer {self.last_click_data['availableCoins']}"
         else:
             return "Running NcContainer"
     
@@ -141,6 +145,24 @@ class NcInfoContainer(BaseContainer):
         
         self.pe_token = correct_line.split("=")[1].strip().split('"')[1]
     
+    def parse_data(self, the_response: bytes):
+        if not the_response:
+            return None
+        
+        j_resp = json.loads(the_response)
+        if not j_resp['ok']:
+            if j_resp["data"]["message"]:
+                raise NcResponseException(f"{j_resp['data']['message']}", the_response)
+            raise NcResponseException(f"failed to activate turbo", the_response)
+        
+        if isinstance(j_resp['data'], list):
+            return j_resp['data'][0]
+        else:
+            return j_resp['data']
+    
+    async def activate_turbo(self):
+        return await self.active_turbo()
+    
     async def active_turbo(self):
         await self.invoke_options_request(
             path="clicker/core/active-turbo",
@@ -150,13 +172,15 @@ class NcInfoContainer(BaseContainer):
             override_url="https://clicker-api.joincommunity.xyz"
         )
 
-        return await self.invoke_request(
+        response = await self.invoke_request(
             path="clicker/core/active-turbo",
             data="",
             token=self.access_token,
             override_host="clicker-api.joincommunity.xyz",
             override_url="https://clicker-api.joincommunity.xyz"
         )
+
+        return self.parse_data(response)
 
     async def start_task(self):
         try:
@@ -190,11 +214,11 @@ class NcInfoContainer(BaseContainer):
             try:
                 # do the job here
                 click_data = await self.do_click(amount=self.click_amount)
-                available_bl = click_data[0]['availableCoins']
-                limit_bl = click_data[0]['limitCoins']
+                available_bl = click_data['availableCoins']
+                limit_bl = click_data['limitCoins']
                 self.last_click_data = click_data
                 if self.log_balance:
-                    logging.info(f"balance: {click_data[0]['balanceCoins']} | {available_bl}")
+                    logging.info(f"balance: {click_data['balanceCoins']} | {available_bl}")
                 
                 if available_bl < self.click_amount:
                     await asyncio.sleep(60)
@@ -259,11 +283,9 @@ class NcInfoContainer(BaseContainer):
             override_host="clicker-api.joincommunity.xyz",
             override_url="https://clicker-api.joincommunity.xyz"
         )
-        j_data = json.loads(response)
-        if not j_data['ok']:
-            raise ValueError(f"failed to do click: {j_data}")
+        j_data = self.parse_data(response)
         
-        self.last_q = base64.b64decode(j_data["data"][0]["hash"][0]).decode("utf-8")
+        self.last_q = base64.b64decode(j_data["hash"][0]).decode("utf-8")
         try:
             self.last_q_answer = self.calculate_q_answer(self.last_q)
             if self.log_q_answers:
@@ -315,7 +337,7 @@ class NcInfoContainer(BaseContainer):
             override_host="plausible.joincommunity.xyz",
             override_url="https://plausible.joincommunity.xyz",
         )
-        return response.decode("utf-8")
+        return self.parse_data(response)
     
     async def authorize_client(self, token: str = None):
         # need to request access to the method first
@@ -335,13 +357,11 @@ class NcInfoContainer(BaseContainer):
             override_host="clicker-api.joincommunity.xyz",
             override_url="https://clicker-api.joincommunity.xyz"
         )
-        j_resp = json.loads(response)
-        if j_resp['ok'] == False:
-            return self.mark_as_incomplete(f'failed to authorize client: {j_resp}')
+        j_resp = self.parse_data(response)
         
-        self.access_token = j_resp['data']['accessToken']
-        self.refresh_token = j_resp['data']['refreshToken']
-        return j_resp['data']
+        self.access_token = j_resp['accessToken']
+        self.refresh_token = j_resp['refreshToken']
+        return j_resp
 
     async def invoke_options_request(
         self, 
@@ -369,7 +389,7 @@ class NcInfoContainer(BaseContainer):
         }
         response = await self.http_client.options(
             f"{override_url if override_url else self.target_url}/{path}", headers=headers)
-        response.raise_for_status()
+        # response.raise_for_status()
         return response.content
 
     async def invoke_request(
@@ -406,7 +426,7 @@ class NcInfoContainer(BaseContainer):
         
         response = await self.http_client.post(
             f"{override_url if override_url else self.target_url}/{path}", data=data_value, headers=headers)
-        response.raise_for_status()
+        # response.raise_for_status()
         return response.content
 
     async def invoke_get_request(
