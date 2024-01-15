@@ -91,6 +91,8 @@ class NcInfoContainer(BaseContainer):
         self.src_url = src_url
         self.http_client = httpx.AsyncClient()
     
+    async def restart(self):
+        return await self.refresh_container(self)
     async def refresh_container(self):
         refresher_result = await self.app_refresher(self.src_url)
         the_url = getattr(refresher_result, "url", None)
