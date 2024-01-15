@@ -249,7 +249,7 @@ class NcInfoContainer(BaseContainer):
                     continue
 
                 failed_count += 1
-                if self.app_refresher % 5 == 0:
+                if failed_count % 5 == 0:
                     await self.refresh_container()
                 
                 await asyncio.sleep(20)
