@@ -308,7 +308,7 @@ class NcInfoContainer(BaseContainer):
             # return self.mark_as_incomplete(f'failed to calculate q answer: {e}')
             print(f"q is : {self.last_q}")
         
-        return j_data["data"]
+        return j_data
     
     def calculate_q_answer(self, q: str) -> int:
         lowered_q = q.lower()
