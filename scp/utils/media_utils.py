@@ -138,6 +138,23 @@ class NcInfoContainer(BaseContainer):
             return None
         
         self.pe_token = correct_line.split("=")[1].strip().split('"')[1]
+    
+    async def active_turbo(self):
+        await self.invoke_options_request(
+            path="clicker/core/active-turbo",
+            future_method="POST",
+            needed_header="auth,authorization",
+            override_host="clicker-api.joincommunity.xyz",
+            override_url="https://clicker-api.joincommunity.xyz"
+        )
+
+        return await self.invoke_request(
+            path="clicker/core/active-turbo",
+            data="",
+            token=self.access_token,
+            override_host="clicker-api.joincommunity.xyz",
+            override_url="https://clicker-api.joincommunity.xyz"
+        )
 
     async def start_task(self):
         try:
@@ -202,26 +219,35 @@ class NcInfoContainer(BaseContainer):
         self, 
         amount: int = 300, 
         q_response: int = None,
-        retry_times: int = 3
+        retry_times: int = 3,
+        is_turbo: bool = False,
     ):
         for _ in range(retry_times):
             last_ex = None
             try:
                 return await self._do_click(
                     amount=amount,
-                    q_response=q_response
+                    q_response=q_response,
+                    is_turbo=is_turbo,
                 )
             except Exception as ex:
                 last_ex = ex
         raise last_ex
         
-    async def _do_click(self, amount: int = 300, q_response: int = None):
+    async def _do_click(
+        self, 
+        amount: int = 300, 
+        q_response: int = None,
+        is_turbo: bool = False,
+    ):
         if q_response:
             self.last_q_answer = q_response
         
         req_data = {"amount": amount, "webAppData": self.app_data}
         if self.last_q_answer:
             req_data["hash"] = self.last_q_answer
+        if is_turbo:
+            req_data["turbo"] = True
         
         data = json.dumps(req_data)
         response = await self.invoke_request(
@@ -360,7 +386,6 @@ class NcInfoContainer(BaseContainer):
             'Accept': 'application/json',
             'User-Agent': 'Mozilla/5.0 (Linux; Android 7.1.2; google Pixel 2 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/92.0.4515.131 Mobile Safari/537.36',
             'Auth': '1',
-            'Content-Type': 'application/json',
             'Origin': f'{self.origin_target_url}',
             "X-Requested-With": self.x_requested_with,
             'Sec-Fetch-Site': 'same-site',
@@ -373,6 +398,9 @@ class NcInfoContainer(BaseContainer):
 
         if token:
             headers['Authorization'] = f'Bearer {token}'
+        
+        if data:
+            headers['Content-Type'] = 'application/json'
         
         response = await self.http_client.post(
             f"{override_url if override_url else self.target_url}/{path}", data=data_value, headers=headers)
