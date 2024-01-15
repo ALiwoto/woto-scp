@@ -46,8 +46,12 @@ class PixivIllustInfo:
         pass
 
 class NcResponseException(Exception):
+    message: str = None
+    data: str = None
     def __init__(self, message: str, data: str = None) -> None:
         super().__init__(message)
+        self.message = message
+        self.data = data
         
 class NcInfoContainer(BaseContainer):
     initial_url: str = None
@@ -61,8 +65,8 @@ class NcInfoContainer(BaseContainer):
     app_refresher_obj: object = None
     app_refresher: Callable = None
     src_url: str = ""
-    click_amount = 14
-    max_fail_amount = 16
+    click_amount = 300
+    max_fail_amount = 8172
 
     logger = logging.getLogger("NcInfoContainer")
 
@@ -148,6 +152,11 @@ class NcInfoContainer(BaseContainer):
     def parse_data(self, the_response: bytes):
         if not the_response:
             return None
+        
+        try:
+            if the_response.decode("utf-8") == "ok":
+                return True
+        except: pass
         
         j_resp = json.loads(the_response)
         if not j_resp['ok']:
@@ -235,11 +244,15 @@ class NcInfoContainer(BaseContainer):
                 continue
             except Exception as ex:
                 logging.warning(f"failed to do click: {ex}")
+                if getattr(ex, "message", "").find("Try later") != -1:
+                    await asyncio.sleep(60)
+                    continue
+
                 failed_count += 1
-                if self.app_refresher:
+                if self.app_refresher % 5 == 0:
                     await self.refresh_container()
                 
-                await asyncio.sleep(10)
+                await asyncio.sleep(20)
 
     async def do_click(
         self, 
