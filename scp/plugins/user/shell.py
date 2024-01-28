@@ -392,7 +392,7 @@ async def makeVid_handler(_, message: Message):
     
     
     outfile = 'aliwoto-output-cutVid.mp4'
-    sh_txt = f'rm "{outfile}" -f'
+    sh_txt = f'rm "{outfile}" -f' if os.name != 'nt' else f'del "{outfile}"'
     scale_value = "scale='min(iw,1280)':'min(ih,720)'"
     times_value = f'-ss {start_t} -to {end_t}'
     sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error {times_value} -i "{user_file_name}"'

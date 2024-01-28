@@ -289,6 +289,9 @@ def html_code_snippets(value, language: str, *argv):
 def html_pre(value, language: str, *argv):
     return f"<pre language={html.escape(language)}>{html.escape(str(value))}</pre>" + get_html_normal(*argv)
 
+def html_spoiler(value, *argv):
+    return f"<spoiler>{html.escape(str(value))}</spoiler>" + get_html_normal(*argv)
+
 async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
     if not isinstance(chat, Chat):
         return html_mono(value, *argv)
