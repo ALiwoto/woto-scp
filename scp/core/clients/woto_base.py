@@ -522,7 +522,6 @@ class WotoClientBase(Client):
             if _is_web_app:
                 return types.InlineKeyboardButton(
                     text=title,
-                    url=value,
                     web_app=types.WebAppInfo(
                         url=value
                     )
