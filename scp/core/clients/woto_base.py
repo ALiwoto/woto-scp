@@ -516,7 +516,17 @@ class WotoClientBase(Client):
         )
 
     def _get_inline_button_by_values(self, title: str, value: str) -> types.InlineKeyboardButton:
+        _is_web_app = value.startswith("app::")
+        value = value.removeprefix("app::")
         if re.findall(self.HTTP_URL_MATCHING, value):
+            if _is_web_app:
+                return types.InlineKeyboardButton(
+                    text=title,
+                    url=value,
+                    web_app=types.WebAppInfo(
+                        url=value
+                    )
+                )
             return types.InlineKeyboardButton(text=title, url=value)
         else:
             return types.InlineKeyboardButton(text=title, callback_data=value)
@@ -641,10 +651,12 @@ class WotoClientBase(Client):
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 message_thread_id=message_thread_id,
+                invert_media=invert_media,
                 reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
                 quote_entities=quote_entities,
+                quote_offset=quote_offset,
                 reply_markup=reply_markup
             )
         except errors.SlowmodeWait as e:
@@ -658,9 +670,11 @@ class WotoClientBase(Client):
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
                 message_thread_id=message_thread_id,
+                invert_media=invert_media,
                 reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
                 quote_entities=quote_entities,
+                quote_offset=quote_offset,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 reply_markup=reply_markup
