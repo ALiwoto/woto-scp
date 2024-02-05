@@ -79,13 +79,13 @@ async def anilist(_, message: Message):
 	~user.filters.forwarded & 
 	~user.filters.sticker & 
 	~user.filters.via_bot &
-	user.owner & 
+	(user.owner | ((user.sudo | user.special_users) & user.filters.private)) & 
 	user.command(
         ['trace', 'tracemoe', 'whatanime', 'wa', 'wait'],
         prefixes=user.cmd_prefixes,
     ),
 )
-async def whatanime(_, message: Message):
+async def whatAnime_handler(_, message: Message):
     media = (
         message.photo or
         message.animation or 
