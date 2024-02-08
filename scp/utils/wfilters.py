@@ -1,3 +1,4 @@
+from typing import Union, List
 import pyrogram
 from pyrogram import (
     types,
@@ -114,6 +115,26 @@ async def tagged_filter(_, client:'pyrogram.Client', m: types.Message) -> bool:
     
     return False
     
+
+def get_media_link(message: types.Message, the_filter: Union[str, List[str]] = 'http') -> str:
+    txt = (message.text or message.caption or '').lower()
+    for f in the_filter:
+        if txt.find(f) != -1:
+            return txt
+    
+    if not isinstance(the_filter, list):
+        the_filter = [the_filter]
+    
+    entities = message.entities or message.caption_entities
+    if entities:
+        for entity in entities:
+            if entity.url:
+                for f in the_filter:
+                    current_url = entity.url.lower()
+                    if current_url.find(f) != -1:
+                        return current_url
+    
+    return None
     
 
 tagged = filters.create(tagged_filter)
@@ -129,8 +150,9 @@ async def pixiv_filter(_, __, m: types.Message) -> bool:
 
     if not m or not m.text:
         return False
-    my_text = m.text.lower()
-    if my_text.find('pixiv.net') != -1:
+    target_media_url = get_media_link(m, 'pixiv.net')
+    if target_media_url:
+        setattr(m, 'target_media_url', target_media_url)
         return True
     
     return False
@@ -142,8 +164,10 @@ async def twitter_filter(_, __, m: types.Message) -> bool:
 
     if not m or not m.text:
         return False
-    my_text = m.text.lower()
-    if my_text.find('twitter.com') != -1 or my_text.find('x.com') != -1:
+    
+    target_media_url = get_media_link(m, ['twitter', 'x.com'])
+    if target_media_url:
+        setattr(m, 'target_media_url', target_media_url)
         return True
     
     # handle more stuff here in future
