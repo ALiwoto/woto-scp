@@ -120,7 +120,7 @@ async def pixiv_handler(_, message: Message):
             original_url = current_meta.image_urls.original
             my_file = BytesIO(bytes())
             my_file.name = f'pic_{illust_id}_{current_counter}.jpg'
-            pixiv_api.download(large_url, name=my_file)
+            pixiv_api.download(large_url, fname=my_file)
             all_files_input.append(InputMediaPhoto(
                 media=my_file,
                 caption=(caption if current_counter == 1 else ""),
@@ -129,7 +129,7 @@ async def pixiv_handler(_, message: Message):
             
             my_file = BytesIO(bytes())
             my_file.name = original_url.split('/')[-1]
-            pixiv_api.download(original_url, name=my_file)
+            pixiv_api.download(original_url, fname=my_file)
             all_large_inputs.append(InputMediaDocument(
                 media=my_file
             ))
@@ -151,7 +151,7 @@ async def pixiv_handler(_, message: Message):
         # get the medium picture
         my_file = BytesIO(bytes())
         my_file.name = f'pic_{illust_id}.jpg'
-        pixiv_api.download(illust.illust.image_urls.large, name=my_file)
+        pixiv_api.download(illust.illust.image_urls.large, fname=my_file)
         
         # send the picture
         sent_photo_msg: Message = None
@@ -165,14 +165,14 @@ async def pixiv_handler(_, message: Message):
         except:
             my_file = BytesIO(bytes())
             my_file.name = f'pic_medium_{illust_id}.jpg'
-            pixiv_api.download(illust.illust.image_urls.medium, name=my_file)
+            pixiv_api.download(illust.illust.image_urls.medium, fname=my_file)
             sent_photo_msg = await bot.send_photo(chat_id=message.chat.id, photo=my_file)
 
         try:
             original_url = illust.illust.meta_single_page.original_image_url
             my_file = BytesIO(bytes())
             my_file.name = original_url.split('/')[-1]
-            pixiv_api.download(original_url, name=my_file)
+            pixiv_api.download(original_url, fname=my_file)
             await bot.send_document(
                 chat_id=message.chat.id,
                 document=my_file,
