@@ -148,7 +148,7 @@ async def pixiv_filter(_, __, m: types.Message) -> bool:
     # https://www.pixiv.net/member_illust.php?mode=big&illust_id=12345678
     # https://www.pixiv.net/en/member_illust.php?mode=big&illust_id=12345678
 
-    if not m or not m.text:
+    if not m or not hasattr(m, 'text'):
         return False
     target_media_url = get_media_link(m, 'pixiv.net')
     if target_media_url:
@@ -161,8 +161,7 @@ pixiv = filters.create(pixiv_filter)
 
 async def twitter_filter(_, __, m: types.Message) -> bool:
     # filter for finding twitter urls
-
-    if not m or not m.text:
+    if not m or not hasattr(m, 'text'):
         return False
     
     target_media_url = get_media_link(m, ['twitter', 'x.com'])
