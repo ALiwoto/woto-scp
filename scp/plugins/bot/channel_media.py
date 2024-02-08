@@ -63,7 +63,10 @@ async def pixiv_handler(_, message: Message):
         return
     
     # parse the url
-    url = message.text
+    url = getattr(message, 'target_media_url', None)
+    if not url:
+        return
+    
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
     await message.delete()
@@ -115,18 +118,20 @@ async def pixiv_handler(_, message: Message):
             current_counter += 1
             large_url = current_meta.image_urls.large
             original_url = current_meta.image_urls.original
-            file_path = f'pic_{illust_id}_{current_counter}.jpg'
-            pixiv_api.download(large_url, path='.', name=file_path)
+            my_file = BytesIO()
+            my_file.name = f'pic_{illust_id}_{current_counter}.jpg'
+            pixiv_api.download(large_url, name=my_file)
             all_files_input.append(InputMediaPhoto(
-                media=file_path,
+                media=my_file,
                 caption=(caption if current_counter == 1 else ""),
                 parse_mode=ParseMode.HTML,
             ))
             
-            file_path = original_url.split('/')[-1]
-            pixiv_api.download(original_url, path='.', name=file_path)
+            my_file = BytesIO()
+            my_file.name = original_url.split('/')[-1]
+            pixiv_api.download(original_url, name=my_file)
             all_large_inputs.append(InputMediaDocument(
-                media=file_path
+                media=my_file
             ))
 
             # telegram's limit is 10
@@ -144,38 +149,37 @@ async def pixiv_handler(_, message: Message):
         )
     else:
         # get the medium picture
-        file_path = f'pic_{illust_id}.jpg'
-        pixiv_api.download(illust.illust.image_urls.large, path='.', name=file_path)
+        my_file = BytesIO()
+        my_file.name = f'pic_{illust_id}.jpg'
+        pixiv_api.download(illust.illust.image_urls.large, name=my_file)
         
         # send the picture
         sent_photo_msg: Message = None
         try:
             sent_photo_msg = await bot.send_photo(
                 chat_id=message.chat.id, 
-                photo=file_path,
+                photo=my_file,
                 caption=caption,
                 parse_mode=ParseMode.HTML,
             )
         except:
-            medium_file_path = f'pic_medium_{illust_id}.jpg'
-            pixiv_api.download(illust.illust.image_urls.medium, path='.', name=file_path)
-            await bot.send_photo(chat_id=message.chat.id, photo=file_path)
-            user.remove_file(medium_file_path)
+            my_file = BytesIO()
+            my_file.name = f'pic_medium_{illust_id}.jpg'
+            pixiv_api.download(illust.illust.image_urls.medium, name=my_file)
+            sent_photo_msg = await bot.send_photo(chat_id=message.chat.id, photo=my_file)
 
         try:
             original_url = illust.illust.meta_single_page.original_image_url
-            file_original_path = original_url.split('/')[-1]
-            if pixiv_api.download(original_url, path='.', name=file_original_path):
-                user.remove_file(file_path)
-                file_path = file_original_path
+            my_file = BytesIO()
+            my_file.name = original_url.split('/')[-1]
+            pixiv_api.download(original_url, name=my_file)
+            await bot.send_document(
+                chat_id=message.chat.id,
+                document=my_file,
+                reply_to_message_id=sent_photo_msg.message_id,
+            )
         except: pass
 
-        await bot.send_document(
-            chat_id=message.chat.id,
-            document=file_path,
-            reply_to_message_id=sent_photo_msg.message_id,
-        )
-        user.remove_file(file_path)
 
 @user.on_message(
     ~user.filters.scheduled
