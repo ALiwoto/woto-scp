@@ -117,13 +117,13 @@ async def tagged_filter(_, client:'pyrogram.Client', m: types.Message) -> bool:
     
 
 def get_media_link(message: types.Message, the_filter: Union[str, List[str]] = 'http') -> str:
+    if not isinstance(the_filter, list):
+        the_filter = [the_filter]
+    
     txt = (message.text or message.caption or '').lower()
     for f in the_filter:
         if txt.find(f) != -1:
             return txt
-    
-    if not isinstance(the_filter, list):
-        the_filter = [the_filter]
     
     entities = message.entities or message.caption_entities
     if entities:
