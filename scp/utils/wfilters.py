@@ -120,10 +120,11 @@ def get_media_link(message: types.Message, the_filter: Union[str, List[str]] = '
     if not isinstance(the_filter, list):
         the_filter = [the_filter]
     
-    txt = (message.text or message.caption or '').lower()
-    for f in the_filter:
-        if txt.find(f) != -1:
-            return txt
+    all_strs = (message.text or message.caption or '').lower().strip().split()
+    for current_part in all_strs:
+        for f in the_filter:
+            if current_part.find(f) != -1:
+                return current_part
     
     entities = message.entities or message.caption_entities
     if entities:
