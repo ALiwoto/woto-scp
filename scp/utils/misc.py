@@ -5,7 +5,7 @@ import psutil
 from pyrogram import types
 import pyrogram
 
-from scp.utils.strUtils import remove_invisible
+from scp.utils.str_utils import remove_invisible
 
 class _KB(types.InlineKeyboardButton):
     def __eq__(self, other):

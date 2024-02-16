@@ -5,7 +5,7 @@ from pyrogram.types import (
 )
 from urllib.parse import quote_plus as quote
 from scp.plugins.user.reporting import report_error
-from scp.utils.strUtils import remove_prefix
+from scp.utils.str_utils import remove_prefix
 from scp import user
 
 REQ_URL = 1

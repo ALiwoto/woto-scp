@@ -1,6 +1,6 @@
 from scp import user, bot
 from scp.utils.selfInfo import info
-from scp.utils.strUtils import name_check, permissionParser
+from scp.utils.str_utils import name_check, parse_permission_as_str
 from pyrogram.types import (
     Message,
     InlineQuery,
@@ -207,7 +207,7 @@ async def _(_, query: InlineQuery):
 )
 async def _(_, query: CallbackQuery):
     await query.answer(
-        permissionParser(
+        parse_permission_as_str(
             (await user.get_chat(int(query.data.split('_')[1]))).permissions,
         ), show_alert=True,
     )
