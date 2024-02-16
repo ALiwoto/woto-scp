@@ -13,6 +13,17 @@ from pyrogram.errors import(
     MediaCaptionTooLong,
 )
 from shortuuid import ShortUUID
+from scp.utils.str_utils import (
+    get_random_cup,
+    get_random_username_repr,
+    get_random_emoji,
+    get_random_username_str,
+    get_random_format_str,
+    get_random_stuff_str,
+    get_random_note_str,
+    get_random_sad_emoji,
+    get_random_right_arrow
+)
 
 _operations_stats = {}
 
@@ -84,7 +95,11 @@ async def pirate_handler(_, message: Message):
     
     if not user.are_bots_started:
         top_message = await message.reply_text(user.html_mono('starting bots...'))
-        await user.start_all_bots()
+        try:
+            await user.start_all_bots()
+        except Exception as ex:
+            return await top_message.edit_text(
+                user.html_bold("Failed to start all bots:") + user.html_mono(ex))
         await top_message.edit_text(user.html_mono('bots started.'))
         
 
@@ -129,11 +144,14 @@ async def pirate_handler(_, message: Message):
         {"cancel": f"pirateCancel_{unique_id}"},
     ]
     link_pre = f'https://t.me/c/{str(the_chat.id)[4:]}/'
-    channel_text = f'🥂 getting some stuff from ({from_id}) to ({to_id}) in 🏷{the_chat.title}\n'
-    channel_text += '✌️ the awesome uname is -> @' + the_chat.username + '<- \n'
-    channel_text += f'📝 formoewtt => @{the_chat.username} [' + user.html_mono(the_chat.id) + ']: '
-    channel_text += user.html_link(from_id, link_pre + f'{from_id}') + '=>'
-    channel_text += user.html_link(to_id, link_pre + f'{to_id}')
+    channel_text = f'{get_random_cup()} getting {get_random_stuff_str()}'
+    channel_text += f' from ({from_id}) to ({to_id}) in 🏷{the_chat.title} for request {unique_id}\n'
+    channel_text += f'{get_random_emoji()} {get_random_username_str()} is {get_random_right_arrow()} '
+    channel_text += get_random_username_repr(the_chat.username) + f'{get_random_sad_emoji()} \n'
+    channel_text += f'{get_random_note_str()} {get_random_format_str()} {get_random_right_arrow()}'
+    channel_text += f' {get_random_username_repr(the_chat.username)} [' + user.html_mono(the_chat.id) + ']: '
+    channel_text += user.html_link(from_id, link_pre + f'{from_id}') + get_random_right_arrow()
+    channel_text += user.html_link(to_id, link_pre + f'{to_id}') + f" {get_random_emoji()}"
     channel_post: Message = await user.send_message(
         chat_id=user.private_resources,
         text=channel_text,
