@@ -75,7 +75,7 @@ class WotoClientBase(Client):
             txt = txt[1:].lstrip("eval")
         
         # remove all non-printable characters from the code.
-        return txt.replace("\u00A0", "").strip()
+        return txt.replace("\u00A0", " ").strip()
 
     def remove_file(self, file_name: str) -> None:
         try:
