@@ -90,6 +90,8 @@ class WotoClientBase(Client):
         message_thread_id: int = None,
         disable_notification: bool = None,
         schedule_date: datetime = None,
+        hide_sender_name: bool = None,
+        hide_captions: bool = None,
         protect_content: bool = None
     ) -> Union["types.Message", List["types.Message"]]:
         target_chat = await self.get_chat(from_chat_id)
@@ -102,6 +104,8 @@ class WotoClientBase(Client):
                     message_thread_id=message_thread_id,
                     disable_notification=disable_notification,
                     schedule_date=schedule_date,
+                    hide_sender_name=hide_sender_name,
+                    hide_captions=hide_captions,
                     protect_content=protect_content
                 )
             except MessageIdInvalid:
