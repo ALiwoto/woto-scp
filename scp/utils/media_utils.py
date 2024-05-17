@@ -606,7 +606,7 @@ class TpsInfoContainer(BaseTaskContainer):
                 if self.log_balance:
                     self.logger.info(f"(clicked {chosen_click_amount} times) balance: {self.player_info['shares']} | {available_bl}")
                 
-                if available_bl < self.click_amount:
+                if available_bl < self.click_amount * self.player_info["tap_level"]:
                     await asyncio.sleep(60)
                 elif available_bl < 1000:
                     await asyncio.sleep(20)
