@@ -518,9 +518,10 @@ class NcInfoContainer(BaseTaskContainer):
     
 
 class TpsInfoContainer(BaseTaskContainer):
-    click_amount = 40
-    click_rand_diff = 20
-    max_fail_amount = 8172
+    click_amount: int = 40
+    click_rand_diff: int = 20
+    max_fail_amount: int = 8172
+    after_login_delay: int = 4
 
     logger = logging.getLogger("TpsInfoContainer")
 
@@ -577,21 +578,23 @@ class TpsInfoContainer(BaseTaskContainer):
         if no_loop:
             return
 
-        
+        # after a fresh login, wait for few seconds before clicking,
+        # so our activity doesn't look suspicious perhaps
+        await asyncio.sleep(self.after_login_delay)
         failed_count = -1
         while not self.is_cancel_requested and not self.is_task_completed:
             if failed_count > self.max_fail_amount:
                 return self.mark_as_incomplete("Too many failed attempts to click. Stopping.")
             
             try:
+                chosen_click_amount = random.randint(
+                    self.click_amount - self.click_rand_diff, self.click_amount + self.click_rand_diff)
                 available_bl = self.player_info["energy"]
-                if available_bl < ((self.click_amount+self.click_rand_diff) * 
-                                self.player_info["tap_level"]):
+                if available_bl < (chosen_click_amount * self.player_info["tap_level"]):
                     await asyncio.sleep(20)
                 
                 # do the job here
-                click_data = await self.do_click(amount=random.randint(
-                    self.click_amount - self.click_rand_diff, self.click_amount + self.click_rand_diff))
+                click_data = await self.do_click(amount=chosen_click_amount)
                 player_info = click_data.get("player", None)
                 if player_info:
                     self.player_info = player_info
@@ -601,7 +604,7 @@ class TpsInfoContainer(BaseTaskContainer):
 
                 self.last_click_data = click_data
                 if self.log_balance:
-                    self.logger.info(f"balance: {self.player_info['shares']} | {available_bl}")
+                    self.logger.info(f"(clicked {chosen_click_amount} times) balance: {self.player_info['shares']} | {available_bl}")
                 
                 if available_bl < self.click_amount:
                     await asyncio.sleep(60)

@@ -53,7 +53,10 @@ from scp.utils.parser import (
     mention_user_html,
     to_output_file,
 )
-from scp.utils.unpack import unpackInlineMessage
+from scp.utils.unpack import (
+    unpack_inline_message,
+    WebViewResultContainer,
+)
 
 
 class WotoClientBase(Client):
@@ -194,8 +197,6 @@ class WotoClientBase(Client):
         link = link.replace('telegram.dog', 't.me')
         link = link.replace('https://', '')
         link = link.replace('http://', '')
-        if link.find('t.me') == -1:
-            return None
 
         chat_id = None
         message_id: int = 0
@@ -217,7 +218,7 @@ class WotoClientBase(Client):
             if len(my_strs) == 1:
                 if term_search:
                     async for current in self.search_messages(
-                        chat_id=chat_id,
+                        chat_id=my_strs[0],
                         query=term_search,
                         limit=1,
                     ):
@@ -228,6 +229,7 @@ class WotoClientBase(Client):
                 )[0]
             if len(my_strs) < 3:
                 return None
+            
             chat_id = my_strs[1]
             message_id = int(my_strs[2])
 
@@ -255,11 +257,17 @@ class WotoClientBase(Client):
 
         return None
 
+    async def message_has_keyboard(self, message: types.Message):
+        return bool(
+            getattr(getattr(message, "reply_markup", None), 
+                    "inline_keyboard", None))
+    
     async def click_web_button_by_message_link(
-            self, 
-            msg_url: Union[str, types.Message],
-            term_search: str = None,
-        ) -> WebViewResultUrl:
+        self, 
+        msg_url: Union[str, types.Message],
+        platform: str = 'android',
+        term_search: str = None,
+    ) -> WebViewResultUrl:
         if isinstance(msg_url, types.Message):
             target_message = msg_url
         else:
@@ -288,13 +296,17 @@ class WotoClientBase(Client):
                 user_id=raw_bot.user_id,
                 access_hash=raw_bot.access_hash
             ),
-            platform='android',
+            platform=platform,
             url=correct_button.web_app.url,
             theme_params=raw.types.DataJSON(data=self.web_theme)
         )
 
-        result = await self.invoke(my_request)
-        setattr(result, "message", target_message)
+        result: WebViewResultUrl = await self.invoke(my_request)
+        return WebViewResultContainer(
+            query_id=result.query_id,
+            url=result.url,
+            message=target_message
+        )
 
     async def send_specified_media(
         self,
@@ -855,7 +867,7 @@ class WotoClientBase(Client):
             return 0
 
     def unpack_inline_message_id(inline_message_id: str) -> Atr:
-        return unpackInlineMessage(inline_message_id)
+        return unpack_inline_message(inline_message_id)
 
     def to_output_file(self, value: Union[str, bytes], file_name: str = "output.txt") -> BytesIO:
         return to_output_file(value=value, file_name=file_name)

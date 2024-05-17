@@ -72,11 +72,12 @@ async def clickWeb_handler(_, message: Message):
     message.text = message.text.replace("--verbose", "").strip()
 
     the_link = user.get_non_cmd(message)
-    if not the_link and not (message.reply_to_message and not message.reply_to_message.entities):
+    if not the_link and not (message.reply_to_message and 
+                             not user.message_has_keyboard(message.reply_to_message)):
         return await message.reply_text('No link found, you can also reply to the target message.')
     
     try:
-        if message.reply_to_message and message.reply_to_message.entities:
+        if message.reply_to_message and user.message_has_keyboard(message.reply_to_message):
             # yes, this will work. it might be weird for you, but not for me
             click_result = await user.click_web_button_by_message_link(message.reply_to_message)
         else:
@@ -87,7 +88,11 @@ async def clickWeb_handler(_, message: Message):
         
         clicked_message = getattr(click_result, "message", None)
         if isinstance(clicked_message, Message):
-            the_link = clicked_message.link
+            if clicked_message.from_user.is_bot:
+                #FIXME: move this part to message.link in wpyrogram lib.
+                the_link = f"https://t.me/{clicked_message.from_user.username}/{clicked_message.id}"
+            else:
+                the_link = clicked_message.link
     except Exception as e:
         return await message.reply_text('Error: \n\t' + user.html_mono(str(e)))
 
