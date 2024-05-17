@@ -44,7 +44,7 @@ class BaseTaskContainer(BaseContainer):
     is_cancel_requested: bool = False
     is_task_completed: bool = False
     task_finished_reason: str = None
-    running_task: asyncio.Task
+    running_task: asyncio.Task = None
 
     read_timeout_reply_delay = 3
 

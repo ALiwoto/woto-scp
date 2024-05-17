@@ -127,7 +127,7 @@ async def clickWeb_handler(_, message: Message):
         )
         setattr(user, 'tps_container', tps_container)
         # start the task in another coroutine
-        asyncio.create_task(tps_container.start_task())
+        tps_container.running_task = asyncio.create_task(tps_container.start_task())
 
         await asyncio.sleep(5)
         txt = ""
