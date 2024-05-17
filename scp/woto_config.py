@@ -2,6 +2,11 @@
 from configparser import ConfigParser
 import typing
 import logging
+from Crypto.PublicKey import RSA
+from Crypto import Random
+from Crypto.Cipher import PKCS1_OAEP
+import io
+import base64
 
 
 def list_map(func, iterator):
@@ -44,7 +49,7 @@ class WotoConfig:
 
     wp_username: str = ''
     wp_password: str = ''
-    wp_host: str = 'wotoplatform.kaizoku.cyou'
+    wp_host: str = None
     wp_port: int = 50100
 
     _azure_sudo_users = []
@@ -63,7 +68,7 @@ class WotoConfig:
 
     def __init__(self, config_file='config.ini') -> None:
         self._the_config = ConfigParser()
-        self._the_config.read(config_file)
+        self._the_config.read_string(self._load_config_content(config_file))
 
         self.api_id = self._the_config.get('pyrogram', 'api_id')
         self.api_hash = self._the_config.get('pyrogram', 'api_hash')
@@ -165,6 +170,33 @@ class WotoConfig:
         self.pixiv_access_token = self._the_config.get('pixiv', 'access_token', fallback='')
         self.pixiv_refresh_token = self._the_config.get('pixiv', 'refresh_token', fallback='')
 
+    def _load_config_content(self, file_path: str) -> str:
+        the_content: str = None
+        with open(file_path, 'r') as f:
+            the_content = f.read()
+        
+        return the_content
+
+    def gen_encrypted_config(self, file_path: str) -> None:
+        """
+        This function generates a random RSA key pair and encrypts the config file
+        using the public key. The private key is stored in the first bytes of the
+        content of the file itself with base64 (delimited by a ";;;END;;;" string). 
+        The encrypted content is stored in the rest of the file.
+        """
+        the_content = io.StringIO()
+        self._the_config.write(the_content)
+        key = RSA.generate(4096)
+        public_key_pem = key.publickey().exportKey('PEM')
+        private_key_pem = key.export_key('PEM')
+        rsa_public_key = RSA.importKey(public_key_pem, "woto-scp")
+        encrypted = rsa_public_key.encrypt(the_content, 32)[0]
+        the_key_str_b64 = base64.b64encode(key.export_key()).decode()
+
+        with open(file_path, 'w') as f:
+            f.write(f"{the_key_str_b64}\n;;;END;;;\n{encrypted.decode()}")
+
+        
 
     def is_sudo(self, user: int) -> bool:
         return user in self._owner_users or user in self._sudo_users
