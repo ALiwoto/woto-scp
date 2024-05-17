@@ -83,7 +83,11 @@ async def clickWeb_handler(_, message: Message):
             # the provided link in front of the message has to look like "https://t.me/somethingBot/1234"
             # where the 1234 number is actually the message id of the message that contains the
             # WebPage inline button.
-            click_result = await user.click_web_button_by_message_link(the_link)
+            click_result = await user.click_web_button_by_message_link(the_link, term_search="welcome")
+        
+        clicked_message = getattr(click_result, "message", None)
+        if isinstance(clicked_message, Message):
+            the_link = clicked_message.link
     except Exception as e:
         return await message.reply_text('Error: \n\t' + user.html_mono(str(e)))
 
