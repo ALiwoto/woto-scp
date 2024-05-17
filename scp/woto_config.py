@@ -2,9 +2,6 @@
 from configparser import ConfigParser
 import typing
 import logging
-from Crypto.PublicKey import RSA
-from Crypto import Random
-from Crypto.Cipher import PKCS1_OAEP
 import io
 import base64
 
@@ -178,6 +175,10 @@ class WotoConfig:
         return the_content
 
     def gen_encrypted_config(self, file_path: str) -> None:
+        from Crypto.PublicKey import RSA
+        from Crypto import Random
+        from Crypto.Cipher import PKCS1_OAEP
+        
         """
         This function generates a random RSA key pair and encrypts the config file
         using the public key. The private key is stored in the first bytes of the
