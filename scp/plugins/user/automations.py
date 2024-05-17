@@ -112,7 +112,7 @@ async def clickWeb_handler(_, message: Message):
         setattr(user, 'nc_container', nc_container)
         # start the task in another coroutine
         asyncio.create_task(nc_container.start_task())
-    elif target_url.find("a\u0070p\u002e\u0074a\u0070\u0073\u0077\u0061\u0070.\u0063l\u0075b") != -1:
+    elif target_url.find("a\u0070p\u002e\u0074a\u0070\u0073\u0077\u0061\u0070.") != -1:
         tps_container = getattr(user, 'tps_container', None)
         if isinstance(tps_container, BaseTaskContainer):
             # cancel the previous task
