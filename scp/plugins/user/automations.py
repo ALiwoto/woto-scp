@@ -79,8 +79,11 @@ async def clickWeb_handler(_, message: Message):
         if message.reply_to_message and message.reply_to_message.entities:
             # yes, this will work. it might be weird for you, but not for me
             click_result = await user.click_web_button_by_message_link(message.reply_to_message)
-        
-        click_result = await user.click_web_button_by_message_link(the_link)
+        else:
+            # the provided link in front of the message has to look like "https://t.me/somethingBot/1234"
+            # where the 1234 number is actually the message id of the message that contains the
+            # WebPage inline button.
+            click_result = await user.click_web_button_by_message_link(the_link)
     except Exception as e:
         return await message.reply_text('Error: \n\t' + user.html_mono(str(e)))
 
