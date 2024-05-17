@@ -44,6 +44,7 @@ class BaseTaskContainer(BaseContainer):
     is_cancel_requested: bool = False
     is_task_completed: bool = False
     task_finished_reason: str = None
+    running_task: asyncio.Task
 
     read_timeout_reply_delay = 3
 
@@ -513,8 +514,13 @@ class NcInfoContainer(BaseTaskContainer):
 
     async def cancel_task(self):
         self.is_cancel_requested = True
-        while not self.is_task_completed:
-            await asyncio.sleep(0.5)
+        if self.running_task:
+            self.running_task.cancel()
+            self.is_task_completed = True
+        else:
+            # old way of doing things
+            while not self.is_task_completed:
+                await asyncio.sleep(0.5)
     
 
 class TpsInfoContainer(BaseTaskContainer):
@@ -828,5 +834,10 @@ class TpsInfoContainer(BaseTaskContainer):
     
     async def cancel_task(self):
         self.is_cancel_requested = True
-        while not self.is_task_completed:
-            await asyncio.sleep(0.5)
+        if self.running_task:
+            self.running_task.cancel()
+            self.is_task_completed = True
+        else:
+            # old way of doing things
+            while not self.is_task_completed:
+                await asyncio.sleep(0.5)

@@ -146,11 +146,21 @@ async def clickWeb_handler(_, message: Message):
     user.owner & user.command('stopWeb'),
 )
 async def stopWeb_handler(_, message: Message):
+    cancelled_tasks_count = 0
     nc_container = getattr(user, 'nc_container', None)
+    tps_container = getattr(user, "tps_container", None)
     if isinstance(nc_container, BaseTaskContainer):
         await nc_container.cancel_task()
-        return await message.reply_text('Task has been cancelled.')
-    return await message.reply_text('No task found.')
+        cancelled_tasks_count += 1
+    
+    if isinstance(tps_container, BaseTaskContainer):
+        await tps_container.cancel_task()
+        cancelled_tasks_count += 1
+    
+    if cancelled_tasks_count:
+        return await message.reply_text(f'{cancelled_tasks_count} task(s) have been cancelled.')
+
+    return await message.reply_text('No background tasks found.')
 
 @user.on_message(
     user.filters.me & 
