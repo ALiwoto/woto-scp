@@ -211,6 +211,11 @@ class WotoClientBase(Client):
             message_id = int(my_strs[1])
         else:
             my_strs = link.split('/')
+            if len(my_strs) == 1:
+                return await self.get_history(
+                    chat_id=chat_id,
+                    limit=1,
+                )[0]
             if len(my_strs) < 3:
                 return None
             chat_id = my_strs[1]
@@ -240,8 +245,11 @@ class WotoClientBase(Client):
 
         return None
 
-    async def click_web_button_by_message_link(self, msg_url: str) -> WebViewResultUrl:
-        target_message = await self.get_message_by_link(msg_url)
+    async def click_web_button_by_message_link(self, msg_url: Union[str, types.Message]) -> WebViewResultUrl:
+        if isinstance(msg_url, types.Message):
+            target_message = msg_url
+        else:
+            target_message = await self.get_message_by_link(msg_url)
         correct_button: types.InlineKeyboardButton = None
         # go through the buttons and find the web app button
         for button in target_message.reply_markup.inline_keyboard:

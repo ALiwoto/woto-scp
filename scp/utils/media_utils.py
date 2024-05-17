@@ -518,10 +518,11 @@ class NcInfoContainer(BaseTaskContainer):
     
 
 class TpsInfoContainer(BaseTaskContainer):
-    click_amount = 300
+    click_amount = 40
+    click_rand_diff = 20
     max_fail_amount = 8172
 
-    logger = logging.getLogger("NcInfoContainer")
+    logger = logging.getLogger("TpsInfoContainer")
 
     player_info: dict = None
     account_info: dict = None
@@ -539,13 +540,18 @@ class TpsInfoContainer(BaseTaskContainer):
         url: str, 
         refresher_obj: object = None,
         refresher: Callable = None,
-        src_url: str = ""
+        src_url: str = "",
+        verbose: bool = True
     ) -> None:
         self.parse_url_stuff(url)
         self.app_refresher_obj = refresher_obj
         self.app_refresher = refresher
         self.src_url = src_url
         self.http_client = httpx.AsyncClient()
+
+        if verbose:
+            self.logger.setLevel(logging.INFO)
+        
         if self.url_query_params and self.url_query_params["bot"]:
             self.bot_key = self.url_query_params["bot"][0x0]
 
@@ -578,12 +584,24 @@ class TpsInfoContainer(BaseTaskContainer):
                 return self.mark_as_incomplete("Too many failed attempts to click. Stopping.")
             
             try:
+                available_bl = self.player_info["energy"]
+                if available_bl < ((self.click_amount+self.click_rand_diff) * 
+                                self.player_info["tap_level"]):
+                    await asyncio.sleep(20)
+                
                 # do the job here
-                click_data = await self.do_click(amount=self.click_amount)
-                available_bl = click_data['energy']
+                click_data = await self.do_click(amount=random.randint(
+                    self.click_amount - self.click_rand_diff, self.click_amount + self.click_rand_diff))
+                player_info = click_data.get("player", None)
+                if player_info:
+                    self.player_info = player_info
+                    available_bl = self.player_info["energy"]
+                else:
+                    raise Exception("returned player_info from do_click is None!")
+
                 self.last_click_data = click_data
                 if self.log_balance:
-                    self.logger.info(f"balance: {click_data['balanceCoins']} | {available_bl}")
+                    self.logger.info(f"balance: {self.player_info['shares']} | {available_bl}")
                 
                 if available_bl < self.click_amount:
                     await asyncio.sleep(60)
@@ -623,7 +641,6 @@ class TpsInfoContainer(BaseTaskContainer):
     async def do_click(
         self, 
         amount: int = 220, 
-        q_response: int = None,
         retry_times: int = 3,
         is_turbo: bool = False,
     ):
@@ -632,7 +649,6 @@ class TpsInfoContainer(BaseTaskContainer):
             try:
                 return await self._do_click(
                     amount=amount,
-                    q_response=q_response,
                     is_turbo=is_turbo,
                 )
             except Exception as ex:
@@ -642,15 +658,9 @@ class TpsInfoContainer(BaseTaskContainer):
     async def _do_click(
         self, 
         amount: int = 300, 
-        q_response: int = None,
         is_turbo: bool = False,
     ):
-        if q_response:
-            self.last_q_answer = q_response
-        
         req_data = {"taps": amount, "time": time.time_ns() // 1_000_000}
-        if self.last_q_answer:
-            req_data["hash"] = self.last_q_answer
         if is_turbo:
             req_data["turbo"] = True
         
