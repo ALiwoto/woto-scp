@@ -2,6 +2,8 @@
 
 """
 import asyncio
+import sys
+from . import woto_config
 from pyrogram import idle
 from scp import user, bot
 from scp.core.functions.plugins import (
@@ -35,5 +37,20 @@ async def start_bot():
     )
     
 if __name__ == '__main__':
+    if '--help' in sys.argv:
+        print('''
+        --help: Show this message
+        --no-input: Disable the input shell
+        --gen-config: Generate a new encrypted config file
+        ''')
+        sys.exit(0)
+    
+    if '--no-input' in sys.argv:
+        user.scp_config.no_input = True
+
+    if '--gen-config' in sys.argv:
+        woto_config.the_config.gen_encrypted_config("config.enc.ini")
+        sys.exit(0)
+
     from . import loop
     loop.run_until_complete(start_bot())

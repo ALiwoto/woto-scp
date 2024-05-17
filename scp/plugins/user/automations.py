@@ -5,7 +5,11 @@ from pyrogram.types import (
     InlineKeyboardButton,
 )
 from pyrogram.raw.functions.messages import RequestWebView
-from scp.utils.media_utils import NcInfoContainer
+from scp.utils.media_utils import (
+    BaseTaskContainer,
+    NcInfoContainer,
+    TpsInfoContainer
+)
 import pyrogram
 
 __PLUGIN__ = 'automations'
@@ -69,14 +73,14 @@ async def clickWeb_handler(_, message: Message):
         return await message.reply_text('No link found.')
     
     try:
-        r = await user.click_web_button_by_message_link(the_link)
+        target_message = await user.click_web_button_by_message_link(the_link)
     except Exception as e:
         return await message.reply_text('Error: ' + str(e))
 
-    target_url = r.url
+    target_url = target_message.url
     if target_url.find('clicker') != -1:
         nc_container = getattr(user, 'nc_container', None)
-        if isinstance(nc_container, NcInfoContainer):
+        if isinstance(nc_container, BaseTaskContainer):
             # cancel the previous task
             await nc_container.cancel_task()
         
@@ -89,6 +93,21 @@ async def clickWeb_handler(_, message: Message):
         setattr(user, 'nc_container', nc_container)
         # start the task in another coroutine
         asyncio.create_task(nc_container.start_task())
+    elif target_url.find("a\u0070p\u002e\u0074a\u0070\u0073\u0077\u0061\u0070.\u0063l\u0075b") != -1:
+        tps_container = getattr(user, 'tps_container', None)
+        if isinstance(tps_container, BaseTaskContainer):
+            # cancel the previous task
+            await tps_container.cancel_task()
+        
+        tps_container = TpsInfoContainer(
+            url=target_url,
+            refresher_obj=user,
+            refresher=user.click_web_button_by_message_link,
+            src_url=the_link,
+        )
+        setattr(user, 'tps_container', tps_container)
+        # start the task in another coroutine
+        asyncio.create_task(tps_container.start_task())
     else:
         # TODO: implement other kinds of urls
         return await message.reply_text('No implementation found for this kind of url: ' + target_url)
@@ -96,9 +115,9 @@ async def clickWeb_handler(_, message: Message):
 @user.on_message(
     user.owner & user.command('stopWeb'),
 )
-async def clickWeb_handler(_, message: Message):
+async def stopWeb_handler(_, message: Message):
     nc_container = getattr(user, 'nc_container', None)
-    if isinstance(nc_container, NcInfoContainer):
+    if isinstance(nc_container, BaseTaskContainer):
         await nc_container.cancel_task()
         return await message.reply_text('Task has been cancelled.')
     return await message.reply_text('No task found.')

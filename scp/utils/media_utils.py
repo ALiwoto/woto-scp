@@ -1,4 +1,5 @@
 import asyncio
+import time
 from typing import Callable
 from urllib.parse import (
     parse_qs, 
@@ -20,6 +21,69 @@ class BaseContainer:
     length: int = 0
     """Base class for all containers"""
     pass
+
+
+
+class BaseTaskContainer(BaseContainer):
+    src_url: str = ""
+    initial_url: str = None
+    parsed_url: UrlParseResult = None
+    url_fragments = None
+    url_query_params = None
+    target_url: str = ""
+    origin_target_url: str = ""
+    app_data: str = ""
+    platform: str = ""
+    app_version: str = ""
+    app_refresher_obj: object = None
+    app_refresher: Callable = None
+    http_client: httpx.AsyncClient = None
+    x_requested_with: str = "org.telegram.messenger.web"
+
+    is_task_started: bool = False
+    is_cancel_requested: bool = False
+    is_task_completed: bool = False
+    task_finished_reason: str = None
+
+    read_timeout_reply_delay = 3
+
+    """
+    Base task container is a container that can be acted as a "task".
+    It can basically manage some related tasks together inside of a container.
+    """
+
+    async def cancel_task(self): pass
+
+    async def restart(self): pass
+
+    async def restart(self): pass
+
+    async def aclose(self): pass
+
+    async def refresh_container(self): pass
+
+    def parse_data(self, the_response: bytes): pass
+
+    def __str__(self) -> str: return "NotImplemented BaseTaskContainer"
+
+    async def start_task(self): pass
+
+    def mark_as_incomplete(self, reason: str):
+        self.is_task_completed = True
+        self.is_cancel_requested = False
+        self.task_finished_reason = reason
+        # TODO: use some loggings here in future
+
+    def parse_url_stuff(self, url: str):
+        self.initial_url = url
+        self.parsed_url = urlparse(url)
+        self.url_fragments = parse_qs(self.parsed_url.fragment)
+        self.url_query_params = parse_qs(self.parsed_url.query)
+        self.target_url = f"{self.parsed_url.scheme}://{self.parsed_url.hostname}"
+        self.origin_target_url = f"{self.parsed_url.scheme}://{self.parsed_url.netloc}"
+        self.app_data = self.url_fragments['tgWebAppData'][0]
+        self.platform = self.url_fragments['tgWebAppPlatform'][0]
+        self.app_version = self.url_fragments['tgWebAppVersion'][0]
 
 class PixivIllustInfo:
     is_multiple: bool = False
@@ -53,18 +117,7 @@ class NcResponseException(Exception):
         self.message = message
         self.data = data
         
-class NcInfoContainer(BaseContainer):
-    initial_url: str = None
-    parsed_url: UrlParseResult = None
-    target_url: str = ""
-    origin_target_url: str = ""
-    url_qs = None
-    app_data: str = ""
-    platform: str = ""
-    app_version: str = ""
-    app_refresher_obj: object = None
-    app_refresher: Callable = None
-    src_url: str = ""
+class NcInfoContainer(BaseTaskContainer):
     click_amount = 300
     max_fail_amount = 8172
 
@@ -78,14 +131,6 @@ class NcInfoContainer(BaseContainer):
     log_q_answers: bool = True
     log_balance: bool = True
     last_click_data: dict = None
-
-    http_client: httpx.AsyncClient = None
-    x_requested_with: str = "org.telegram.messenger.web"
-
-    is_task_started: bool = False
-    is_cancel_requested: bool = False
-    is_task_completed: bool = False
-    task_finished_reason: str = None
 
     def __init__(self, 
         url: str, 
@@ -101,6 +146,7 @@ class NcInfoContainer(BaseContainer):
     
     async def restart(self):
         return await self.refresh_container(self)
+    
     async def refresh_container(self):
         refresher_result = await self.app_refresher(self.src_url)
         the_url = getattr(refresher_result, "url", None)
@@ -112,16 +158,6 @@ class NcInfoContainer(BaseContainer):
         # itself. Starting a loop after this is up to the caller.
         await self._start_task(no_loop=True)
 
-
-    def parse_url_stuff(self, url: str):
-        self.initial_url = url
-        self.parsed_url = urlparse(url)
-        self.url_qs = parse_qs(self.parsed_url.fragment)
-        self.target_url = f"{self.parsed_url.scheme}://{self.parsed_url.hostname}"
-        self.origin_target_url = f"{self.parsed_url.scheme}://{self.parsed_url.netloc}"
-        self.app_data = self.url_qs['tgWebAppData'][0]
-        self.platform = self.url_qs['tgWebAppPlatform'][0]
-        self.app_version = self.url_qs['tgWebAppVersion'][0]
 
     async def aclose(self):
         await self.http_client.aclose()
@@ -322,7 +358,6 @@ class NcInfoContainer(BaseContainer):
             # a random number
             return random.randint(126, 349)
 
-
     async def notify_api_event(self):
         resp = await self.invoke_get_request("assets/vendor-28842ac8.js", dest_value="script")
         resp = await self.invoke_get_request("assets/index-eaf7a2bd.js", dest_value="script")
@@ -481,8 +516,304 @@ class NcInfoContainer(BaseContainer):
         while not self.is_task_completed:
             await asyncio.sleep(0.5)
     
-    def mark_as_incomplete(self, reason: str):
-        self.is_task_completed = True
-        self.is_cancel_requested = False
-        self.task_finished_reason = reason
-        # TODO: use some loggings here in future
+
+class TpsInfoContainer(BaseTaskContainer):
+    click_amount = 300
+    max_fail_amount = 8172
+
+    logger = logging.getLogger("NcInfoContainer")
+
+    player_info: dict = None
+    account_info: dict = None
+    config_info: dict = None
+    user_settings: dict = None
+    bot_key = "\u0061\u0070\u0070\u005f\u0062\u006f\u0074\u005f\u0030"
+
+    access_token: str = None
+
+    log_balance: bool = True
+    last_click_data: dict = None
+
+
+    def __init__(self, 
+        url: str, 
+        refresher_obj: object = None,
+        refresher: Callable = None,
+        src_url: str = ""
+    ) -> None:
+        self.parse_url_stuff(url)
+        self.app_refresher_obj = refresher_obj
+        self.app_refresher = refresher
+        self.src_url = src_url
+        self.http_client = httpx.AsyncClient()
+        if self.url_query_params and self.url_query_params["bot"]:
+            self.bot_key = self.url_query_params["bot"][0x0]
+
+    async def start_task(self):
+        try:
+            return await self._start_task()
+        except Exception as e:
+            return self.mark_as_incomplete(f'failed to start task: {e}')
+
+    async def _start_task(self, no_loop: bool = False):
+        index_content = await self.invoke_get_request(self.parsed_url.path)
+        if not index_content:
+            return self.mark_as_incomplete('failed to get index content')
+        
+        login_resp = await self.login_client()
+        if not login_resp:
+            raise NcResponseException("login response is none!")
+        
+        self.player_info = login_resp["player"]
+        self.account_info = login_resp["account"]
+        self.config_info = login_resp["conf"]
+
+        if no_loop:
+            return
+
+        
+        failed_count = -1
+        while not self.is_cancel_requested and not self.is_task_completed:
+            if failed_count > self.max_fail_amount:
+                return self.mark_as_incomplete("Too many failed attempts to click. Stopping.")
+            
+            try:
+                # do the job here
+                click_data = await self.do_click(amount=self.click_amount)
+                available_bl = click_data['energy']
+                self.last_click_data = click_data
+                if self.log_balance:
+                    self.logger.info(f"balance: {click_data['balanceCoins']} | {available_bl}")
+                
+                if available_bl < self.click_amount:
+                    await asyncio.sleep(60)
+                elif available_bl < 1000:
+                    await asyncio.sleep(20)
+                
+                failed_count = 0
+                await asyncio.sleep(30)
+            except httpx.ReadTimeout:
+                # read timeouts aren't important much, retry after few seconds...
+                self.logger.info(f"got ReadTimeout, retrying after {self.read_timeout_reply_delay} seconds...")
+                await asyncio.sleep(self.read_timeout_reply_delay)
+                continue
+            except Exception as ex:
+                logging.warning(f"failed to do click: {ex}")
+                if getattr(ex, "message", "").find("Try later") != -1:
+                    await asyncio.sleep(60)
+                    continue
+
+                failed_count += 1
+                if failed_count % 5 == 0:
+                    await self.refresh_container()
+                
+                await asyncio.sleep(20)
+
+    async def refresh_container(self):
+        refresher_result = await self.app_refresher(self.src_url)
+        the_url = getattr(refresher_result, "url", None)
+        if not the_url:
+            self.parse_url_stuff(self.src_url)
+        
+        # do not allow the start task to start its own loop,
+        # because refresh_container might be called from within a loop
+        # itself. Starting a loop after this is up to the caller.
+        await self._start_task(no_loop=True)
+
+    async def do_click(
+        self, 
+        amount: int = 220, 
+        q_response: int = None,
+        retry_times: int = 3,
+        is_turbo: bool = False,
+    ):
+        for _ in range(retry_times):
+            last_ex = None
+            try:
+                return await self._do_click(
+                    amount=amount,
+                    q_response=q_response,
+                    is_turbo=is_turbo,
+                )
+            except Exception as ex:
+                last_ex = ex
+        raise last_ex
+        
+    async def _do_click(
+        self, 
+        amount: int = 300, 
+        q_response: int = None,
+        is_turbo: bool = False,
+    ):
+        if q_response:
+            self.last_q_answer = q_response
+        
+        req_data = {"taps": amount, "time": time.time_ns() // 1_000_000}
+        if self.last_q_answer:
+            req_data["hash"] = self.last_q_answer
+        if is_turbo:
+            req_data["turbo"] = True
+        
+        data = json.dumps(req_data)
+        response = await self.invoke_request(
+            "api/player/submit_taps",
+            data=data,
+            token=self.access_token,
+            override_host="api.tapswap.ai",
+            override_url="https://api.tapswap.ai"
+        )
+        j_data = self.parse_data(response)
+        
+        # if there is any q_param, the q_answer should be
+        # calculated here.
+
+        return j_data
+    
+    def parse_data(self, the_response: bytes):
+        if not the_response:
+            return None
+        
+        try:
+            if the_response.decode("utf-8") == "ok":
+                return True
+        except: pass
+        
+        j_resp: dict = json.loads(the_response)
+        status_code = j_resp.get("statusCode", None)
+        if status_code and status_code != 200:
+            resp_message = j_resp.get("message", None)
+            if resp_message:
+                raise NcResponseException(resp_message, the_response)
+            raise NcResponseException(f"failed to parse response data", the_response)
+        
+        return j_resp
+    
+
+    async def login_client(self, token: str = None):
+        data = json.dumps({
+            "init_data": self.app_data,
+            "bot_key": self.bot_key,
+            "referrer": "",
+        })
+        response = await self.invoke_request(
+            "api/account/login", 
+            data=data,
+            token=token,
+            override_host="api.tapswap.ai",
+            override_url="https://api.tapswap.ai"
+        )
+        j_resp = self.parse_data(response)
+        
+        self.access_token = j_resp['access_token']
+        return j_resp
+
+    async def invoke_options_request(
+        self, 
+        path: str, 
+        future_method: str,
+        needed_header: str = None,
+        override_host: str = None,
+        override_url: str = None,
+    ):
+        path = path.rstrip('/')
+        headers = {
+            'Host': f"{override_host if override_host else self.parsed_url.hostname}",
+            'Accept': '*/*',
+            'Access-Control-Request-Method': future_method,
+            'Access-Control-Request-Headers': needed_header,
+            'Origin': f'{self.origin_target_url}',
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 7.1.2; google Pixel 2 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/92.0.4515.131 Mobile Safari/537.36',
+            'Sec-Fetch-Mode': 'cors',
+            "X-Requested-With": self.x_requested_with,
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-Dest': 'empty',
+            'Referer': f'{self.origin_target_url}/',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'en,en-US;q=0.9',
+            'X-App': "\u0074\u0061\u0070\u0073\u0077\u0061\u0070\u005f\u0073\u0065\u0072\u0076\u0065\u0072",
+            'X-Cv': '1'
+        }
+        response = await self.http_client.options(
+            f"{override_url if override_url else self.target_url}/{path}", headers=headers)
+        # response.raise_for_status()
+        return response.content
+
+    async def invoke_request(
+        self, 
+        path: str, 
+        data: str, 
+        token: str = None,
+        override_host: str = None,
+        override_url: str = None,
+    ):
+        path = path.rstrip('/')
+        data_value = data.encode('utf-8')
+        headers = {
+            'Host': override_host if override_host else f"{self.parsed_url.hostname}",
+            'Content-Length': str(len(data_value)),
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 7.1.2; google Pixel 2 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/92.0.4515.131 Mobile Safari/537.36',
+            'Auth': '1',
+            'Origin': f'{self.origin_target_url}',
+            "X-Requested-With": self.x_requested_with,
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Dest': 'empty',
+            'Referer': f'{self.origin_target_url}/',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'en,en-US;q=0.9',
+            'X-App': "\u0074\u0061\u0070\u0073\u0077\u0061\u0070\u005f\u0073\u0065\u0072\u0076\u0065\u0072",
+            'X-Cv': '1'
+        }
+
+        if token:
+            headers['Authorization'] = f'Bearer {token}'
+        
+        if data:
+            headers['Content-Type'] = 'application/json'
+        
+        response = await self.http_client.post(
+            f"{override_url if override_url else self.target_url}/{path}", data=data_value, headers=headers)
+        # response.raise_for_status()
+        return response.content
+
+    async def invoke_get_request(
+        self, 
+        path: str,
+        override_url: str = None,
+        if_non_match: str = None,
+        dest_value: str = None,
+    ):
+        headers = {
+            'Host': f"{self.parsed_url.hostname}",
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 7.1.2; google Pixel 2 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/92.0.4515.131 Mobile Safari/537.36',
+            'Auth': '1',
+            'Content-Type': 'application/json',
+            'Origin': f'{self.origin_target_url}',
+            "X-Requested-With": self.x_requested_with,
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Dest': dest_value if dest_value else 'document',
+            'Referer': f'{self.origin_target_url}/',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'en,en-US;q=0.9',
+            'Connection': 'close',
+            'X-App': "\u0074\u0061\u0070\u0073\u0077\u0061\u0070\u005f\u0073\u0065\u0072\u0076\u0065\u0072",
+            'X-Cv': '1'
+        }
+
+        if if_non_match:
+            headers['If-None-Match'] = if_non_match
+
+        response = await self.http_client.get(
+            f"{override_url if override_url else self.target_url}/{path}", 
+            headers=headers
+        )
+        response.raise_for_status()
+        return response.content
+    
+    async def cancel_task(self):
+        self.is_cancel_requested = True
+        while not self.is_task_completed:
+            await asyncio.sleep(0.5)
