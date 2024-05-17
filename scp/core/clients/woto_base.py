@@ -188,6 +188,7 @@ class WotoClientBase(Client):
         link: str,
         continue_til_found: bool = False,
         chunk_amount: int = 10,
+        term_search: str = None,
     ) -> types.Message:
         link = link.replace('telegram.me', 't.me')
         link = link.replace('telegram.dog', 't.me')
@@ -207,11 +208,20 @@ class WotoClientBase(Client):
             my_strs = my_strs[1].split('/')
             if len(my_strs) < 2:
                 return None
-            chat_id = int('-100' + my_strs[0])
+            
+            if not my_strs[0].startswith("-100"):
+                chat_id = int('-100' + my_strs[0])
             message_id = int(my_strs[1])
         else:
             my_strs = link.split('/')
             if len(my_strs) == 1:
+                if term_search:
+                    async for current in self.search_messages(
+                        chat_id=chat_id,
+                        query=term_search,
+                        limit=1,
+                    ):
+                        return current
                 return await self.get_history(
                     chat_id=chat_id,
                     limit=1,
@@ -245,11 +255,18 @@ class WotoClientBase(Client):
 
         return None
 
-    async def click_web_button_by_message_link(self, msg_url: Union[str, types.Message]) -> WebViewResultUrl:
+    async def click_web_button_by_message_link(
+            self, 
+            msg_url: Union[str, types.Message],
+            term_search: str = None,
+        ) -> WebViewResultUrl:
         if isinstance(msg_url, types.Message):
             target_message = msg_url
         else:
-            target_message = await self.get_message_by_link(msg_url)
+            target_message = await self.get_message_by_link(
+                link=msg_url,
+                term_search=term_search,
+            )
         correct_button: types.InlineKeyboardButton = None
         # go through the buttons and find the web app button
         for button in target_message.reply_markup.inline_keyboard:
@@ -275,7 +292,9 @@ class WotoClientBase(Client):
             url=correct_button.web_app.url,
             theme_params=raw.types.DataJSON(data=self.web_theme)
         )
-        return await self.invoke(my_request)
+
+        result = await self.invoke(my_request)
+        setattr(result, "message", target_message)
 
     async def send_specified_media(
         self,
