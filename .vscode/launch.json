@@ -9,6 +9,7 @@
             "type": "debugpy",
             "request": "launch",
             "module": "scp",
+            "justMyCode": false,
             // "args": ["--gen-config"]
         }
     ]

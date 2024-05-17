@@ -1,4 +1,4 @@
-FROM python:3.10-slim-buster
+FROM python:3.12.3-alpine3.19
 
 ADD https://www.google.com /time.now
 

@@ -223,10 +223,10 @@ class WotoClientBase(Client):
                         limit=1,
                     ):
                         return current
-                return await self.get_history(
+                return (await self.get_history(
                     chat_id=chat_id,
                     limit=1,
-                )[0]
+                ))[0]
             if len(my_strs) < 3:
                 return None
             
