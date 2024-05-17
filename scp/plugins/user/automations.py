@@ -68,16 +68,23 @@ async def gautoread_handler(_, message: Message):
     user.owner & user.command('clickWeb'),
 )
 async def clickWeb_handler(_, message: Message):
+    is_verbose = message.text.find("--verbose") != -1
+    message.text = message.text.replace("--verbose", "").strip()
+
     the_link = user.get_non_cmd(message)
     if not the_link:
         return await message.reply_text('No link found.')
     
     try:
-        target_message = await user.click_web_button_by_message_link(the_link)
+        if message.reply_to_message and message.reply_to_message.entities:
+            # yes, this will work. it might be weird for you, but not for me
+            click_result = await user.click_web_button_by_message_link(message.reply_to_message)
+        
+        click_result = await user.click_web_button_by_message_link(the_link)
     except Exception as e:
-        return await message.reply_text('Error: ' + str(e))
+        return await message.reply_text('Error: \n\t' + user.html_mono(str(e)))
 
-    target_url = target_message.url
+    target_url = click_result.url
     if target_url.find('clicker') != -1:
         nc_container = getattr(user, 'nc_container', None)
         if isinstance(nc_container, BaseTaskContainer):
@@ -104,10 +111,21 @@ async def clickWeb_handler(_, message: Message):
             refresher_obj=user,
             refresher=user.click_web_button_by_message_link,
             src_url=the_link,
+            verbose=is_verbose,
         )
         setattr(user, 'tps_container', tps_container)
         # start the task in another coroutine
         asyncio.create_task(tps_container.start_task())
+
+        await asyncio.sleep(5)
+        txt = ""
+        if tps_container.player_info:
+            txt = user.html_bold("Task is started successfully!\n")
+            txt += user.html_normal(f"Balance: {tps_container.player_info['shares']} | ")
+            txt += user.html_normal(f"{tps_container.player_info['energy']}")
+        else:
+            txt = user.html_normal("player_info object is not set... maybe 5s is not enough?")
+        return await message.reply_text(txt)
     else:
         # TODO: implement other kinds of urls
         return await message.reply_text('No implementation found for this kind of url: ' + target_url)
