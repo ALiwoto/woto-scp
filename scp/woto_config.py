@@ -5,7 +5,7 @@ import logging
 import io
 import os
 import sys
-import base64
+from getpass import getpass
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
@@ -252,8 +252,8 @@ class WotoConfig:
             the_content = b64decode(the_content).decode('utf-8')
             suitable_rfl = self._get_suitable_rfl()
             if not suitable_rfl:
-                user_key = input("Password-protected config file detected. Enter your key:")
-                fav_letter = input("Enter your favorite letter: ")
+                user_key = getpass("Password-protected config file detected. Enter your key: ")
+                fav_letter = getpass("Enter your favorite letter: ")
             else:
                 user_key, fav_letter = self._decompress_rfl(suitable_rfl)
             return self.decrypt_config(the_content, user_key, fav_letter)
