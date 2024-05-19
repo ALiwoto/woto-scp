@@ -1,16 +1,20 @@
 from scp import user, __version__, bot, RUNTIME, __long_version__
 import time
 from scp.utils.parser import humanize_time
+from pyrogram.types import (
+    Message,
+    CallbackQuery
+)
 
 @user.on_message(
     user.sudo & user.command('scp'),
 )
-async def _(_, message: user.types.Message):
+async def _(_, message: Message):
     start = time.time()
     m = await user.send_message('me', '.')
     end = time.time()
     await m.delete()
-    with user.storage.lock, user.storage.conn:
+    with user.storage, user.storage.conn:
         groups_query_result = user.storage.conn.execute(
             'SELECT COUNT(id) FROM peers WHERE type in ("group", "supergroup", "channel")',
         ).fetchall()
@@ -41,5 +45,5 @@ async def _(_, message: user.types.Message):
     bot.sudo
     & bot.filters.regex('^close_message'),
 )
-async def _(_, query: user.types.CallbackQuery):
+async def _(_, query: CallbackQuery):
     await query.message.delete()
