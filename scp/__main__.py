@@ -3,6 +3,7 @@
 """
 import asyncio
 import sys
+from getpass import getpass
 from . import woto_config
 from pyrogram import idle
 from scp import user, bot
@@ -46,8 +47,8 @@ if __name__ == '__main__':
         user.scp_config.no_input = True
 
     if '--gen-config' in sys.argv:
-        user_key = input("Enter your config gen key: ")
-        fav_letter = input("Enter your favorite letter: ")
+        user_key = getpass("Enter your config gen key: ")
+        fav_letter = getpass("Enter your favorite letter: ")
         woto_config.the_config.gen_encrypted_config("config.ini.enc", user_key, fav_letter)
         sys.exit(0)
 
