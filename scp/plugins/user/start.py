@@ -35,9 +35,9 @@ async def _(_, message: Message):
         user.html_mono(f'{groups_query_result[0][0]} groups')
     text += user.html_bold("\t\t\t\tscp_uptime: ") + \
         user.html_mono(humanize_time(time.time() - RUNTIME))
-    buttons = {
+    buttons = [
         {"Source": "https://github.com/aliwoto/woto-scp", "close": "close_message"},
-    }
+    ]
     return await message.reply_text(text=text, reply_markup=buttons)
 
 
