@@ -757,6 +757,19 @@ class TpsInfoContainer(BaseTaskContainer):
         # response.raise_for_status()
         return response.content
 
+    async def aclose(self):
+        await self.http_client.aclose()
+    
+    def __str__(self) -> str:
+        if self.is_cancel_requested:
+            return "Being canceled TpsInfoContainer"
+        elif self.is_task_completed:
+            return f"Completed TpsInfoContainer {self.task_finished_reason}"
+        elif self.last_click_data:
+            return f"Running TpsInfoContainer {self.last_click_data['shares']}"
+        else:
+            return "Running TpsInfoContainer"
+    
     async def invoke_request(
         self, 
         path: str, 
