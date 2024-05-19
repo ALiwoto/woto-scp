@@ -261,7 +261,11 @@ class ScpClient(WotoPyroClient):
 
     async def restart_scp(self, update_req: bool = False, hard: bool = False) -> bool:
         await self.stop_scp()
-        return restart_woto_scp(update_req, hard)
+        extra_args = []
+        if self.scp_config._rfl_value:
+            extra_args.append(self.scp_config._rfl_value)
+        
+        return restart_woto_scp(update_req, hard, extra_args)
 
     async def exit_scp(self) -> 'NoReturn':
         await self.stop_scp()

@@ -133,6 +133,7 @@ dmypy.json
 bot.ini
 *.session-journal
 config.ini
+config.all.ini
 gdrive_settings.yaml
 g_credentials.json
 scp/logs/*.txt
@@ -151,3 +152,4 @@ bots.json
 scp-venv/
 
 yt_cookies.txt
+*.enc

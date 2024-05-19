@@ -3,15 +3,65 @@ from configparser import ConfigParser
 import typing
 import logging
 import io
+import os
+import sys
 import base64
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
+from base64 import b64encode, b64decode
+from os import urandom
+import hashlib
 
 
 def list_map(func, iterator):
     if not iterator: return []
     return list(map(func, iterator))
 
+
+
+class AESCipher:
+    def __init__(self, key: str, fav_letter: str):
+        if len(key) > 32:
+            raise ValueError("Key length must be 32 bytes or less")
+        elif len(key) < 32:
+            key = key.ljust(len(key) + (32 - len(key) % 32), fav_letter)
+
+        key = key.encode('utf-8')
+        if len(key) != 32:
+            raise ValueError("Key length must be 32 bytes")
+        
+        self.key = key
+        self.backend = default_backend()
+
+    def encrypt(self, plaintext):
+        if isinstance(plaintext, str):
+            plaintext = plaintext.encode('utf-8')
+        
+        iv = urandom(16)
+        cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv), backend=self.backend)
+        padder = padding.PKCS7(128).padder()
+        padded_data = padder.update(plaintext) + padder.finalize()
+        encryptor = cipher.encryptor()
+        ciphertext = encryptor.update(padded_data) + encryptor.finalize()
+        return b64encode(iv + ciphertext).decode('utf-8')
+
+    def decrypt(self, b64_encrypted_data):
+        encrypted_data = b64decode(b64_encrypted_data)
+        iv = encrypted_data[:16]
+        ciphertext = encrypted_data[16:]
+        cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv), backend=self.backend)
+        unpadder = padding.PKCS7(128).unpadder()
+        decryptor = cipher.decryptor()
+        padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+        plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
+        return plaintext
+
+
 class WotoConfig:
     _the_config: ConfigParser = None
+    _encrypted_magic_str: str = "_RFL4"
+    _passing_key_magic_str = "_P4SS"
 
     api_id: str = ''
     api_hash: str = ''
@@ -23,6 +73,7 @@ class WotoConfig:
     _owner_users: typing.List[int] = []
     _special_users: typing.List[int] = []
     _special_channels: typing.List[int] = []
+    _rfl_value: str = None
     prefixes: typing.List[str] = []
     log_channel: int = 0
     chat_join_shield: typing.List[int] = []
@@ -167,37 +218,96 @@ class WotoConfig:
         self.pixiv_access_token = self._the_config.get('pixiv', 'access_token', fallback='')
         self.pixiv_refresh_token = self._the_config.get('pixiv', 'refresh_token', fallback='')
 
+    def _get_suitable_rfl(self) -> str:
+        for current in sys.argv:
+            if current.startswith(self._passing_key_magic_str):
+                return current[len(self._passing_key_magic_str):]
+        return None
+    
+    def _decompress_rfl(self, rfl: str) -> typing.Tuple[str, str]:
+        if not rfl:
+            raise ValueError("No suitable rfl found")
+        
+        aes_cipher = AESCipher(
+            self._passing_key_magic_str + self.__class__.__name__, "w")
+        decrypted = aes_cipher.decrypt(b64decode(rfl.encode("utf-8")))
+        return decrypted[32:64].decode("utf-8"), decrypted[64:].decode('utf-8')
+    
     def _load_config_content(self, file_path: str) -> str:
+        is_encrypted = False
+        # first check if file.enc exists
+        if os.path.exists(file_path+".enc"):
+            file_path += ".enc"
+            is_encrypted = True
+        
         the_content: str = None
         with open(file_path, 'r') as f:
             the_content = f.read()
+            # check if it starts with the magic string
+            if the_content and the_content.startswith(self._encrypted_magic_str):
+                is_encrypted = True
         
-        return the_content
+        if is_encrypted:
+            the_content = the_content[len(self._encrypted_magic_str):]
+            the_content = b64decode(the_content).decode('utf-8')
+            suitable_rfl = self._get_suitable_rfl()
+            if not suitable_rfl:
+                user_key = input("Password-protected config file detected. Enter your key:")
+                fav_letter = input("Enter your favorite letter: ")
+            else:
+                user_key, fav_letter = self._decompress_rfl(suitable_rfl)
+            return self.decrypt_config(the_content, user_key, fav_letter)
 
-    def gen_encrypted_config(self, file_path: str) -> None:
-        from Crypto.PublicKey import RSA
-        from Crypto import Random
-        from Crypto.Cipher import PKCS1_OAEP
+        return the_content
+    
+    def decrypt_config(self, file_content: str, key: str, fav_letter: str) -> str:
+        all_strs = file_content.split("\n")
+        encrypted_content = all_strs[0x05]
+        content_signature = all_strs[0x0a]
+
+        aes_cipher = AESCipher(key, fav_letter)
+        decrypted = aes_cipher.decrypt(encrypted_content)
+        sha512_signature = hashlib.sha512(decrypted).hexdigest()
+
+        if sha512_signature != content_signature:
+            raise ValueError("Content has been tampered with. Signature mismatch")
         
-        """
-        This function generates a random RSA key pair and encrypts the config file
-        using the public key. The private key is stored in the first bytes of the
-        content of the file itself with base64 (delimited by a ";;;END;;;" string). 
-        The encrypted content is stored in the rest of the file.
-        """
+        self._rfl_value = self._passing_key_magic_str
+        rfl_aes_cipher = AESCipher(
+            self._passing_key_magic_str + self.__class__.__name__, "w")
+        
+        self._rfl_value += b64encode(
+            rfl_aes_cipher.encrypt(
+                urandom(32) +
+                aes_cipher.key +
+                fav_letter.encode("utf-8")
+            ).encode("utf-8")).decode('utf-8')
+        return decrypted.decode('utf-8')
+
+    def gen_encrypted_config(self, file_path: str, key: str, fav_letter: str) -> None:
         the_content = io.StringIO()
         self._the_config.write(the_content)
-        key = RSA.generate(4096)
-        public_key_pem = key.publickey().exportKey('PEM')
-        private_key_pem = key.export_key('PEM')
-        rsa_public_key = RSA.importKey(public_key_pem, "woto-scp")
-        encrypted = rsa_public_key.encrypt(the_content, 32)[0]
-        the_key_str_b64 = base64.b64encode(key.export_key()).decode()
+        the_content = the_content.getvalue()
+        aes_cipher = AESCipher(key, fav_letter)
+        encrypted = aes_cipher.encrypt(the_content)
+        sha512_signature = hashlib.sha512(the_content.encode("utf-8")).hexdigest()
+
+        output_str =  "-------------------------------\n"
+        output_str += "-----BEGIN ENCRYPTED BLOCK-----\n"
+        output_str += "--THIS FILE IS AUTO GENERATED--\n"
+        output_str += "-----DO NOT EDIT OR MODIFY-----\n"
+        output_str += "-------------------------------\n"
+        output_str += f"{encrypted}\n"
+        output_str += "-------------------------------\n"
+        output_str += "-----END ENCRYPTED BLOCK-------\n"
+        output_str += "-------------------------------\n"
+        output_str += "-----BEGIN SIGNATURE BLOCK-----\n"
+        output_str += f"{sha512_signature}\n"
+        output_str += "-----END SIGNATURE BLOCK-------\n"
+        output_str += "-------------------------------\n"
 
         with open(file_path, 'w') as f:
-            f.write(f"{the_key_str_b64}\n;;;END;;;\n{encrypted.decode()}")
-
-        
+            f.write(self._encrypted_magic_str + b64encode(output_str.encode("utf-8")).decode('utf-8'))
 
     def is_sudo(self, user: int) -> bool:
         return user in self._owner_users or user in self._sudo_users
@@ -207,7 +317,6 @@ class WotoConfig:
     
     def is_only_sudo(self, user: int) -> bool:
         return user in self._sudo_users
-
 
 
 the_config: WotoConfig = WotoConfig()

@@ -14,9 +14,6 @@ from scp.core.functions.plugins import (
 from scp.core.functions.extra_features import load_extra_features
 from scp.utils.selfInfo import updateInfo
 from scp.utils.interpreter import shell
-#from scp.database.Operational import InitializeDatabase
-
-
 HELP_COMMANDS = {}
 
 
@@ -49,7 +46,9 @@ if __name__ == '__main__':
         user.scp_config.no_input = True
 
     if '--gen-config' in sys.argv:
-        woto_config.the_config.gen_encrypted_config("config.enc.ini")
+        user_key = input("Enter your config gen key: ")
+        fav_letter = input("Enter your favorite letter: ")
+        woto_config.the_config.gen_encrypted_config("config.ini.enc", user_key, fav_letter)
         sys.exit(0)
 
     from . import loop
