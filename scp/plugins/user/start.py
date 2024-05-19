@@ -39,7 +39,11 @@ async def _(_, message: Message):
     buttons = [
         {"Source": "https://github.com/aliwoto/woto-scp", "close": "close_message"},
     ]
-    return await message.reply_text(text=text, reply_markup=buttons)
+    return await message.reply_text(
+        text=text, 
+        reply_markup=buttons,
+        disable_web_page_preview=True,
+    )
 
 
 @bot.on_callback_query(
