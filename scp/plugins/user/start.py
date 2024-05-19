@@ -14,13 +14,13 @@ async def _(_, message: Message):
     m = await user.send_message('me', '.')
     end = time.time()
     await m.delete()
-    with user.storage, user.storage.conn:
-        groups_query_result = user.db.execute(
-            'SELECT COUNT(id) FROM peers WHERE type in ("group", "supergroup", "channel")',
-        )
-        users_query_result = user.db.execute(
-            'SELECT COUNT(id) FROM peers WHERE type in ("user", "bot")',
-        )
+    
+    groups_query_result = user.db.execute(
+        'SELECT COUNT(id) FROM peers WHERE type in ("group", "supergroup", "channel")',
+    )
+    users_query_result = user.db.execute(
+        'SELECT COUNT(id) FROM peers WHERE type in ("user", "bot")',
+    )
 
     text = user.html_bold("woto-scp\n")
     text += user.html_bold("\t\tversion: ")
