@@ -165,7 +165,7 @@ def restart_scp(update_req: bool = False, hard: bool = False, extra_args = None)
         if extra_args:
             for arg in extra_args:
                 the_arg += f" {arg}"
-        os.execl(sys.executable, sys.executable, '-m', "", the_arg)  # nosec
+        os.execl(sys.executable, sys.executable, '-m', "scp", the_arg)  # nosec
     
     return True
     
