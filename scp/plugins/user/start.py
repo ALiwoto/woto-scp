@@ -14,7 +14,7 @@ async def _(_, message: Message):
     m = await user.send_message('me', '.')
     end = time.time()
     await m.delete()
-    
+
     groups_query_result = user.db.execute(
         'SELECT COUNT(id) FROM peers WHERE type in ("group", "supergroup", "channel")',
     )
@@ -30,9 +30,9 @@ async def _(_, message: Message):
     text += user.html_bold("\t\t\t\tping_dc: ") + \
         user.html_mono(f'{round((end - start) * 1000, 3)}ms')
     text += user.html_bold("\t\t\t\tpeer_users: ") + \
-        user.html_mono(f'{len(users_query_result[0][0])} users')
+        user.html_mono(f'{users_query_result[0][0]} users')
     text += user.html_bold("\t\t\t\tpeer_groups: ") + \
-        user.html_mono(f'{len(groups_query_result)} groups')
+        user.html_mono(f'{groups_query_result[0][0]} groups')
     text += user.html_bold("\t\t\t\tscp_uptime: ") + \
         user.html_mono(humanize_time(time.time() - RUNTIME))
     buttons = {
