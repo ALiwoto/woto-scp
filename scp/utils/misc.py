@@ -140,7 +140,7 @@ def remove_special_chars(value: str) -> str:
     
     return result
 
-def restart_scp(update_req: bool = False, hard: bool = False) -> bool:
+def restart_scp(update_req: bool = False, hard: bool = False, extra_args = None) -> bool:
     """ Restart the woto-scp """
     if update_req:
         os.system(  # nosec
@@ -160,7 +160,12 @@ def restart_scp(update_req: bool = False, hard: bool = False) -> bool:
                 
             except Exception:
                 continue
-        os.execl(sys.executable, sys.executable, '-m', 'scp')  # nosec
+        
+        the_arg = "scp"
+        if extra_args:
+            for arg in extra_args:
+                the_arg += f" {arg}"
+        os.execl(sys.executable, sys.executable, '-m', the_arg)  # nosec
     
     return True
     
