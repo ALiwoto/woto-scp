@@ -15,12 +15,12 @@ async def _(_, message: Message):
     end = time.time()
     await m.delete()
     with user.storage, user.storage.conn:
-        groups_query_result = user.storage.conn.execute(
+        groups_query_result = user.db.execute(
             'SELECT COUNT(id) FROM peers WHERE type in ("group", "supergroup", "channel")',
-        ).fetchall()
-        users_query_result = user.storage.conn.execute(
+        )
+        users_query_result = user.db.execute(
             'SELECT COUNT(id) FROM peers WHERE type in ("user", "bot")',
-        ).fetchall()
+        )
 
     text = user.html_bold("woto-scp\n")
     text += user.html_bold("\t\tversion: ")
