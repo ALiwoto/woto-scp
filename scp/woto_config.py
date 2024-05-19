@@ -220,6 +220,7 @@ class WotoConfig:
 
     def _get_suitable_rfl(self) -> str:
         for current in sys.argv:
+            current = current.strip()
             if current.startswith(self._passing_key_magic_str):
                 return current[len(self._passing_key_magic_str):]
         return None
