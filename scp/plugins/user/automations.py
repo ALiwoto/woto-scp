@@ -73,7 +73,7 @@ async def clickWeb_handler(_, message: Message):
 
     the_link = user.get_non_cmd(message)
     if not the_link and not (message.reply_to_message and 
-                             not user.message_has_keyboard(message.reply_to_message)):
+                             user.message_has_keyboard(message.reply_to_message)):
         return await message.reply_text('No link found, you can also reply to the target message.')
     
     try:
