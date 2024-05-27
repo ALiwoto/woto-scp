@@ -39,6 +39,12 @@ class BaseTaskContainer(BaseContainer):
     app_refresher: Callable = None
     http_client: httpx.AsyncClient = None
     x_requested_with: str = "org.telegram.messenger.web"
+    x_app: str = "\u0074\u0061\u0070\u0073\u0077\u0061\u0070\u005f\u0073\u0065\u0072\u0076\u0065\u0072"
+    x_cv: str = "607"
+    user_agent: str = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36'
+    sec_ch_ua: str = '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"'
+    sec_ch_ua_mobile: str = "?1"
+    sec_ch_ua_platform: str = '"Android"'
 
     is_task_started: bool = False
     is_cancel_requested: bool = False
@@ -661,6 +667,10 @@ class TpsInfoContainer(BaseTaskContainer):
                     is_turbo=is_turbo,
                 )
             except Exception as ex:
+                if f"{ex}".lower().find("unauthorized") != -1:
+                    await self.refresh_container()
+                    await asyncio.sleep(5)
+                    continue
                 last_ex = ex
         raise last_ex
         
@@ -669,7 +679,8 @@ class TpsInfoContainer(BaseTaskContainer):
         amount: int = 300, 
         is_turbo: bool = False,
     ):
-        req_data = {"taps": amount, "time": time.time_ns() // 1_000_000}
+        current_time = time.time_ns() // 1_000_000
+        req_data = {"taps": amount, "time": current_time}
         if is_turbo:
             req_data["turbo"] = True
         
@@ -679,7 +690,8 @@ class TpsInfoContainer(BaseTaskContainer):
             data=data,
             token=self.access_token,
             override_host="api.tapswap.ai",
-            override_url="https://api.tapswap.ai"
+            override_url="https://api.tapswap.ai",
+            content_id=self.get_content_id(self.player_info["id"], current_time)
         )
         j_data = self.parse_data(response)
         
@@ -687,6 +699,9 @@ class TpsInfoContainer(BaseTaskContainer):
         # calculated here.
 
         return j_data
+    
+    def get_content_id(self, player_id: int, current_time: int) -> int:
+        return player_id * current_time % player_id
     
     def parse_data(self, the_response: bytes):
         if not the_response:
@@ -741,7 +756,7 @@ class TpsInfoContainer(BaseTaskContainer):
             'Access-Control-Request-Method': future_method,
             'Access-Control-Request-Headers': needed_header,
             'Origin': f'{self.origin_target_url}',
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 7.1.2; google Pixel 2 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/92.0.4515.131 Mobile Safari/537.36',
+            'User-Agent': self.user_agent,
             'Sec-Fetch-Mode': 'cors',
             "X-Requested-With": self.x_requested_with,
             'Sec-Fetch-Site': 'same-site',
@@ -749,8 +764,12 @@ class TpsInfoContainer(BaseTaskContainer):
             'Referer': f'{self.origin_target_url}/',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'en,en-US;q=0.9',
-            'X-App': "\u0074\u0061\u0070\u0073\u0077\u0061\u0070\u005f\u0073\u0065\u0072\u0076\u0065\u0072",
-            'X-Cv': '1'
+            'X-App': self.x_app,
+            'X-CV': self.x_cv,
+            'X-Cv': '1',
+            'Sec-Ch-Ua': self.sec_ch_ua,
+            'Sec-Ch-Ua-Mobile': self.sec_ch_ua_mobile,
+            'Sec-Ch-Ua-Platform': self.sec_ch_ua_platform,
         }
         response = await self.http_client.options(
             f"{override_url if override_url else self.target_url}/{path}", headers=headers)
@@ -777,6 +796,7 @@ class TpsInfoContainer(BaseTaskContainer):
         token: str = None,
         override_host: str = None,
         override_url: str = None,
+        content_id: str = None,
     ):
         path = path.rstrip('/')
         data_value = data.encode('utf-8')
@@ -784,7 +804,7 @@ class TpsInfoContainer(BaseTaskContainer):
             'Host': override_host if override_host else f"{self.parsed_url.hostname}",
             'Content-Length': str(len(data_value)),
             'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 7.1.2; google Pixel 2 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/92.0.4515.131 Mobile Safari/537.36',
+            'User-Agent': self.user_agent,
             'Auth': '1',
             'Origin': f'{self.origin_target_url}',
             "X-Requested-With": self.x_requested_with,
@@ -794,12 +814,18 @@ class TpsInfoContainer(BaseTaskContainer):
             'Referer': f'{self.origin_target_url}/',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'en,en-US;q=0.9',
-            'X-App': "\u0074\u0061\u0070\u0073\u0077\u0061\u0070\u005f\u0073\u0065\u0072\u0076\u0065\u0072",
-            'X-Cv': '1'
+            'X-App': self.x_app,
+            'X-CV': self.x_cv,
+            'Sec-Ch-Ua': self.sec_ch_ua,
+            'Sec-Ch-Ua-Mobile': self.sec_ch_ua_mobile,
+            'Sec-Ch-Ua-Platform': self.sec_ch_ua_platform,
         }
 
         if token:
             headers['Authorization'] = f'Bearer {token}'
+        
+        if content_id:
+            headers['Content-Id'] = content_id
         
         if data:
             headers['Content-Type'] = 'application/json'
@@ -815,11 +841,12 @@ class TpsInfoContainer(BaseTaskContainer):
         override_url: str = None,
         if_non_match: str = None,
         dest_value: str = None,
+        content_id: str = None,
     ):
         headers = {
             'Host': f"{self.parsed_url.hostname}",
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 7.1.2; google Pixel 2 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/92.0.4515.131 Mobile Safari/537.36',
+            'User-Agent': self.user_agent,
             'Auth': '1',
             'Content-Type': 'application/json',
             'Origin': f'{self.origin_target_url}',
@@ -831,12 +858,18 @@ class TpsInfoContainer(BaseTaskContainer):
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'en,en-US;q=0.9',
             'Connection': 'close',
-            'X-App': "\u0074\u0061\u0070\u0073\u0077\u0061\u0070\u005f\u0073\u0065\u0072\u0076\u0065\u0072",
-            'X-Cv': '1'
+            'X-App': self.x_app,
+            'X-CV': self.x_cv,
+            'Sec-Ch-Ua': self.sec_ch_ua,
+            'Sec-Ch-Ua-Mobile': self.sec_ch_ua_mobile,
+            'Sec-Ch-Ua-Platform': self.sec_ch_ua_platform,
         }
 
         if if_non_match:
             headers['If-None-Match'] = if_non_match
+        
+        if content_id:
+            headers['Content-Id'] = content_id
 
         response = await self.http_client.get(
             f"{override_url if override_url else self.target_url}/{path}", 
