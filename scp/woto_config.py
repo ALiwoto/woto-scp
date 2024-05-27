@@ -68,6 +68,7 @@ class WotoConfig:
     device_model: str = ''
     app_version: str = ''
     no_input: bool = False
+    node_path: str = ''
 
     _sudo_users: typing.List[int] = []
     _owner_users: typing.List[int] = []
@@ -139,6 +140,7 @@ class WotoConfig:
         self.auto_read_mode = self._the_config.getint('woto-scp', 'auto_read_mode', fallback=0)
         self.gdrive_upload_folder_id = self._the_config.get('woto-scp', 'gdrive_upload_folder_id', fallback='')
         self.yt_cookies_file = self._the_config.get('woto-scp', 'yt_cookies_file', fallback=None)
+        self.node_path = self._the_config.get('woto-scp', 'node_path', fallback='node')
 
         # sibyl configuration
         try:
