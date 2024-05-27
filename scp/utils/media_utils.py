@@ -12,10 +12,18 @@ import httpx
 import json
 import math
 import logging
+import subprocess
+from scp.woto_config import the_config
 
 math.abs = abs
 math.min = min
 math.max = max
+
+def run_command(command: str) -> str:
+    """Utility function to run commands."""
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    output, _ = process.communicate()
+    return output.decode("utf-8")
 
 class BaseContainer:
     length: int = 0
@@ -679,6 +687,14 @@ class TpsInfoContainer(BaseTaskContainer):
         amount: int = 300, 
         is_turbo: bool = False,
     ):
+        await self.invoke_options_request(
+            path="api/player/submit_taps",
+            future_method="POST",
+            needed_header="authorization,content-id,content-type,x-app,x-cv",
+            override_host="api.tapswap.ai",
+            override_url="https://api.tapswap.ai",
+        )
+
         current_time = time.time_ns() // 1_000_000
         req_data = {"taps": amount, "time": current_time}
         if is_turbo:
@@ -700,8 +716,11 @@ class TpsInfoContainer(BaseTaskContainer):
 
         return j_data
     
-    def get_content_id(self, player_id: int, current_time: int) -> int:
-        return player_id * current_time % player_id
+    def get_content_id(self, player_id: int, current_time: int) -> str:
+        # I HATE YOU JAVASCRIPT
+        return run_command(
+            f"{the_config.node_path} -e \"console.log({player_id} * {current_time} % {player_id})\""
+        ).strip()
     
     def parse_data(self, the_response: bytes):
         if not the_response:
