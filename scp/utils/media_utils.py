@@ -717,10 +717,7 @@ class TpsInfoContainer(BaseTaskContainer):
         return j_data
     
     def get_content_id(self, player_id: int, current_time: int) -> str:
-        # I HATE YOU JAVASCRIPT
-        return run_command(
-            f"{the_config.node_path} -e \"console.log({player_id} * {current_time} % {player_id})\""
-        ).strip()
+        return str(int(float(player_id) * float(current_time) % float(player_id)))
     
     def parse_data(self, the_response: bytes):
         if not the_response:
