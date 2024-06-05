@@ -2,7 +2,6 @@ import asyncio
 from scp import user
 from pyrogram.types import (
     Message,
-    InlineKeyboardButton,
 )
 from pyrogram.raw.functions.messages import RequestWebView
 from scp.utils.media_utils import (
@@ -10,9 +9,14 @@ from scp.utils.media_utils import (
     NcInfoContainer,
     TpsInfoContainer
 )
-import pyrogram
 
 __PLUGIN__ = 'automations'
+
+nc_pool_check_info = {
+    "target_channel": 1234567890,
+    "notified_pool_ids": set(),
+}
+nc_bot_username = "notcoin_bot"
 
 @user.on_message(
     ~(
@@ -63,6 +67,70 @@ async def gautoread_handler(_, message: Message):
     else:
         await message.reply_text('Auto read is disabled.')
 
+@user.on_message(
+    user.owner & user.command('ncPoolCheck'),
+)
+async def poolCheck_handler(_, message: Message):
+    is_verbose = message.text.find("--verbose") != -1
+    message.text = message.text.replace("--verbose", "").strip()
+    target_channel = user.get_non_cmd(message)
+    if not target_channel:
+        return await message.reply_text('Example: .ncPoolCheck @channelusername')
+    
+    try:
+        target_channel = await user.get_chat(target_channel)
+    except Exception as e:
+        return await message.reply_text('Error: ' + user.html_mono(str(e)))
+    
+    if not target_channel:
+        return await message.reply_text('Channel not found.')
+    
+    nc_pool_check_info["target_channel"] = target_channel.id
+    nc_container = getattr(user, 'nc_container', None)
+    if isinstance(nc_container, BaseTaskContainer):
+        await nc_container.cancel_task()
+    
+    click_result = await user.click_web_button_by_message_link(
+        nc_bot_username,
+        term_search="is available",
+    )
+    target_url = click_result.url
+    clicked_message: Message = getattr(click_result, "message", None)
+
+    nc_container = NcInfoContainer(
+        url=target_url,
+        refresher_obj=user,
+        refresher=user.click_web_button_by_message_link,
+        src_url=clicked_message.link,
+        verbose=is_verbose,
+    )
+    setattr(user, 'nc_container', nc_container)
+    nc_container.on_new_pool_data = nc_on_new_pool_data
+    nc_container.running_task = asyncio.create_task(nc_container.start_pool_check_task())
+
+async def nc_on_new_pool_data(pool_data):
+    for current_pool in pool_data:
+        if not current_pool["isActive"] or \
+            current_pool["id"] in nc_pool_check_info["notified_pool_ids"] or \
+            current_pool["isJoined"]:
+            continue
+        
+        txt = user.html_bold(f"New"+ f"{' RISKY ' if current_pool['isRisky'] else ' '}" + "notcoin pool\n")
+        txt += user.html_bold("Name: ") + user.html_normal(current_pool["name"]) + "\n"
+        txt += user.html_bold("Description: ") + user.html_normal(str(current_pool["description"])) + "\n"
+        txt += user.html_bold("ID: ") + user.html_normal(current_pool["challengeId"]) + "\n"
+        txt += user.html_bold("Reward: ") + user.html_normal(str(current_pool["reward"] / (10 ** 9)))
+
+        try:
+            await user.send_message(
+                nc_pool_check_info["target_channel"],
+                text=txt,
+            )
+            nc_pool_check_info["notified_pool_ids"].add(current_pool["id"])
+        except Exception as e:
+            print("Error in nc_on_new_pool_data: " + str(e))
+            continue
+        
 
 @user.on_message(
     user.owner & user.command('clickWeb'),
