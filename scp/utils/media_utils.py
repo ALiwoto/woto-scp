@@ -171,16 +171,19 @@ class NcInfoContainer(BaseTaskContainer):
     async def restart(self):
         return await self.refresh_container(self)
     
-    async def refresh_container(self):
+    async def refresh_container(self, plain_only: bool = False):
         refresher_result = await self.app_refresher(self.src_url)
         the_url = getattr(refresher_result, "url", None)
         if not the_url:
             self.parse_url_stuff(self.src_url)
+        else:
+            self.parse_url_stuff(the_url)
         
-        # do not allow the start task to start its own loop,
-        # because refresh_container might be called from within a loop
-        # itself. Starting a loop after this is up to the caller.
-        await self._start_click_task(no_loop=True)
+        if not plain_only:
+            # do not allow the start task to start its own loop,
+            # because refresh_container might be called from within a loop
+            # itself. Starting a loop after this is up to the caller.
+            await self._start_click_task(no_loop=True)
 
 
     async def aclose(self):
@@ -340,9 +343,15 @@ class NcInfoContainer(BaseTaskContainer):
 
                 self.last_pool_data = pool_data
                 if self.on_new_pool_data:
+                    logging.debug("invoking on_new_pool_data callback...")
                     await self.on_new_pool_data(pool_data)
                 await asyncio.sleep(60)
             except Exception as ex:
+                if f"{ex}".lower().find("unauthorized") != -1:
+                    logging.debug("unauthorized, refreshing...")
+                    await self.refresh_container(plain_only=True)
+                    await asyncio.sleep(5)
+                    continue
                 logging.warning(f"failed to check pool: {ex}")
                 await asyncio.sleep(60)
     
@@ -725,6 +734,8 @@ class TpsInfoContainer(BaseTaskContainer):
         the_url = getattr(refresher_result, "url", None)
         if not the_url:
             self.parse_url_stuff(self.src_url)
+        else:
+            self.parse_url_stuff(the_url)
         
         # do not allow the start task to start its own loop,
         # because refresh_container might be called from within a loop
