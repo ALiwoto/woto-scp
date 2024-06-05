@@ -115,11 +115,11 @@ async def nc_on_new_pool_data(pool_data):
             current_pool["isJoined"]:
             continue
         
-        txt = user.html_bold(f"New"+ f"{' RISKY ' if current_pool['isRisky'] else ' '}" + "notcoin pool\n")
-        txt += user.html_bold("Name: ") + user.html_normal(current_pool["name"]) + "\n"
-        txt += user.html_bold("Description: ") + user.html_normal(str(current_pool["description"])) + "\n"
-        txt += user.html_bold("ID: ") + user.html_normal(current_pool["challengeId"]) + "\n"
-        txt += user.html_bold("Reward: ") + user.html_normal(str(current_pool["reward"] / (10 ** 9)))
+        txt = user.html_bold(f"❇️New"+ f"{' RISKY ' if current_pool['isRisky'] else ' '}" + "notcoin pool\n")
+        txt += user.html_bold("・Name: ") + user.html_normal(current_pool["name"]) + "\n"
+        txt += user.html_bold("・Description: ") + user.html_normal(str(current_pool["description"])) + "\n"
+        txt += user.html_bold("・ID: ") + user.html_normal(current_pool["challengeId"]) + "\n"
+        txt += user.html_bold("・Reward: ") + user.html_normal(str(int(current_pool["reward"]) / (10 ** 9)))
 
         try:
             await user.send_message(
