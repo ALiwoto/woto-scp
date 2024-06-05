@@ -53,6 +53,7 @@ class BaseTaskContainer(BaseContainer):
     sec_ch_ua: str = '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"'
     sec_ch_ua_mobile: str = "?1"
     sec_ch_ua_platform: str = '"Android"'
+    is_authorized: bool = False
 
     is_task_started: bool = False
     is_cancel_requested: bool = False
@@ -137,6 +138,9 @@ class NcInfoContainer(BaseTaskContainer):
     max_fail_amount = 8172
 
     logger = logging.getLogger("NcInfoContainer")
+    
+    last_pool_data: dict = None
+    on_new_pool_data: Callable = None
 
     pe_token: str = None
     access_token: str = None
@@ -151,13 +155,18 @@ class NcInfoContainer(BaseTaskContainer):
         url: str, 
         refresher_obj: object = None,
         refresher: Callable = None,
-        src_url: str = ""
+        src_url: str = "",
+        verbose: bool = True
     ) -> None:
         self.parse_url_stuff(url)
         self.app_refresher_obj = refresher_obj
         self.app_refresher = refresher
         self.src_url = src_url
         self.http_client = httpx.AsyncClient()
+
+        if verbose:
+            self.logger.setLevel(logging.INFO)
+        
     
     async def restart(self):
         return await self.refresh_container(self)
@@ -171,7 +180,7 @@ class NcInfoContainer(BaseTaskContainer):
         # do not allow the start task to start its own loop,
         # because refresh_container might be called from within a loop
         # itself. Starting a loop after this is up to the caller.
-        await self._start_task(no_loop=True)
+        await self._start_click_task(no_loop=True)
 
 
     async def aclose(self):
@@ -200,7 +209,7 @@ class NcInfoContainer(BaseTaskContainer):
         
         self.pe_token = correct_line.split("=")[1].strip().split('"')[1]
     
-    def parse_data(self, the_response: bytes):
+    def parse_data(self, the_response: bytes, flatten: bool = False):
         if not the_response:
             return None
         
@@ -215,7 +224,9 @@ class NcInfoContainer(BaseTaskContainer):
                 raise NcResponseException(f"{j_resp['data']['message']}", the_response)
             raise NcResponseException(f"failed to activate turbo", the_response)
         
-        if isinstance(j_resp['data'], list):
+        if isinstance(j_resp['data'], list) \
+            and flatten \
+            and len(j_resp['data']) == 1:
             return j_resp['data'][0]
         else:
             return j_resp['data']
@@ -242,13 +253,13 @@ class NcInfoContainer(BaseTaskContainer):
 
         return self.parse_data(response)
 
-    async def start_task(self):
+    async def start_click_task(self):
         try:
             return await self._start_task()
         except Exception as e:
             return self.mark_as_incomplete(f'failed to start task: {e}')
         
-    async def _start_task(self, no_loop: bool = False):
+    async def _start_click_task(self, no_loop: bool = False):
         index_content = await self.invoke_get_request(self.parsed_url.path)
         if not index_content:
             return self.mark_as_incomplete('failed to get index content')
@@ -304,6 +315,54 @@ class NcInfoContainer(BaseTaskContainer):
                     await self.refresh_container()
                 
                 await asyncio.sleep(20)
+
+    async def start_pool_check_task(self):
+        try:
+            return await self._start_pool_check_task()
+        except Exception as e:
+            return self.mark_as_incomplete(f'failed to start pool check task: {e}')
+    
+    async def _start_pool_check_task(self, no_loop: bool = False):
+        # await self.notify_api_event()
+        # authorize the client
+        await self.authorize_client(token=self.refresh_token)
+
+        if no_loop:
+            return
+        
+        while not self.is_cancel_requested and not self.is_task_completed:
+            try:
+                pool_data = await self.get_my_pool()
+                if not pool_data:
+                    await asyncio.sleep(60)
+                    self.logger.warning("pool data is None")
+                    continue
+
+                self.last_pool_data = pool_data
+                if self.on_new_pool_data:
+                    await self.on_new_pool_data(pool_data)
+                await asyncio.sleep(60)
+            except Exception as ex:
+                logging.warning(f"failed to check pool: {ex}")
+                await asyncio.sleep(60)
+    
+    async def get_my_pool(self) -> dict:
+        if not self.is_authorized:
+            await self.authorize_client(token=self.refresh_token)
+        
+        response = await self.invoke_get_request(
+            path="pool/my",
+            override_host="clicker-api.joincommunity.xyz",
+            override_url="https://clicker-api.joincommunity.xyz"
+        )
+        j_resp = self.parse_data(response)
+        
+        # note: parse_data method already checks for errors
+        # and only returns the "data" field.
+        if not j_resp:
+            raise NcResponseException("failed to get my pool", response)
+        
+        return j_resp
 
     async def do_click(
         self, 
@@ -424,6 +483,7 @@ class NcInfoContainer(BaseTaskContainer):
         
         self.access_token = j_resp['accessToken']
         self.refresh_token = j_resp['refreshToken']
+        self.is_authorized = True
         return j_resp
 
     async def invoke_options_request(
@@ -495,18 +555,23 @@ class NcInfoContainer(BaseTaskContainer):
     async def invoke_get_request(
         self, 
         path: str,
+        override_host: str = None,
         override_url: str = None,
         if_non_match: str = None,
         dest_value: str = None,
+        accept_value: str = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
     ):
         headers = {
-            'Host': f"{self.parsed_url.hostname}",
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 7.1.2; google Pixel 2 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/92.0.4515.131 Mobile Safari/537.36',
+            'Host': f"{override_host if override_host else self.parsed_url.hostname}",
+            'Accept': accept_value,
+            'User-Agent': self.user_agent,
             'Auth': '1',
             'Content-Type': 'application/json',
             'Origin': f'{self.origin_target_url}',
             "X-Requested-With": self.x_requested_with,
+            'Sec-Ch-Ua': self.sec_ch_ua,
+            'Sec-Ch-Ua-Mobile': self.sec_ch_ua_mobile,
+            'Sec-Ch-Ua-Platform': self.sec_ch_ua_platform,
             'Sec-Fetch-Site': 'same-site',
             'Sec-Fetch-Mode': 'cors',
             'Sec-Fetch-Dest': dest_value if dest_value else 'document',
@@ -518,12 +583,17 @@ class NcInfoContainer(BaseTaskContainer):
 
         if if_non_match:
             headers['If-None-Match'] = if_non_match
+        
+        if self.access_token:
+            headers['Authorization'] = f'Bearer {self.access_token}'
 
         response = await self.http_client.get(
             f"{override_url if override_url else self.target_url}/{path}", 
             headers=headers
         )
-        response.raise_for_status()
+        if response.status_code != 200:
+            raise NcResponseException(f"failed to get response from {path}", response.content)
+        
         return response.content
 
     async def cancel_task(self):
