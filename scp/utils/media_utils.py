@@ -179,7 +179,11 @@ class NcInfoContainer(BaseTaskContainer):
         else:
             self.parse_url_stuff(the_url)
         
-        if not plain_only:
+        if plain_only:
+            self.refresh_token = None
+            self.access_token = None
+            await self.authorize_client(token=None)
+        else:
             # do not allow the start task to start its own loop,
             # because refresh_container might be called from within a loop
             # itself. Starting a loop after this is up to the caller.
@@ -343,12 +347,12 @@ class NcInfoContainer(BaseTaskContainer):
 
                 self.last_pool_data = pool_data
                 if self.on_new_pool_data:
-                    logging.debug("invoking on_new_pool_data callback...")
+                    logging.info("invoking on_new_pool_data callback...")
                     await self.on_new_pool_data(pool_data)
                 await asyncio.sleep(60)
             except Exception as ex:
                 if f"{ex}".lower().find("unauthorized") != -1:
-                    logging.debug("unauthorized, refreshing...")
+                    logging.info("unauthorized, refreshing...")
                     await self.refresh_container(plain_only=True)
                     await asyncio.sleep(5)
                     continue
