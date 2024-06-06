@@ -901,7 +901,8 @@ class WotoClientBase(Client):
         query: raw.core.TLObject,
         retries: int = session.Session.MAX_RETRIES,
         timeout: float = session.Session.WAIT_TIMEOUT,
-        sleep_threshold: float = None
+        sleep_threshold: float = None,
+        business_connection_id: str = None
     ) -> raw.core.TLObject:
         while True:
             try:
@@ -910,6 +911,7 @@ class WotoClientBase(Client):
                     retries=retries,
                     timeout=timeout,
                     sleep_threshold=sleep_threshold,
+                    business_connection_id=business_connection_id
                 )
             except (
                 errors.SlowmodeWait,
@@ -932,13 +934,15 @@ class WotoClientBase(Client):
         data: raw.core.TLObject,
         retries: int = session.Session.MAX_RETRIES,
         timeout: float = session.Session.WAIT_TIMEOUT,
-        sleep_threshold: float = None
+        sleep_threshold: float = None,
+        business_connection_id: str = None
     ) -> raw.core.TLObject:
         return await self.invoke(
             query=data,
             retries=retries,
             timeout=timeout,
-            sleep_threshold=sleep_threshold
+            sleep_threshold=sleep_threshold,
+            business_connection_id=business_connection_id
         )
 
     def iter_history(
