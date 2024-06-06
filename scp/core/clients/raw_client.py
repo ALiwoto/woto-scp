@@ -356,6 +356,7 @@ class ScpClient(WotoPyroClient):
         quote_offset: int = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
+        business_connection_id: str = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -377,6 +378,7 @@ class ScpClient(WotoPyroClient):
                 show_above_text=show_above_text,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
                 reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
@@ -442,6 +444,7 @@ class ScpClient(WotoPyroClient):
         quote_offset: int = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
+        business_connection_id: str = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -467,6 +470,7 @@ class ScpClient(WotoPyroClient):
                 reply_to_chat_id=reply_to_chat_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
                 message_thread_id=message_thread_id,
                 effect_id=effect_id,
                 reply_to_story_id=reply_to_story_id,
