@@ -325,6 +325,8 @@ class WotoClientBase(Client):
         progress: callable = None,
         progress_args: tuple = (),
         protect_content: bool = None,
+        business_connection_id: str = None,
+        effect_id: int = None,
         unsave: bool = False,
         file_name: str = None,
         thumb: str | BinaryIO = None,
@@ -356,6 +358,8 @@ class WotoClientBase(Client):
                 file_name=file_name,
                 thumb=thumb,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
+                effect_id=effect_id,
                 duration=duration,
                 has_spoiler=has_spoiler,
                 width=width,
@@ -381,6 +385,8 @@ class WotoClientBase(Client):
                 progress=progress,
                 progress_args=progress_args,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
+                effect_id=effect_id,
                 title=title,
             )
         elif media_type == MessageMediaType.DOCUMENT:
@@ -401,7 +407,9 @@ class WotoClientBase(Client):
                 reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
                 reply_markup=reply_markup,
-                protect_content=protect_content
+                protect_content=protect_content,
+                business_connection_id=business_connection_id,
+                effect_id=effect_id,
             )
         elif media_type == MessageMediaType.PHOTO:
             return await self.send_photo(
@@ -416,6 +424,8 @@ class WotoClientBase(Client):
                 progress=progress,
                 progress_args=progress_args,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
+                effect_id=effect_id,
                 reply_markup=reply_markup,
                 reply_to_message_id=reply_to_message_id,
                 reply_to_chat_id=reply_to_chat_id,
@@ -438,6 +448,8 @@ class WotoClientBase(Client):
                 progress=progress,
                 progress_args=progress_args,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
+                effect_id=effect_id,
                 reply_markup=reply_markup,
                 reply_to_message_id=reply_to_message_id,
                 reply_to_chat_id=reply_to_chat_id,
@@ -455,6 +467,8 @@ class WotoClientBase(Client):
                 schedule_date=schedule_date,
                 duration=duration,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
+                effect_id=effect_id,
                 thumb=thumb,
                 reply_to_message_id=reply_to_message_id,
                 reply_to_chat_id=reply_to_chat_id,
@@ -476,6 +490,8 @@ class WotoClientBase(Client):
                 progress=progress,
                 progress_args=progress_args,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
+                effect_id=effect_id,
                 reply_markup=reply_markup,
                 reply_to_message_id=reply_to_message_id,
                 reply_to_chat_id=reply_to_chat_id,
@@ -490,6 +506,8 @@ class WotoClientBase(Client):
                 progress=progress,
                 progress_args=progress_args,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
+                effect_id=effect_id,
                 reply_markup=reply_markup,
                 reply_to_message_id=reply_to_message_id,
                 reply_to_chat_id=reply_to_chat_id,
@@ -672,6 +690,7 @@ class WotoClientBase(Client):
         quote_offset: int = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
+        business_connection_id: str = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -693,6 +712,7 @@ class WotoClientBase(Client):
                 reply_to_message_id=reply_to_message_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
                 message_thread_id=message_thread_id,
                 effect_id=effect_id,
                 show_above_text=show_above_text,
@@ -722,6 +742,7 @@ class WotoClientBase(Client):
                 quote_offset=quote_offset,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
+                business_connection_id=business_connection_id,
                 reply_markup=reply_markup
             )
 
