@@ -129,9 +129,11 @@ class NcResponseException(Exception):
     message: str = None
     data: str = None
     def __init__(self, message: str, data: str = None) -> None:
+        if isinstance(data, bytes):
+            data = data.decode("utf-8")
         super().__init__(message)
-        self.message = message
-        self.data = data
+        self.message = f"{message}; with data: {data}"
+        self.data = data        
         
 class NcInfoContainer(BaseTaskContainer):
     click_amount = 300
@@ -351,13 +353,8 @@ class NcInfoContainer(BaseTaskContainer):
                     await self.on_new_pool_data(pool_data)
                 await asyncio.sleep(60)
             except Exception as ex:
-                if f"{ex}".lower().find("unauthorized") != -1:
-                    logging.info("unauthorized, refreshing...")
-                    await self.refresh_container(plain_only=True)
-                    await asyncio.sleep(5)
-                    continue
-                logging.warning(f"failed to check pool: {ex}")
-                await asyncio.sleep(60)
+                await self.refresh_container(plain_only=True)
+                await asyncio.sleep(5)
     
     async def get_my_pool(self) -> dict:
         if not self.is_authorized:
