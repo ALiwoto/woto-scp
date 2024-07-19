@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Module",
+            "name": "Python Debugger: SCP Module",
             "type": "debugpy",
             "request": "launch",
             "module": "scp",
             "justMyCode": false,
-            // "args": ["--gen-config"]
+            "args": ["abc"]
         }
     ]
 }

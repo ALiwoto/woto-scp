@@ -353,7 +353,11 @@ class NcInfoContainer(BaseTaskContainer):
                     await self.on_new_pool_data(pool_data)
                 await asyncio.sleep(60)
             except Exception as ex:
-                await self.refresh_container(plain_only=True)
+                try:
+                    await self.refresh_container(plain_only=True)
+                except Exception as e:
+                    logging.warning(f"failed to refresh container: {e}")
+                    continue
                 await asyncio.sleep(5)
     
     async def get_my_pool(self) -> dict:
