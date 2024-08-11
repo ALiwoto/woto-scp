@@ -262,6 +262,29 @@ class WotoClientBase(Client):
             getattr(getattr(message, "reply_markup", None), 
                     "inline_keyboard", None))
     
+    async def click_web_button_by_url(
+        self,
+        target_bot: Union[int, str],
+        app_url: str,
+        platform: str = 'android',
+    ) -> WebViewResultUrl:
+        raw_bot = await self.resolve_peer(target_bot)
+        my_request = RequestWebView(
+            peer=raw.types.InputPeerUser(
+                user_id=raw_bot.user_id, 
+                access_hash=raw_bot.access_hash
+            ),
+            bot=raw.types.InputUser(
+                user_id=raw_bot.user_id,
+                access_hash=raw_bot.access_hash
+            ),
+            platform=platform,
+            url=app_url,
+            theme_params=raw.types.DataJSON(data=self.web_theme)
+        )
+
+        return await self.invoke(my_request)
+    
     async def click_web_button_by_message_link(
         self, 
         msg_url: Union[str, types.Message],
