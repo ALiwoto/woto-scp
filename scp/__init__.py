@@ -6,13 +6,8 @@ import asyncio
 import sys
 import time
 from scp.utils.gitTools import getVersion
-from pyromod import listen
 from rich.logging import RichHandler
 from .core.clients import ScpClient
-
-if not type(listen):
-    logging.error('Pyromod is invalid.')
-    sys.exit()
 
 RUNTIME = time.time()
 
