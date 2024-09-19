@@ -444,6 +444,7 @@ class ScpClient(WotoPyroClient):
         quote_offset: int = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
+        view_once: bool = None,
         business_connection_id: str = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
@@ -470,6 +471,7 @@ class ScpClient(WotoPyroClient):
                 reply_to_chat_id=reply_to_chat_id,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
+                view_once=view_once,
                 business_connection_id=business_connection_id,
                 message_thread_id=message_thread_id,
                 effect_id=effect_id,
