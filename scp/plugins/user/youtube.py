@@ -41,8 +41,10 @@ async def yt_handler(_, message: Message):
     primary_opts = {
         "extract_audio": True, 
         "extract-audio": True, 
-        "cookies": user.scp_config.yt_cookies_file
     }
+    if os.path.exists(user.scp_config.yt_cookies_file):
+        primary_opts["cookies"] = user.scp_config.yt_cookies_file
+
     with yt_dlp.YoutubeDL(primary_opts) as ydl:
         try:
             result = ydl.extract_info(user_input, download=False)
