@@ -87,6 +87,8 @@ class WotoConfig:
     auto_read_mode: int =  0
     gdrive_upload_folder_id: str = None
     yt_cookies_file: str = None
+    yt_dlp_username: str = None
+    yt_dlp_password: str = ''
 
     _enforcers = []
     _inspectors = []
@@ -140,6 +142,8 @@ class WotoConfig:
         self.auto_read_mode = self._the_config.getint('woto-scp', 'auto_read_mode', fallback=0)
         self.gdrive_upload_folder_id = self._the_config.get('woto-scp', 'gdrive_upload_folder_id', fallback='')
         self.yt_cookies_file = self._the_config.get('woto-scp', 'yt_cookies_file', fallback=None)
+        self.yt_dlp_username = self._the_config.get('woto-scp', 'yt_dlp_username', fallback=None)
+        self.yt_dlp_password = self._the_config.get('woto-scp', 'yt_dlp_password', fallback='')
         self.node_path = self._the_config.get('woto-scp', 'node_path', fallback='node')
 
         # sibyl configuration

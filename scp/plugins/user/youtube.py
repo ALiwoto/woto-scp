@@ -39,11 +39,14 @@ async def yt_handler(_, message: Message):
         return await message.reply_text(txt, quote=True)
     
     primary_opts = {
-        "extract_audio": True, 
-        "extract-audio": True, 
+        "extract_audio": True,
+        "extract-audio": True,
     }
     if user.scp_config.yt_cookies_file and os.path.exists(user.scp_config.yt_cookies_file):
         primary_opts["cookies"] = user.scp_config.yt_cookies_file
+    elif user.scp_config.yt_dlp_username:
+        primary_opts["username"] = user.scp_config.yt_dlp_username
+        primary_opts["password"] = user.scp_config.yt_dlp_password
 
     with yt_dlp.YoutubeDL(primary_opts) as ydl:
         try:
@@ -259,7 +262,10 @@ async def _(_, query: CallbackQuery):
     
     if user.scp_config.yt_cookies_file and os.path.exists(user.scp_config.yt_cookies_file):
         ydl_opts["cookies"] = user.scp_config.yt_cookies_file
-        
+    elif user.scp_config.yt_dlp_username:
+        ydl_opts["username"] = user.scp_config.yt_dlp_username
+        ydl_opts["password"] = user.scp_config.yt_dlp_password
+
     the_info: dict = None
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
