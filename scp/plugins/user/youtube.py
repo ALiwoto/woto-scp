@@ -42,7 +42,7 @@ async def yt_handler(_, message: Message):
         "extract_audio": True, 
         "extract-audio": True, 
     }
-    if os.path.exists(user.scp_config.yt_cookies_file):
+    if user.scp_config.yt_cookies_file and os.path.exists(user.scp_config.yt_cookies_file):
         primary_opts["cookies"] = user.scp_config.yt_cookies_file
 
     with yt_dlp.YoutubeDL(primary_opts) as ydl:
@@ -257,7 +257,9 @@ async def _(_, query: CallbackQuery):
             "outtmpl": _OUT_TML,
         }
     
-    ydl_opts["cookies"] = user.scp_config.yt_cookies_file
+    if user.scp_config.yt_cookies_file and os.path.exists(user.scp_config.yt_cookies_file):
+        ydl_opts["cookies"] = user.scp_config.yt_cookies_file
+        
     the_info: dict = None
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
