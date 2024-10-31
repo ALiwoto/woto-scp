@@ -6,7 +6,9 @@ from pyrogram.types import (
     Chat,
     User,
     ChatMember,
+    ChatMemberUpdated,
 )
+from datetime import datetime, timedelta
 from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.enums.chat_member_status import ChatMemberStatus
 from pyrogram.enums.chat_members_filter import ChatMembersFilter
@@ -1319,5 +1321,22 @@ async def cachedScan_handler(_, message: Message):
     await my_msg.edit_text(
         html_mono('Cymatic scan request has been sent to Sibyl.'), 
         parse_mode=ParseMode.HTML,
+    )
+
+
+@user.the_bot.on_chat_member_updated(
+    user.filters.chat('woto_desu')
+)
+async def woto_join_handler(_, update: ChatMemberUpdated):
+    if not update.new_chat_member: return
+    try:
+        the_user = await user.get_users(update.new_chat_member.user.id)
+        if the_user.is_mutual_contact:
+            return
+    except Exception: pass
+    
+    await update.chat.ban_member(
+        user_id=the_user.id,
+        until_date=datetime.now() + timedelta(hours=8),
     )
 
