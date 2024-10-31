@@ -1,7 +1,7 @@
 from scp import user
 import aiofiles
 import os
-
+from pyrogram.types import Message
 
 __PLUGIN__ = 'paste'
 __DOC__ = str(
@@ -18,7 +18,7 @@ __DOC__ = str(
 
 
 @user.on_message(user.sudo & user.command('paste'))
-async def _(_, message: user.types.Message):
+async def _(_, message: Message):
     text = message.text.split(None, 1)[1] if len(
         message.command,
     ) != 1 else None
