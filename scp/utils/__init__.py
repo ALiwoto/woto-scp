@@ -35,7 +35,12 @@ def format_bytes(size):
     return f"{size:.2f} {power_labels[n]+'B'}"
 
 # https://stackoverflow.com/a/34325723
-def return_progress_string(current, total):
+def return_progress_string(current: float, total: float):
+    if not total:
+        if not current:
+            return '[0 / 0]'
+        total = current
+
     filled_length = int(30 * current // total)
     return '[' + '=' * filled_length + ' ' * (30 - filled_length) + ']'
 
