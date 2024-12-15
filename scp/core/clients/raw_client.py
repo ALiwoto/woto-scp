@@ -1,5 +1,4 @@
 import typing
-import os
 import json
 import uuid
 from datetime import datetime
@@ -97,7 +96,7 @@ def _get_scp_bots() -> typing.List[WotoClientBase]:
         __scp__helper__bots__ = my_bots
         return my_bots
 
-    except:
+    except Exception:
         return None
 
 
@@ -140,11 +139,11 @@ class ScpClient(WotoPyroClient):
     async def start(self):
         await super().start()
         # me = await super().get_me()
-        if not self.me.id in self.scp_config._sudo_users:
+        if self.me.id not in self.scp_config._sudo_users:
             self.scp_config._sudo_users.append(self.me.id)
             self.sudo |= self.filters.user(self.me.id)
         
-        if not self.me.id in self.scp_config._owner_users:
+        if self.me.id not in self.scp_config._owner_users:
             self.scp_config._owner_users.append(self.me.id)
             self.owner |= self.filters.user(self.me.id)
 
@@ -198,7 +197,8 @@ class ScpClient(WotoPyroClient):
                         continue_till_found=continue_till_found
                     )
                 
-            except: pass
+            except Exception:
+                pass
         
         if not message.command:
             message.command = [] #TODO: FIXME
@@ -347,7 +347,7 @@ class ScpClient(WotoPyroClient):
         disable_notification: bool = None,
         message_thread_id: int = None,
         effect_id: int = None,
-        show_above_text: bool = None,
+        show_caption_above_media: bool = None,
         reply_to_message_id: int = None,
         reply_to_chat_id: Union[int, str] = None,
         reply_to_story_id: int = None,
@@ -357,6 +357,7 @@ class ScpClient(WotoPyroClient):
         schedule_date: datetime = None,
         protect_content: bool = None,
         business_connection_id: str = None,
+        allow_paid_broadcast: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -375,10 +376,11 @@ class ScpClient(WotoPyroClient):
                 reply_to_message_id=reply_to_message_id,
                 message_thread_id=message_thread_id,
                 effect_id=effect_id,
-                show_above_text=show_above_text,
+                show_caption_above_media=show_caption_above_media,
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 business_connection_id=business_connection_id,
+                allow_paid_broadcast=allow_paid_broadcast,
                 reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
@@ -446,6 +448,7 @@ class ScpClient(WotoPyroClient):
         protect_content: bool = None,
         view_once: bool = None,
         business_connection_id: str = None,
+        allow_paid_broadcast: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -473,6 +476,7 @@ class ScpClient(WotoPyroClient):
                 protect_content=protect_content,
                 view_once=view_once,
                 business_connection_id=business_connection_id,
+                allow_paid_broadcast=allow_paid_broadcast,
                 message_thread_id=message_thread_id,
                 effect_id=effect_id,
                 reply_to_story_id=reply_to_story_id,

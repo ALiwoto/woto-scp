@@ -14,7 +14,6 @@ import logging
 import asyncio
 from traceback import format_exception
 from io import BytesIO
-from typing import Union
 import typing
 from attrify import Attrify as Atr
 from pyrogram.raw.types.web_view_result_url import WebViewResultUrl
@@ -25,9 +24,6 @@ from pyrogram import (
     raw,
     utils as pUtils,
     enums,
-    Client,
-    types,
-    raw,
     errors,
     session,
     filters as pyroFilters
@@ -69,8 +65,8 @@ class WotoClientBase(Client):
     aioclient: ClientSession = ClientSession()
 
     def is_real_media(self, message: types.Message) -> bool:
-        return (message != None and
-                message.media != None and
+        return (message is not None and
+                message.media is not None and
                 message.media != MessageMediaType.WEB_PAGE)
     
     def fix_eval_text(self, txt: str) -> str:
@@ -83,7 +79,8 @@ class WotoClientBase(Client):
     def remove_file(self, file_name: str) -> None:
         try:
             os.remove(file_name)
-        except: return None
+        except Exception:
+            return None
     
     async def forward_messages(
         self,
@@ -95,7 +92,8 @@ class WotoClientBase(Client):
         schedule_date: datetime = None,
         hide_sender_name: bool = None,
         hide_captions: bool = None,
-        protect_content: bool = None
+        protect_content: bool = None,
+        allow_paid_broadcast: bool = None
     ) -> Union["types.Message", List["types.Message"]]:
         target_chat = await self.get_chat(from_chat_id)
         if not target_chat.has_protected_content:
@@ -109,7 +107,8 @@ class WotoClientBase(Client):
                     schedule_date=schedule_date,
                     hide_sender_name=hide_sender_name,
                     hide_captions=hide_captions,
-                    protect_content=protect_content
+                    protect_content=protect_content,
+                    allow_paid_broadcast=allow_paid_broadcast
                 )
             except MessageIdInvalid:
                 pass # let it pass actually
@@ -170,7 +169,8 @@ class WotoClientBase(Client):
         message_thread_id: int = None,
         disable_notification: bool = None,
         schedule_date: datetime = None,
-        protect_content: bool = None
+        protect_content: bool = None,
+        allow_paid_broadcast: bool = None
     ) -> Union["types.Message", List["types.Message"]]:
         the_message = await self.get_message_by_link(message_link)
         if not the_message:
@@ -183,7 +183,8 @@ class WotoClientBase(Client):
             message_thread_id=message_thread_id,
             disable_notification=disable_notification,
             schedule_date=schedule_date,
-            protect_content=protect_content
+            protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast
         )
 
     async def get_message_by_link(
@@ -361,6 +362,7 @@ class WotoClientBase(Client):
         title: str = None,
         force_document: bool = None,
         ttl_seconds: int = None,
+        allow_paid_broadcast: bool = None,
     ) -> "types.Message":
         if media_type == MessageMediaType.ANIMATION:
             return await self.send_animation(
@@ -386,7 +388,8 @@ class WotoClientBase(Client):
                 duration=duration,
                 has_spoiler=has_spoiler,
                 width=width,
-                height=height
+                height=height,
+                allow_paid_broadcast=allow_paid_broadcast,
             )
         elif media_type == MessageMediaType.AUDIO:
             return await self.send_audio(
@@ -411,6 +414,7 @@ class WotoClientBase(Client):
                 business_connection_id=business_connection_id,
                 effect_id=effect_id,
                 title=title,
+                allow_paid_broadcast=allow_paid_broadcast,
             )
         elif media_type == MessageMediaType.DOCUMENT:
             return await self.send_document(
@@ -433,6 +437,7 @@ class WotoClientBase(Client):
                 protect_content=protect_content,
                 business_connection_id=business_connection_id,
                 effect_id=effect_id,
+                allow_paid_broadcast=allow_paid_broadcast,
             )
         elif media_type == MessageMediaType.PHOTO:
             return await self.send_photo(
@@ -453,7 +458,8 @@ class WotoClientBase(Client):
                 reply_to_message_id=reply_to_message_id,
                 reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
-                ttl_seconds=ttl_seconds
+                ttl_seconds=ttl_seconds,
+                allow_paid_broadcast=allow_paid_broadcast,
             )
         elif media_type == MessageMediaType.VIDEO:
             return await self.send_video(
@@ -479,7 +485,8 @@ class WotoClientBase(Client):
                 reply_to_story_id=reply_to_story_id,
                 thumb=thumb,
                 ttl_seconds=ttl_seconds,
-                width=width
+                width=width,
+                allow_paid_broadcast=allow_paid_broadcast,
             )
         elif media_type == MessageMediaType.VIDEO_NOTE:
             return await self.send_video_note(
@@ -499,6 +506,7 @@ class WotoClientBase(Client):
                 progress=progress,
                 progress_args=progress_args,
                 reply_markup=reply_markup,
+                allow_paid_broadcast=allow_paid_broadcast,
             )
         elif media_type == MessageMediaType.VOICE:
             return await self.send_voice(
@@ -519,6 +527,7 @@ class WotoClientBase(Client):
                 reply_to_message_id=reply_to_message_id,
                 reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
+                allow_paid_broadcast=allow_paid_broadcast,
             )
         elif media_type == MessageMediaType.STICKER:
             return await self.send_sticker(
@@ -535,6 +544,7 @@ class WotoClientBase(Client):
                 reply_to_message_id=reply_to_message_id,
                 reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
+                allow_paid_broadcast=allow_paid_broadcast,
             )
         else:
             raise ValueError("Unknown media type!")
@@ -594,7 +604,7 @@ class WotoClientBase(Client):
     def is_silent(self, message: types.Message) -> bool:
         return (
             isinstance(message, types.Message)
-            and message.command != None
+            and message.command
             and len(message.command) > 0
             and message.command[0x0].endswith('!')
         )
@@ -704,7 +714,7 @@ class WotoClientBase(Client):
         disable_notification: bool = None,
         message_thread_id: int = None,
         effect_id: int = None,
-        show_above_text: bool = None,
+        show_caption_above_media: bool = None,
         reply_to_message_id: int = None,
         reply_to_chat_id: Union[int, str] = None,
         reply_to_story_id: int = None,
@@ -714,6 +724,7 @@ class WotoClientBase(Client):
         schedule_date: datetime = None,
         protect_content: bool = None,
         business_connection_id: str = None,
+        allow_paid_broadcast: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -738,12 +749,13 @@ class WotoClientBase(Client):
                 business_connection_id=business_connection_id,
                 message_thread_id=message_thread_id,
                 effect_id=effect_id,
-                show_above_text=show_above_text,
+                show_caption_above_media=show_caption_above_media,
                 reply_to_chat_id=reply_to_chat_id,
                 reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
                 quote_entities=quote_entities,
                 quote_offset=quote_offset,
+                allow_paid_broadcast=allow_paid_broadcast,
                 reply_markup=reply_markup
             )
         except errors.SlowmodeWait as e:
@@ -758,7 +770,7 @@ class WotoClientBase(Client):
                 reply_to_message_id=reply_to_message_id,
                 message_thread_id=message_thread_id,
                 effect_id=effect_id,
-                show_above_text=show_above_text,
+                show_caption_above_media=show_caption_above_media,
                 reply_to_story_id=reply_to_story_id,
                 quote_text=quote_text,
                 quote_entities=quote_entities,
@@ -766,6 +778,7 @@ class WotoClientBase(Client):
                 schedule_date=schedule_date,
                 protect_content=protect_content,
                 business_connection_id=business_connection_id,
+                allow_paid_broadcast=allow_paid_broadcast,
                 reply_markup=reply_markup
             )
 
@@ -1043,8 +1056,12 @@ class WotoClientBase(Client):
         caption_entities: List["types.MessageEntity"] = None,
         disable_notification: bool = None,
         reply_to_message_id: int = None,
+        reply_to_chat_id: Union[int, str] = None,
         schedule_date: datetime = None,
         protect_content: bool = None,
+        has_spoiler: bool = None,
+        business_connection_id: str = None,
+        allow_paid_broadcast: bool = None,
         reply_markup: Union[
             "types.InlineKeyboardMarkup",
             "types.ReplyKeyboardMarkup",
@@ -1135,7 +1152,11 @@ class WotoClientBase(Client):
             reply_to_message_id=reply_to_message_id,
             schedule_date=schedule_date,
             protect_content=protect_content,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            allow_paid_broadcast=allow_paid_broadcast,
+            business_connection_id=business_connection_id,
+            has_spoiler=has_spoiler,
+            reply_to_chat_id=reply_to_chat_id,
         )
 
     async def forward_messages_with_delay(

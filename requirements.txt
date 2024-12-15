@@ -8,7 +8,8 @@ gpytranslate==1.4.0
 humanize==3.11.0
 kantex==0.2.0
 psutil==5.9.1
-WPyrogram==2.0.148
+WPyrogram==2.0.149
+pyromod==1.5
 pyzxing==1.0.2
 rich==12.6.0
 shortuuid==1.0.1
@@ -20,7 +21,7 @@ sibylsystem==0.0.24
 wotoplatform==0.0.25
 azure-cognitiveservices-speech==1.27.0
 PyDrive==1.3.1
-yt-dlp==2024.8.6
+yt-dlp==2024.12.13
 pydantic==1.10.8
 pixivpy3==3.7.4
-gallery-dl==1.26.5
+gallery-dl==1.28.1
