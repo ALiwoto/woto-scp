@@ -3,12 +3,13 @@ from scp import user
 from pyrogram.types import (
     Message,
 )
-from pyrogram.raw.functions.messages import RequestWebView
+# from pyrogram.raw.functions.messages import RequestWebView
 from scp.utils.media_utils import (
     BaseTaskContainer,
     NcInfoContainer,
     TpsInfoContainer
 )
+# from har2requests import json_dfs
 
 __PLUGIN__ = 'automations'
 
@@ -115,7 +116,7 @@ async def nc_on_new_pool_data(pool_data):
             current_pool["isJoined"]:
             continue
         
-        txt = user.html_bold(f"❇️New"+ f"{' RISKY ' if current_pool['isRisky'] else ' '}" + "notcoin pool\n")
+        txt = user.html_bold("❇️New"+ f"{' RISKY ' if current_pool['isRisky'] else ' '}" + "notcoin pool\n")
         txt += user.html_bold("・Name: ") + user.html_normal(current_pool["name"]) + "\n"
         txt += user.html_bold("・Description: ") + user.html_normal(str(current_pool["description"])) + "\n"
         txt += user.html_bold("・ID: ") + user.html_normal(current_pool["challengeId"]) + "\n"
@@ -243,11 +244,13 @@ async def auto_remove_bluetext_handler(_, message: Message):
     if not user.auto_read_enabled or \
         message.chat.title.lower().find('test') != -1:
         return
-    elif message.text.find('@') != -1: await asyncio.sleep(1.2)
+    elif message.text.find('@') != -1:
+        await asyncio.sleep(1.2)
     
     try:
         await message.delete()
-    except Exception: return
+    except Exception:
+        return
 
 @user.on_edited_message(
     user.filters.bot,
@@ -261,12 +264,14 @@ async def auto_sff_handler(_, message: Message):
     """
     sff is short for "send-friend-fac".
     """
-    if not message.text: return
+    if not message.text:
+        return
     msg_text = message.text.lower()
     if msg_text.find("have finished their work") != -1 or \
         msg_text.find("work options for the worker") != -1:
         await asyncio.sleep(3)
         try:
             return await message.click(0)
-        except Exception: return
+        except Exception:
+            return
     
