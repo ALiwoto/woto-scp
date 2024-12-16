@@ -56,7 +56,8 @@ async def eval_handler(_, message: Message):
             message_id=message.id,
             text=user.html_pre(code, "python")
         )
-    except: pass
+    except Exception:
+        pass
     
     await eval_base(user, message, code)
     

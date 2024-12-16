@@ -261,7 +261,7 @@ class SibylClient(PsychoPass):
     def get_div_by_general(self, target: GeneralInfo) -> int:
         if not isinstance(target, GeneralInfo):
             raise Exception("target should be of type 'GeneralInfo'")
-        if target.result and target.result.division != None:
+        if target.result and target.result.division is not None:
             if target.result.division < 1:
                 return None
             

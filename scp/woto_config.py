@@ -117,6 +117,8 @@ class WotoConfig:
     pixiv_access_token : str = ''
     pixiv_refresh_token : str = ''
 
+    bx_acc_name: str = 'default'
+
     def __init__(self, config_file='config.ini') -> None:
         self._the_config = ConfigParser()
         self._the_config.read_string(self._load_config_content(config_file))
@@ -181,6 +183,12 @@ class WotoConfig:
             self.load_pixiv()
         except Exception as e:
             logging.warning(e, stacklevel=3)
+        
+        # bx configuration
+        try:
+            self.load_bx_config()
+        except Exception as e:
+            logging.warning(e, stacklevel=3)
     
     def load_sibyl_config(self) -> None:
         self._enforcers = list_map(int, self._the_config.get('sibyl-system', 'enforcers').split())
@@ -223,6 +231,9 @@ class WotoConfig:
     def load_pixiv(self) -> None:
         self.pixiv_access_token = self._the_config.get('pixiv', 'access_token', fallback='')
         self.pixiv_refresh_token = self._the_config.get('pixiv', 'refresh_token', fallback='')
+
+    def load_bx_config(self) -> None:
+        self.bx_acc_name = self._the_config.get('bx', 'bx_acc_name', fallback='default')
 
     def _get_suitable_rfl(self) -> str:
         for current in sys.argv:
