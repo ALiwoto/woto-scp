@@ -73,7 +73,7 @@ async def positions_handler(_, message: Message):
                 margin_coin_name=current_stat.margin_coin_name,
             )
             for current_contract in result.data.orders:
-                txt += user.html_normal(f" - {current_contract}")
+                txt += user.html_normal(current_contract.to_str(separator='\n -'))
 
             await asyncio.sleep(0.5)  # prevent rate limiting
             total_fetched += per_page_size
