@@ -115,7 +115,7 @@ async def earnings_handler(_, message: Message):
     )
 
     month_earnings = await user.bx_client.get_this_month_contract_earnings()
-    txt = user.html_bold("\n - This Month's Earnings: ") + user.html_mono(
+    txt += user.html_bold("\n - This Month's Earnings: ") + user.html_mono(
         dec_to_str(month_earnings)
     )
 
