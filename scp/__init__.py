@@ -5,7 +5,7 @@ import logging
 import asyncio
 import sys
 import time
-from scp.utils.gitTools import getVersion
+from scp.utils.git_tools import getVersion
 from pyromod import listen
 from rich.logging import RichHandler
 from .core.clients import ScpClient

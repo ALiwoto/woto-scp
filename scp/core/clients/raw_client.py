@@ -24,6 +24,7 @@ from wotoplatform import WotoClient
 from wotoplatform.types.errors import (
     ClientAlreadyInitializedException,
 )
+from trd_utils.bx_ultra import BXUltraClient
 from scp.core.filters.command import command
 from scp.utils import wfilters
 from scp.utils.auto_inline import (
@@ -31,7 +32,7 @@ from scp.utils.auto_inline import (
     AutoInlineContainer,
     AutoInlineType
 )
-from scp.utils.sibylUtils import SibylClient
+from scp.utils.sibyl_utils import SibylClient
 from scp.database.database_client import DatabaseClient
 from scp.utils.misc import restart_scp as restart_woto_scp
 from kantex import md as Markdown
@@ -673,6 +674,7 @@ class ScpClient(WotoPyroClient):
         the_config.private_listener,
     )
     sibyl: SibylClient = SibylClient(the_config.sibyl_token)
+    bx_client: BXUltraClient = BXUltraClient(the_config.bx_acc_name)
 
     auto_read_enabled = True
     avalon_system_enabled = True

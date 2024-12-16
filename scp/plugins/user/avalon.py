@@ -9,7 +9,7 @@ Get back your focus.
 
 __PLUGIN__ = 'avalon'
 
-__HELP__ = f"""
+__HELP__ = """
 Avalon is a centralized system that allows you to get back your focus by
 reducing the number of chats you have to check.
 It is based on the idea of having a single chat where all the messages
@@ -194,7 +194,7 @@ async def get_txt_and_keyboard(message: Message, mode: AvalonMode = AvalonMode.P
         txt += user.html_normal(f"#TAG #{user.me.first_name} (")
 
     txt += user.html_mono(user.me.id, ")")
-    txt += user.html_bold(f"\n• FROM: ")
+    txt += user.html_bold("\n• FROM: ")
     if sender.username:
         txt += user.html_link(message.from_user.first_name[:16], \
                               f"https://t.me/{message.from_user.username}", " (")
@@ -234,7 +234,7 @@ async def get_txt_and_keyboard(message: Message, mode: AvalonMode = AvalonMode.P
 
     keyboard = [
         {"↩️ Reply": f"reply_{message.from_user.id}_{message.id}", "▶️ Send message": f"msg_{message.from_user.id}"},
-        {"❌ Block": f"block_{message.from_user.id}", f"💢 Delete": "delete_msg"},
+        {"❌ Block": f"block_{message.from_user.id}", "💢 Delete": "delete_msg"},
         {"🌀 React": f"react_{message.from_user.id}_{message.id}", "✅ Mark as read": f"read_{message.from_user.id}_{message.id}"},
         ({"🖼 Send media here": media_btn_data} if is_real_media else None)
     ]

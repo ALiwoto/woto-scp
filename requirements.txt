@@ -8,7 +8,8 @@ gpytranslate==1.4.0
 humanize==3.11.0
 kantex==0.2.0
 psutil==5.9.1
-WPyrogram==2.0.149
+trd_utils==0.0.3
+WPyrogram==2.0.151
 pyromod==1.5
 pyzxing==1.0.2
 rich==12.6.0
