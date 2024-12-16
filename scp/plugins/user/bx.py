@@ -105,12 +105,18 @@ async def earnings_handler(_, message: Message):
     txt = user.html_bold("Earnings:")
 
     today_earnings = await user.bx_client.get_today_contract_earnings()
-    txt = user.html_bold(f"\n - nToday's Earnings: {dec_to_str(today_earnings)}")
+    txt += user.html_bold("\n - nToday's Earnings: ") + user.html_mono(
+        dec_to_str(today_earnings)
+    )
 
     week_earnings = await user.bx_client.get_this_week_contract_earnings()
-    txt = user.html_bold(f"\n - This Week's Earnings: {dec_to_str(week_earnings)}")
+    txt += user.html_bold("\n - This Week's Earnings: ") + user.html_mono(
+        dec_to_str(week_earnings)
+    )
 
     month_earnings = await user.bx_client.get_this_month_contract_earnings()
-    txt = user.html_bold(f"\n - This Month's Earnings: {dec_to_str(month_earnings)}")
+    txt = user.html_bold("\n - This Month's Earnings: ") + user.html_mono(
+        dec_to_str(month_earnings)
+    )
 
     return await top_message.edit_text(text=txt, disable_web_page_preview=True)
