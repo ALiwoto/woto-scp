@@ -62,7 +62,7 @@ async def positions_handler(_, message: Message):
 
     for current_stat in result.data.margin_stats:
         txt = user.html_bold(
-            f" - {current_stat.margin_coin_name}: {current_stat.total} positions open"
+            f"✨{current_stat.margin_coin_name}: {current_stat.total} positions open:\n"
         )
         total_fetched = 0
         while total_fetched < current_stat.total:
@@ -73,7 +73,8 @@ async def positions_handler(_, message: Message):
                 margin_coin_name=current_stat.margin_coin_name,
             )
             for current_contract in result.data.orders:
-                txt += user.html_normal(current_contract.to_str(separator='\n -'))
+                txt += user.html_normal(current_contract.to_str(separator='\n - '))
+                txt += "\n"
 
             await asyncio.sleep(0.5)  # prevent rate limiting
             total_fetched += per_page_size
