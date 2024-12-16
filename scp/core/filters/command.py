@@ -7,7 +7,6 @@ from pyrogram.filters import (
     create,
 )
 from pyrogram.types import Message
-from scp.utils.selfInfo import info
 from ...woto_config import the_config
 
 prefixes = the_config.prefixes
@@ -46,7 +45,7 @@ def command(
             if not text:
                 return False
 
-            if message.from_user != None and text.lower().find("@me") != -1:
+            if message.from_user and text.lower().find("@me") != -1:
                 text = text.replace("@me", f"@{message.from_user.username}")
 
             for prefix in flt.prefixes:

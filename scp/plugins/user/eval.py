@@ -115,7 +115,7 @@ async def eval_base(client: pClient, message: Message, code: str, silent: bool =
         exx = _gf(o_body)
     rnd_id = '#' + str(ShortUUID().random(length=8))
     reply: Message = None
-    if message != None and not silent:
+    if message and not silent:
         reply = await message.reply_text(
             user.html_bold('Executing task ') + user.html_mono(rnd_id, '...'),
             quote=True,
@@ -187,8 +187,9 @@ async def eval_base(client: pClient, message: Message, code: str, silent: bool =
     if not output.strip():
         output = 'Success'
     
-    if silent or reply == None:
+    if silent or not reply:
         return
+
     output = output.replace(user.original_phone_number, '$PHONE_NUMBER')
 
     if len(output) > 4096:
@@ -331,19 +332,26 @@ async def get_id_handler(_, message: Message):
         text = user.html_bold("Result:")
         for current in await user.get_my_dialogs():
             my_title: str = ''
-            if current.chat.first_name: my_title += current.chat.first_name
-            if current.chat.last_name: my_title += current.chat.last_name
-            else: current.chat.last_name = '' # to prevent showing "None"
+            if current.chat.first_name:
+                my_title += current.chat.first_name
+            if current.chat.last_name:
+                my_title += current.chat.last_name
+            else: 
+                current.chat.last_name = '' # to prevent showing "None"
 
-            if current.chat.username: my_title += current.chat.username
-            if current.chat.title: my_title += current.chat.title
-            if not my_title: continue
+            if current.chat.username:
+                my_title += current.chat.username
+            if current.chat.title:
+                my_title += current.chat.title
+            if not my_title:
+                continue
 
             my_title = my_title.lower()
             if my_title.find(user_input) != -1:
                 the_name = current.chat.title or f"{current.chat.first_name} {current.chat.last_name}"[:24]
                 text += f"\n  {await user.html_mention(current.chat, the_name)} "
-                if current.chat.username: text += f"(@{current.chat.username})"
+                if current.chat.username:
+                    text += f"(@{current.chat.username})"
                 text += f" - {user.html_mono(current.chat.id)}"
         return await message.reply_text(text)
     
