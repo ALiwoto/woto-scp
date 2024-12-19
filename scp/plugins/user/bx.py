@@ -105,7 +105,7 @@ async def earnings_handler(_, message: Message):
     txt = user.html_bold("Earnings:")
 
     today_earnings = await user.bx_client.get_today_contract_earnings()
-    txt += user.html_bold("\n - nToday's Earnings: ") + user.html_mono(
+    txt += user.html_bold("\n - Today's Earnings: ") + user.html_mono(
         dec_to_str(today_earnings)
     )
 
