@@ -357,16 +357,16 @@ async def webPre_handler(_, message: Message):
             video=web_page.video.file_id,
             caption=web_page.description,
         )
-    elif web_page.photo:
-        await user.send_photo(
-            message.chat.id,
-            photo=web_page.photo.file_id,
-            caption=web_page.description,
-        )
     elif web_page.animation:
         await user.send_animation(
             message.chat.id,
             animation=web_page.animation.file_id,
+            caption=web_page.description,
+        )
+    elif web_page.photo:
+        await user.send_photo(
+            message.chat.id,
+            photo=web_page.photo.file_id,
             caption=web_page.description,
         )
     elif web_page.description:
