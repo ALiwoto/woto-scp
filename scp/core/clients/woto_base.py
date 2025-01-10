@@ -201,8 +201,8 @@ class WotoClientBase(Client):
 
         chat_id = None
         message_id: int = 0
-        # the format can be either like t.me/c/1627169341/1099 or
-        # t.me/AnimeKaizoku/6669424
+        # the format can be either like t.me/c/123456/1099 or
+        # t.me/username/6669424
         if link.find('/c/') != -1:
             my_strs = link.split('/c/')
             if len(my_strs) < 2:
