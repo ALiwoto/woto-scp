@@ -14,10 +14,10 @@ from os import urandom
 import hashlib
 
 
-def list_map(func, iterator):
-    if not iterator: return []
+def list_map(func: typing.Callable, iterator: typing.Iterable) -> typing.List:
+    if not iterator:
+        return []
     return list(map(func, iterator))
-
 
 
 class AESCipher:
@@ -125,7 +125,7 @@ class WotoConfig:
 
         self.api_id = self._the_config.get('pyrogram', 'api_id')
         self.api_hash = self._the_config.get('pyrogram', 'api_hash')
-        self.device_model = self._the_config.get('pyrogram', 'device_model', fallback='Kaizoku v1.2')
+        self.device_model = self._the_config.get('pyrogram', 'device_model', fallback='Woto v1.2')
         self.app_version = self._the_config.get('pyrogram', 'app_version', fallback='woto-scp v0.0.1')
         self.no_input = self._the_config.getboolean('pyrogram', 'no_input', fallback=False)
 
@@ -205,7 +205,7 @@ class WotoConfig:
         self.wp_host = self._the_config.get(
             'woto-platform', 
             'host', 
-            fallback='wotoplatform.kaizoku.cyou'
+            fallback=None
         )
         self.wp_port = self._the_config.getint('woto-platform', 'port', fallback=50100)
 
