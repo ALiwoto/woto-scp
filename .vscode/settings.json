@@ -30,6 +30,7 @@
         "execv",
         "fmembers",
         "gautoread",
+        "gblur",
         "getpid",
         "getsrc",
         "gimage",
