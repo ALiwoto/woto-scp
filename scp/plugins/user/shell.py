@@ -22,6 +22,8 @@ BACKUP_SHELL_SCRIPT = (
     " cp config.ini my-backup/config.ini"
 )
 
+FFMPEG_LOG_FLAGS = "-hide_banner -loglevel error"
+
 @user.on_message(
     ~user.filters.forwarded
     & ~user.filters.sticker
@@ -96,7 +98,7 @@ async def git_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def git_handler(_, message: Message):
+async def ffmpeg_handler(_, message: Message):
     await shell_base(message, message.text[1:].replace('ffmpeg', user.ffmpeg_path, 1))
 
 @user.on_message(
@@ -239,10 +241,10 @@ async def cat(_, message: Message):
 )
 async def toGif_handler(_, message: Message):
     replied_message = message.reply_to_message
-    if replied_message == None or not replied_message.media:
+    if not replied_message or not replied_message.media:
         return await message.reply_text('Please reply to a media message with this command.')
     
-    if not replied_message.media.name in ("VIDEO", "STICKER", "ANIMATION"):
+    if replied_message.media.name not in ("VIDEO", "STICKER", "ANIMATION"):
         return await message.reply_text(f'Invalid media message detected: {replied_message.media.name}')
     
     sticker = message.reply_to_message.sticker
@@ -254,8 +256,10 @@ async def toGif_handler(_, message: Message):
         message=message.reply_to_message, 
         file_name=rfile.name,
     )
-    output_to_gif = 'output-toGif.mp4'
-    the_command = f'rm "{output_to_gif}" -f; ffmpeg -an -sn -i "{rfile.name}" -c:v libx264 -crf 10 "{output_to_gif}" -hide_banner -loglevel error'
+    output_to_gif = f'output-toGif-{ShortUUID().random(length=8)}.mp4'
+    scale_value = "scale='min(iw,1280)':'min(ih,720)'"
+    the_command = f'rm "{output_to_gif}" -f; ffmpeg -an -sn -i "{rfile.name}" ' + \
+        f'-c:v libx264 -vf "{scale_value}" -crf 10 "{output_to_gif}" {FFMPEG_LOG_FLAGS} -y'
     await shell_base(message, the_command, silent_on_success=True)
     
     # text = f'Uploading {html_mono(output_to_gif)}...'
@@ -268,10 +272,7 @@ async def toGif_handler(_, message: Message):
             document=output_to_gif, 
             # progress=progress_callback, 
             # progress_args=(reply, text, True),
-            reply_to_message_id=(
-                None if message.chat.type in ('private', 'bot') 
-                else message.id
-            ),
+            reply_to_message_id=message.id,
         )
         os.remove(output_to_gif)
     except user.exceptions.MediaInvalid:
@@ -280,7 +281,8 @@ async def toGif_handler(_, message: Message):
         try:
             await message.reply_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
-        except Exception: pass
+        except Exception:
+            pass
     
 
 @user.on_message(
@@ -324,8 +326,8 @@ async def makeGif_handler(_, message: Message):
     sh_txt = f'rm "{outfile}" -f'
     scale_value = "scale='min(iw,1280)':'min(ih,720)'"
     times_value = f'-ss {start_t} -to {end_t}'
-    sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error -an {times_value} -i "{user_file_name}"'
-    sh_txt += f' -vf "{scale_value}" -pix_fmt yuv420p -c:v libx264 "{outfile}" '
+    sh_txt += f' ; {user.ffmpeg_path} -sn -an {times_value} -i "{user_file_name}"'
+    sh_txt += f' -vf "{scale_value}" -pix_fmt yuv420p -c:v libx264 "{outfile}" {FFMPEG_LOG_FLAGS}'
     await shell_base(message, sh_txt)
     
     text = f'Uploading {html_mono(outfile)}...'
@@ -349,7 +351,8 @@ async def makeGif_handler(_, message: Message):
         try:
             await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
-        except Exception: pass
+        except Exception:
+            pass
     else:
         await reply.delete()
     
@@ -395,8 +398,8 @@ async def makeVid_handler(_, message: Message):
     sh_txt = f'rm "{outfile}" -f' if os.name != 'nt' else f'del "{outfile}"'
     scale_value = "scale='min(iw,1280)':'min(ih,720)'"
     times_value = f'-ss {start_t} -to {end_t}'
-    sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error {times_value} -i "{user_file_name}"'
-    sh_txt += f' -vf "{scale_value}" -pix_fmt yuv420p -c:v libx264 "{outfile}" '
+    sh_txt += f' ; {user.ffmpeg_path} -sn {times_value} -i "{user_file_name}"'
+    sh_txt += f' -vf "{scale_value}" -pix_fmt yuv420p -c:v libx264 "{outfile}" {FFMPEG_LOG_FLAGS} -y'
     await shell_base(message, sh_txt)
     
     text = f'Uploading {html_mono(outfile)}...'
@@ -420,7 +423,8 @@ async def makeVid_handler(_, message: Message):
         try:
             await reply.edit_text(html_mono(str(e)[:4000]), parse_mode=ParseMode.HTML)
             return
-        except Exception: pass
+        except Exception:
+            pass
     else:
         await reply.delete()
     
@@ -496,8 +500,8 @@ async def postStory_handler(_, message: Message):
     outfile = f'aliwoto-output-cutVid{ShortUUID().random(length=8)}.mp4'
     sh_txt = f'rm "{outfile}" -f'
     times_value = f'-ss {start_t} -to {end_t}' if start_t and end_t else ''
-    sh_txt += f' ; {user.ffmpeg_path} -sn -hide_banner -loglevel error {times_value} -i "{user_file_name}"'
-    sh_txt += f' -c:v copy "{outfile}" '
+    sh_txt += f' ; {user.ffmpeg_path} -sn {times_value} -i "{user_file_name}"'
+    sh_txt += f' -c:v copy "{outfile}" {FFMPEG_LOG_FLAGS}'
     
     await shell_base(message, sh_txt, throw_on_error=True, absolute_silent=True)
 
@@ -505,14 +509,14 @@ async def postStory_handler(_, message: Message):
     output_file = f'output{ShortUUID().random(length=8)}.mp4'
     vf_value = "-vf 'split[original][copy];[copy]scale=-1:ih*(16/9)*(16/9),crop=w=ih*9/16,\
         gblur=sigma=20[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2'"
-    sh_txt = f"ffmpeg -i {input_file} {vf_value} -c:v libx265 -crf 26 {output_file} -hide_banner -loglevel error -y"
+    sh_txt = f"ffmpeg -i {input_file} {vf_value} -c:v libx265 -crf 26 {output_file} {FFMPEG_LOG_FLAGS} -y"
     await shell_base(message, sh_txt, throw_on_error=True)
 
     user.remove_file(input_file)
     input_file = output_file
     scale_value = "-vf \"scale='min(iw,720)':'min(ih,1280)'\"" if not no_scale else ''
     output_file = f'output{ShortUUID().random(length=8)}.mp4'
-    sh_txt = f"ffmpeg -i ok.mp4 {scale_value} -c:v libx265 {output_file} -hide_banner -loglevel error -y"
+    sh_txt = f"ffmpeg -i ok.mp4 {scale_value} -c:v libx265 {output_file} {FFMPEG_LOG_FLAGS} -y"
     await shell_base(message, sh_txt, throw_on_error=True)
 
     try:
