@@ -329,6 +329,7 @@ async def cancel_exec(_, query: CallbackQuery):
 async def get_id_handler(_, message: Message):
     user_input = user.get_non_cmd(message)
     if user_input:
+        user_input = user_input.lower()
         text = user.html_bold("Result:")
         for current in await user.get_my_dialogs():
             my_title: str = ''
