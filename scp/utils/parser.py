@@ -115,7 +115,8 @@ class BasicFlagContainer:
         
         if self.flag_added_member and message.service == MessageServiceType.NEW_CHAT_MEMBERS:
             for current in message.new_chat_members:
-                if not current.is_bot: return True
+                if not current.is_bot:
+                    return True
         
         if self.flag_media and message.media:
             return True
@@ -216,7 +217,8 @@ def fix_encoding(value: str) -> str:
         return ""
     try:
         return value.strip().encode('utf-8')
-    except: return ""
+    except Exception:
+        return ""
 
 
 def split_all(value: str, *delimiters) -> List[str]:
@@ -240,7 +242,8 @@ def contains_str(value: str, *substrs) -> bool:
                     return True
         
         return False
-    except Exception: return False
+    except Exception:
+        return False
 
 def remove_empty_strs(values: list) -> list:
     myStrs: list[str] = []
@@ -317,8 +320,9 @@ async def html_mention(value: Union[User, Union[Chat, int]], name: str = None, c
     
     if isinstance(value, Chat):
         if value.type != ChatType.PRIVATE and value.type != ChatType.BOT:
-            if not name: name = value.title
-            return html_normal_chat_link(name, value, *argv)
+            if not name:
+                name = value.title
+            return await html_normal_chat_link(name, value, *argv)
         
         if not name:
             name = f"{value.first_name} {value.last_name}"[:24]
@@ -348,10 +352,11 @@ def html_mention_by_user(value: User, *argv):
     )
 
 def get_html_normal(*argv) -> str:
-    if argv is None or len(argv) == 0: return ""
+    if not argv:
+        return ""
     my_str = ""
     for value in argv:
-        if value == None:
+        if not value:
             continue
         if isinstance(value, str):
             my_str += value
@@ -378,9 +383,11 @@ async def html_in_common(user: types.User, get_common: bool = False) -> str:
     return html_in_parenthesis(await in_common_length(user))
 
 def get_name(user: types.User, name_limit: int = -1) -> str:
-    if not isinstance(user, types.User): return "Not user"
+    if not isinstance(user, types.User):
+        return "Not user"
     
-    if user.is_deleted: return "Deleted account"
+    if user.is_deleted:
+        return "Deleted account"
     
     if user.first_name and len(user.first_name) > 0:
         return user.first_name if name_limit == -1 else user.first_name[:name_limit]
