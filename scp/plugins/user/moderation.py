@@ -20,7 +20,6 @@ from scp.utils.parser import (
     BasicFlagContainer,
     html_bold,
     html_in_common,
-    html_link,
     html_mono,
     html_normal_chat_link, 
     mention_user_html,
@@ -95,7 +94,8 @@ async def stalkers_handler(_, message: Message):
     top_message = await message.reply_text(my_text, quote=True)
     try:
         minimum = int(commands[2])
-    except Exception: pass
+    except Exception:
+        pass
     async for member in user.iter_chat_members(message.chat.id):
         if not isinstance(member, ChatMember):
             continue
@@ -139,7 +139,8 @@ async def stalkers_handler(_, message: Message):
                     user_id=current.user.id,
                 )
                 my_count += 1
-            except Exception: pass
+            except Exception:
+                pass
         
         my_text = html_mono(f'found {len(all_members)} stalkers in ')
         my_text += await html_normal_chat_link(message.chat.title, message.chat, ' .\n')
@@ -235,7 +236,7 @@ async def admins_handler(_, message: Message):
 
 #@user.on_message(
 #    user.wfilters.channel_in_group
-#)
+#) DEPRECATED
 async def by_channels_handler(_, message: Message):
     from_message: Message = None
     original_message: Message = None
@@ -244,7 +245,8 @@ async def by_channels_handler(_, message: Message):
             chat_id=user.log_channel, text=f'from {message.chat.id}',
         )
         original_message = await message.forward(chat_id=user.log_channel)
-    except Exception: pass
+    except Exception:
+        pass
     if not original_message and from_message:
         await from_message.delete()
 
@@ -321,7 +323,7 @@ async def tPurge_handler(_, message: Message):
         if flags.can_match(current):
             the_messages.append(current.id)
 
-    if not message.id in the_messages:
+    if message.id not in the_messages:
         the_messages.append(message.id)
     
     try:
@@ -329,7 +331,9 @@ async def tPurge_handler(_, message: Message):
             chat_id=message.chat.id,
             message_ids=the_messages,
         )
-    except Exception: pass
+    except Exception:
+        pass
+
 
 
 @user.on_message(~user.filters.scheduled & 
@@ -652,43 +656,49 @@ async def fadmins_handler(_, message: Message):
         query = ' '.join(all_strs[2:])
     elif is_here and len(all_strs) == 2:
         query = all_strs[1]
-    else: return
+    else:
+        return
         
     top_msg = await message.reply_text(html_mono('fetching group admins...'))
     txt: str = ''
     common = not user.is_silent(message)
-    m = None
+    all_members: list[ChatMember] = None
     try:
-        m = await user.fetch_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
+        all_members = await user.fetch_chat_members(the_chat, filter=ChatMembersFilter.ADMINISTRATORS)
     except Exception as ex:
         return await top_msg.edit_text(text=html_mono(ex))
     
     creator: ChatMember = None
     admins: list[ChatMember] = []
     bots: list[ChatMember] = []
-    for i in m:
-        if i.status == 'creator':
-            if not await can_member_match(i, user, query):
+    for current_member in all_members:
+        if current_member.status == ChatMemberStatus.OWNER:
+            if not await can_member_match(current_member, user, query):
                 continue
-            creator = i
+            creator = current_member
             continue
-        elif i.status == 'administrator':
-            if not await can_member_match(i, user, query):
+        elif current_member.status == ChatMemberStatus.ADMINISTRATOR:
+            if not await can_member_match(current_member, user, query):
                 continue
-            if i.user.is_bot:
-                bots.append(i)
+            if current_member.user.is_bot:
+                bots.append(current_member)
                 continue
-            admins.append(i)
+            admins.append(current_member)
 
     if not creator and len(admins) == 0 and len(bots) == 0:
         try:
             await top_msg.edit_text(
                 text=f"No results found for query '{html_mono(query)}'...",
             )
-        except Exception: return
+        except Exception as ex:
+            return await user.reply_exception(
+                message=message,
+                e=ex,
+                limit=2,
+            )
         return
 
-    starter = "<code>" + " • " + "</code>"
+    starter = user.html_mono(" • ")
     if creator:
         txt += html_bold("The creator:", "\n")
         u = creator.user
@@ -728,8 +738,9 @@ async def fadmins_handler(_, message: Message):
 )
 async def remSpec_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n', '\t')
-    if len(all_strs) < 2: return
-    query = user.get_non_cmd(message.text)
+    if len(all_strs) < 2:
+        return
+    query = user.get_non_cmd(message.reply_to_message or message)
     result = ''
     try:
         result = remove_special_chars(query)
@@ -791,7 +802,8 @@ async def ban_handler(_, message: Message):
             disable_notification=True, 
             disable_web_page_preview=True,
         )
-    except: return
+    except Exception:
+        return
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -803,7 +815,7 @@ async def ban_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def ban_handler(_, message: Message):
+async def del_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n')
     target_message: Message = None
 
@@ -823,7 +835,8 @@ async def ban_handler(_, message: Message):
     try:
         await message.delete()
         await target_message.delete()
-    except Exception: pass
+    except Exception:
+        pass
 
 @user.on_message(~user.filters.scheduled & 
 	~user.filters.forwarded & 
@@ -904,7 +917,7 @@ async def mute_handler(_, message: Message):
         prefixes=user.cmd_prefixes,
     ),
 )
-async def mute_handler(_, message: Message):
+async def unmute_handler(_, message: Message):
     all_strs = split_all(message.text, ' ', '\n')
     target_user = 0
     target_chat = 0
@@ -1328,12 +1341,14 @@ async def cachedScan_handler(_, message: Message):
     user.filters.chat('woto_desu')
 )
 async def woto_join_handler(_, update: ChatMemberUpdated):
-    if not update.new_chat_member: return
+    if not update.new_chat_member:
+        return
     try:
         the_user = await user.get_users(update.new_chat_member.user.id)
         if the_user.is_mutual_contact:
             return
-    except Exception: pass
+    except Exception:
+        pass
     
     await update.chat.ban_member(
         user_id=the_user.id,

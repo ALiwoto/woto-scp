@@ -1006,7 +1006,7 @@ class WotoClientBase(Client):
         query: str = "",
         limit: int = 0,
         filter: "enums.ChatMembersFilter" = enums.ChatMembersFilter.SEARCH
-    ):
+    ) -> list["types.ChatMember"]:
         results = []
         async for member in self.get_chat_members(chat_id=chat_id, query=query, limit=limit, filter=filter):
             results.append(member)
@@ -1203,6 +1203,11 @@ class WotoClientBase(Client):
         
         all_parsed_updates = []
         for current_updates in updates:
+            # fast path: if this is the exact same type, add and skip
+            if isinstance(current_updates, filter_type):
+                all_parsed_updates.append(current_updates)
+                continue
+
             chats = getattr(current_updates, "chats", [])
             chats = {c.id: c for c in chats}
             users = getattr(current_updates, "users", [])
