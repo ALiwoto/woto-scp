@@ -366,6 +366,7 @@ class ScpClient(WotoPyroClient):
             "types.ForceReply"
         ] = None,
         link_preview_options = None, # incoming changes
+        reply_parameters = None # incoming changes
     ) -> "types.Message":
         if self.me.is_bot or not isinstance(reply_markup, (types.InlineKeyboardMarkup, dict, list)):
             return await super().send_message(
