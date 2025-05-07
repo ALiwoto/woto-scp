@@ -513,19 +513,15 @@ async def archive_by_user_handler(_, message: Message):
         elif len(all_messages) % 50 == 0:
             await asyncio.sleep(5)
     
-    all_messages.reverse()
-    for current_message in all_messages:
-        if not isinstance(current_message, int):
-            continue
-        
-        try:
-            await user.forward_all_messages(
-                chat_id=to_chat,
-                from_chat_id=from_chat,
-                message_ids=all_messages,
-            )
-        except Exception as ex:
-            await user.reply_exception(
-                message=message,
-                e=ex,
-            )
+    all_messages.reverse()        
+    try:
+        await user.forward_all_messages(
+            chat_id=to_chat,
+            from_chat_id=from_chat,
+            message_ids=all_messages,
+        )
+    except Exception as ex:
+        await user.reply_exception(
+            message=message,
+            e=ex,
+        )
