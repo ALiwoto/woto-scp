@@ -54,6 +54,14 @@ from scp.utils.unpack import (
     WebViewResultContainer,
 )
 
+scp_loop = asyncio.get_event_loop()
+
+def get_aio_client() -> ClientSession:
+    try:
+        return ClientSession(loop=scp_loop)
+    except Exception as ex:
+        logging.error(f"Failed to get aio-client: {ex}")
+        return None
 
 class WotoClientBase(Client):
     HTTP_URL_MATCHING = r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*"
@@ -62,7 +70,7 @@ class WotoClientBase(Client):
 
     filters = pyroFilters
     __my_all_dialogs__: typing.List[types.Dialog] = None
-    aioclient: ClientSession = ClientSession()
+    aioclient: ClientSession = get_aio_client()
 
     def is_real_media(self, message: types.Message) -> bool:
         return (message is not None and

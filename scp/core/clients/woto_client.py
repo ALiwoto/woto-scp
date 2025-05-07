@@ -7,8 +7,6 @@ from pyrogram.file_id import FileId
 from .woto_base import (
     WotoClientBase,
 )
-import yt_dlp
-
 
 class WotoPyroClient(WotoClientBase):
     ffmpeg_path: str = 'ffmpeg'

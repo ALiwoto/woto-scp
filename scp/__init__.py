@@ -8,7 +8,10 @@ import time
 from scp.utils.git_tools import getVersion
 from pyromod import listen
 from rich.logging import RichHandler
-from .core.clients import ScpClient
+from .core.clients import (
+    ScpClient,
+    scp_loop,
+)
 
 if not type(listen):
     logging.error('Pyromod is invalid.')
@@ -40,7 +43,7 @@ console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 
 log = logging.getLogger()
-loop = asyncio.get_event_loop()
+loop = scp_loop or asyncio.get_event_loop()
 
 bot = ScpClient('woto-scp-bot', True)
 user = ScpClient('woto-scp-user', False, bot)

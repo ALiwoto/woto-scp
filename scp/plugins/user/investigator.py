@@ -173,7 +173,7 @@ async def pirate_handler(_, message: Message):
             )
             done += 1
             await asyncio.sleep(0.5)
-        except:
+        except Exception:
             failed += 1
             continue
 
@@ -218,8 +218,8 @@ async def addPBots_handler(_, message: Message):
             failed += 1
             continue
     
-    text = user.html_bold(f'Added: ') + user.html_mono(added, '\n')
-    text += user.html_bold(f'Failed: ') + user.html_mono(failed, '\n')
+    text = user.html_bold('Added: ') + user.html_mono(added, '\n')
+    text += user.html_bold('Failed: ') + user.html_mono(failed, '\n')
     await message.reply_text(text, disable_web_page_preview=True, parse_mode=ParseMode.HTML)
 
 @user.on_message(
