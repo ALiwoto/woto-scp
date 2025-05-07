@@ -319,7 +319,8 @@ class ScpClient(WotoPyroClient):
         hide_captions: bool = None,
         protect_content: bool = None,
         allow_paid_broadcast: bool = None,
-        chunk_amount: int = 20
+        chunk_amount: int = 20,
+        continue_on_error: bool = True
     ) -> bool:
         if len(message_ids) < chunk_amount:
             return await self.forward_messages(
@@ -347,8 +348,10 @@ class ScpClient(WotoPyroClient):
                     allow_paid_broadcast=allow_paid_broadcast,
                 )
                 await asyncio.sleep(3)
-            except Exception:
-                pass
+            except Exception as ex:
+                print(f"forward_all_messages: failed to forward: {ex}")
+                if not continue_on_error:
+                    raise ex
     
 
     async def eval_base(self, client, message, code: str, silent: bool = False):
