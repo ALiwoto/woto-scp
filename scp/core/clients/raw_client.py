@@ -289,15 +289,16 @@ class ScpClient(WotoPyroClient):
         chat_id: Union[int, str],
         message_ids: Union[int, typing.Iterable[int]],
         revoke: bool = True,
+        chunk_amount: int = 100
     ) -> bool:
-        if len(message_ids) < 100:
+        if len(message_ids) < chunk_amount:
             return await self.delete_messages(
                 chat_id=chat_id,
                 message_ids=message_ids,
                 revoke=revoke
             )
-        all_messages = [message_ids[i:i + 100]
-                        for i in range(0, len(message_ids), 100)]
+        all_messages = [message_ids[i:i + chunk_amount]
+                        for i in range(0, len(message_ids), chunk_amount)]
         for current in all_messages:
             try:
                 await self.delete_messages(
@@ -307,6 +308,48 @@ class ScpClient(WotoPyroClient):
                 await asyncio.sleep(3)
             except Exception:
                 pass
+    
+    async def forward_all_messages(
+        self,
+        chat_id: Union[int, str],
+        from_chat_id: Union[int, str],
+        message_ids: Union[int, typing.Iterable[int]],
+        schedule_date: datetime = None,
+        hide_sender_name: bool = None,
+        hide_captions: bool = None,
+        protect_content: bool = None,
+        allow_paid_broadcast: bool = None,
+        chunk_amount: int = 20
+    ) -> bool:
+        if len(message_ids) < chunk_amount:
+            return await self.forward_messages(
+                chat_id=chat_id,
+                from_chat_id=from_chat_id,
+                message_ids=message_ids,
+                schedule_date=schedule_date,
+                hide_sender_name=hide_sender_name,
+                hide_captions=hide_captions,
+                protect_content=protect_content,
+                allow_paid_broadcast=allow_paid_broadcast,
+            )
+        all_messages = [message_ids[i:i + chunk_amount]
+                        for i in range(0, len(message_ids), chunk_amount)]
+        for current in all_messages:
+            try:
+                await self.forward_messages(
+                    chat_id=chat_id,
+                    from_chat_id=from_chat_id,
+                    message_ids=current,
+                    schedule_date=schedule_date,
+                    hide_sender_name=hide_sender_name,
+                    hide_captions=hide_captions,
+                    protect_content=protect_content,
+                    allow_paid_broadcast=allow_paid_broadcast,
+                )
+                await asyncio.sleep(3)
+            except Exception:
+                pass
+    
 
     async def eval_base(self, client, message, code: str, silent: bool = False):
         """

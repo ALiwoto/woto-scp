@@ -474,4 +474,58 @@ async def investigate_user_handler(_, message: Message):
     except Exception as e:
         return await user.reply_exception(message, e)
     
+
+@user.on_message(~user.filters.scheduled & 
+	~user.filters.forwarded & 
+	~user.filters.sticker & 
+	~user.filters.via_bot &
+	user.owner & 
+	user.command(
+        ['archiveByUser'],
+        prefixes=user.cmd_prefixes,
+    ),
+)
+async def archive_by_user_handler(_, message: Message):
+    args = user.split_some(message.text, 3, ' ', '\n')
+    if not args or len(args) < 4:
+        await message.reply_text(
+            user.html_bold('usage:', '\n') +
+            user.html_mono('.iUser from-chat target-user to-chat')
+        )
+        return
+
+    from_chat = args[1]
+    target_user = args[2]
+    to_chat = args[3]
+    all_messages = []
+
+    async for current_message in user.search_messages(
+        chat_id=from_chat,
+        from_user=target_user
+    ):
+        all_messages.append(current_message.id)
+        if len(all_messages) % 15 == 0:
+            await asyncio.sleep(2)
+        elif len(all_messages) % 300 == 0:
+            await asyncio.sleep(20)
+        elif len(all_messages) % 200 == 0:
+            await asyncio.sleep(10)
+        elif len(all_messages) % 50 == 0:
+            await asyncio.sleep(5)
     
+    all_messages.reverse()
+    for current_message in all_messages:
+        if not isinstance(current_message, int):
+            continue
+        
+        try:
+            await user.forward_all_messages(
+                chat_id=to_chat,
+                from_chat_id=from_chat,
+                message_ids=all_messages,
+            )
+        except Exception as ex:
+            await user.reply_exception(
+                message=message,
+                e=ex,
+            )
