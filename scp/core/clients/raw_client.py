@@ -350,8 +350,10 @@ class ScpClient(WotoPyroClient):
                     protect_content=protect_content,
                     allow_paid_broadcast=allow_paid_broadcast,
                 )
-                if current_chunk % 5 == 0:
-                    await asyncio.sleep(sleep_amount * 2)
+                if current_chunk % 10 == 0:
+                    await asyncio.sleep(sleep_amount * 4)
+                elif current_chunk % 5 == 0:
+                     await asyncio.sleep(sleep_amount * 3)
                 else:
                     await asyncio.sleep(sleep_amount)
             except Exception as ex:
