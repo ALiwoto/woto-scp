@@ -500,7 +500,6 @@ class WotoClientBase(Client):
             return await self.send_video_note(
                 chat_id=chat_id,
                 video_note=media,
-                caption=caption,
                 disable_notification=disable_notification,
                 schedule_date=schedule_date,
                 duration=duration,

@@ -316,7 +316,7 @@ async def html_normal_chat_link(value, chat: Chat, *argv) -> str:
 
 async def html_mention(value: Union[User, Union[Chat, int]], name: str = None, client: Client = None, *argv):
     if isinstance(value, str):
-        value: Chat = await client.get_chat(user_ids=value)
+        value: Chat = await client.get_chat(chat_id=value)
     
     if isinstance(value, Chat):
         if value.type != ChatType.PRIVATE and value.type != ChatType.BOT:

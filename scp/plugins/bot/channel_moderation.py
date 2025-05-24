@@ -78,7 +78,7 @@ async def validate_member(_, update: ChatMemberUpdated):
                 if update.new_chat_member.user.username \
                 else update.new_chat_member.user.id
             the_target = await user.get_users(user_ids=target_id)
-        except: 
+        except Exception: 
             the_target = update.new_chat_member.user
     
     # 2. name validation
