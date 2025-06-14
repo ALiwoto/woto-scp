@@ -1,6 +1,6 @@
 from scp import user
 from pyrogram.types import Message
-from trd_utils.bx_ultra.common_utils import dec_to_str
+from trd_utils.common_utils.float_utils import dec_to_str
 import asyncio
 
 

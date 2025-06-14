@@ -24,7 +24,7 @@ from wotoplatform import WotoClient
 from wotoplatform.types.errors import (
     ClientAlreadyInitializedException,
 )
-from trd_utils.bx_ultra import BXUltraClient
+from trd_utils.exchanges import BXUltraClient
 from scp.core.filters.command import command
 from scp.utils import wfilters
 from scp.utils.auto_inline import (
